@@ -4,9 +4,21 @@
     <Filter Include="collab">
       <UniqueIdentifier>{75d95b20-d35a-49be-a24c-ca7c90959894}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\resources">
+      <UniqueIdentifier>{a5e92d0d-e5d8-4dcc-9ed6-82d29f5a49c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\resources\ico">
+      <UniqueIdentifier>{03de9fe6-8147-4caa-89bb-05267c9fa6a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\resources\png">
+      <UniqueIdentifier>{c77601bc-f1ea-4f6e-af22-e640c4457cc1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
+      <Filter>collab</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
       <Filter>collab</Filter>
     </ClInclude>
   </ItemGroup>
@@ -14,10 +26,39 @@
     <ResourceCompile Include="version_info.rc">
       <Filter>collab</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="resource.rc">
+      <Filter>collab</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>collab</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\ico\icon.ico">
+      <Filter>collab\resources\ico</Filter>
+    </Image>
+    <Image Include="resources\png\icon_32.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\icon_64.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\icon_128.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\icon_256.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\icon_512.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\splash_128.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\splash_256.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
   </ItemGroup>
 </Project>
