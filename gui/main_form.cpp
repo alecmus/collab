@@ -388,6 +388,8 @@ void main_form::create_update_status() {
 			.text("Checking for updates")
 			.color_text(lecui::color().red(100).green(100).blue(100))
 			.font_size(8.f)
+			.on_resize(lecui::resize_params()
+				.y_rate(100.f))
 			.rect().height(15.f).width(ref.width())
 			.place(ref, 0.f, 100.f);
 

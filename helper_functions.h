@@ -73,12 +73,3 @@ bool get_directory_from_full_path(
 /// The full path to the current folder.
 /// </returns>
 std::string get_current_folder();
-
-/// <summary>
-/// Format data size in B, KB, MB, GB or TB.
-/// </summary>
-///
-/// <returns>
-/// Returns a formatted string in the form 5B, 45KB, 146MB, 52GB, 9TB etc.
-/// </returns>
-std::string format_size(unsigned long long size);

@@ -26,6 +26,7 @@
 #include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/widgets/toggle.h>
 #include <liblec/lecui/widgets/line.h>
+#include <liblec/lecui/widgets/rectangle.h>
 #include <liblec/lecui/utilities/filesystem.h>
 
 void main_form::add_settings_page() {
@@ -42,7 +43,8 @@ void main_form::add_settings_page() {
 			.left(_margin)
 			.right(right - _margin)
 			.top(_margin)
-			.height(25.f));
+			.height(25.f))
+		.on_resize(lecui::resize_params().width_rate(100.f));
 
 	const auto width = title.rect().width();
 
@@ -50,22 +52,27 @@ void main_form::add_settings_page() {
 	auto& general_caption = lecui::widgets::label::add(settings);
 	general_caption
 		.text("<strong>General</strong>")
+		.on_resize(lecui::resize_params().width_rate(100.f))
 		.rect().width(width).snap_to(title.rect(), snap_type::bottom, _margin);
 
-	auto& general_line = lecui::widgets::line::add(settings);
+	auto& general_line = lecui::widgets::rectangle::add(settings);
 	general_line
-		.thickness(0.25f)
-		.rect(general_caption.rect())
-		.points(
-			{
-				lecui::point().x(0.f).y(general_line.rect().height()),
-				lecui::point().x(general_line.rect().width()).y(general_line.rect().height())
-			});
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect(general_caption.rect());
+
+	general_line.rect().top(general_line.rect().bottom());
+	general_line.rect().height(.25f);
+	general_line
+		.border(.25f)
+		.color_fill().alpha(0);
 
 	// add dark theme toggle button
 	auto& darktheme_caption = lecui::widgets::label::add(settings);
 	darktheme_caption
 		.text("Dark theme")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect()
 		.width(width)
 		.height(20.f)
@@ -74,6 +81,8 @@ void main_form::add_settings_page() {
 	auto& darktheme = lecui::widgets::toggle::add(settings);
 	darktheme
 		.text("On").text_off("Off").tooltip("Change the UI theme").on(_setting_darktheme)
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(darktheme_caption.rect().width()).snap_to(darktheme_caption.rect(), snap_type::bottom, 0.f);
 	darktheme.events().toggle = [&](bool on) { on_darktheme(on); };
 
@@ -81,12 +90,16 @@ void main_form::add_settings_page() {
 	auto& autostart_label = lecui::widgets::label::add(settings);
 	autostart_label
 		.text("Start automatically with Windows")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect(darktheme.rect())
 		.rect().snap_to(darktheme.rect(), snap_type::bottom, 2.f * _margin);
 
 	auto& autostart = lecui::widgets::toggle::add(settings, "autostart");
 	autostart.text("Yes").text_off("No")
 		.tooltip("Select whether to automatically start the app when the user signs into Windows").on(_setting_autostart)
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect(darktheme.rect())
 		.rect().snap_to(autostart_label.rect(), snap_type::bottom, 0.f);
 	autostart.events().toggle = [&](bool on) { on_autostart(on); };
@@ -95,6 +108,7 @@ void main_form::add_settings_page() {
 	auto& location_caption = lecui::widgets::label::add(settings);
 	location_caption
 		.text("Location of files")
+		.on_resize(lecui::resize_params().width_rate(100.f))
 		.rect(autostart.rect())
 		.rect().snap_to(autostart.rect(), snap_type::bottom, 2.f * _margin);
 
@@ -102,6 +116,8 @@ void main_form::add_settings_page() {
 	location
 		.text(_folder)
 		.tooltip("Click to change location")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(location_caption.rect(), snap_type::bottom, 0.f);
 
 	if (_installed)
@@ -112,22 +128,28 @@ void main_form::add_settings_page() {
 	auto& updates_caption = lecui::widgets::label::add(settings);
 	updates_caption
 		.text("<strong>Updates</strong>")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(location.rect(), snap_type::bottom, 3.f * _margin);
 
-	auto& updates_line = lecui::widgets::line::add(settings);
+	auto& updates_line = lecui::widgets::rectangle::add(settings);
 	updates_line
-		.thickness(0.25f)
-		.rect(updates_caption.rect())
-		.points(
-			{
-				lecui::point().x(0.f).y(updates_line.rect().height()),
-				lecui::point().x(updates_line.rect().width()).y(updates_line.rect().height())
-			});
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect(updates_caption.rect());
+
+	updates_line.rect().top(updates_line.rect().bottom());
+	updates_line.rect().height(.25f);
+	updates_line
+		.border(.25f)
+		.color_fill().alpha(0);
 
 	// add auto check updates toggle button
 	auto& autocheck_updates_caption = lecui::widgets::label::add(settings);
 	autocheck_updates_caption
 		.text("Auto-check")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect()
 		.width(width)
 		.height(20.f)
@@ -136,6 +158,8 @@ void main_form::add_settings_page() {
 	auto& autocheck_updates = lecui::widgets::toggle::add(settings);
 	autocheck_updates
 		.text("Yes").text_off("No").tooltip("Select whether to automatically check for updates").on(_setting_autocheck_updates)
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect(darktheme.rect())
 		.rect().snap_to(autocheck_updates_caption.rect(), snap_type::bottom, 0.f);
 	autocheck_updates.events().toggle = [&](bool on) { on_autocheck_updates(on); };
@@ -144,12 +168,16 @@ void main_form::add_settings_page() {
 	auto& autodownload_updates_caption = lecui::widgets::label::add(settings);
 	autodownload_updates_caption
 		.text("Auto-download")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect(autocheck_updates_caption.rect())
 		.rect().snap_to(autocheck_updates.rect(), snap_type::bottom, 2.f * _margin);
 
 	auto& autodownload_updates = lecui::widgets::toggle::add(settings, "autodownload_updates");
 	autodownload_updates
 		.text("Yes").text_off("No").tooltip("Select whether to automatically download updates").on(_setting_autodownload_updates)
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect(autocheck_updates.rect())
 		.rect().snap_to(autodownload_updates_caption.rect(), snap_type::bottom, 0.f);
 

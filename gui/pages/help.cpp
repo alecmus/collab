@@ -26,6 +26,7 @@
 #include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/widgets/line.h>
 #include <liblec/lecui/widgets/image_view.h>
+#include <liblec/lecui/widgets/rectangle.h>
 
 #include <liblec/leccore/system.h>
 
@@ -43,7 +44,9 @@ void main_form::add_help_page() {
 			.left(_margin)
 			.right(right - _margin)
 			.top(_margin)
-			.height(25.f));
+			.height(25.f))
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f));
 
 	const auto width = title.rect().width();
 
@@ -62,23 +65,31 @@ void main_form::add_help_page() {
 		.text("<span style = 'font-size: 9.0pt;'>" +
 			std::string(appname) + " " + std::string(appversion) + " (" + std::string(architecture) + "), " + std::string(appdate) +
 			"</span>")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).height(20.f).snap_to(app_icon.rect(), snap_type::bottom_left, _margin);
 
 	// add copyright information
 	auto& copyright = lecui::widgets::label::add(help);
 	copyright
 		.text("<span style = 'font-size: 8.0pt;'>© 2021 Alec Musasa</span>")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(app_version.rect(), snap_type::bottom, 0.f);
 
 	// add more information
 	auto& more_info_caption = lecui::widgets::label::add(help);
 	more_info_caption
 		.text("<strong>For more info</strong>")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(copyright.rect(), snap_type::bottom, _margin);
 
 	auto& github_link = lecui::widgets::label::add(help);
 	github_link
 		.text("Visit https://github.com/alecmus/collab")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(more_info_caption.rect(), snap_type::bottom, 0.f);
 	github_link
 		.events().action = [this]() {
@@ -91,11 +102,15 @@ void main_form::add_help_page() {
 	auto& libraries_used_caption = lecui::widgets::label::add(help);
 	libraries_used_caption
 		.text("<strong>Libraries used</strong>")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(github_link.rect(), snap_type::bottom, _margin);
 
 	auto& leccore_version = lecui::widgets::label::add(help);
 	leccore_version
 		.text(leccore::version())
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(libraries_used_caption.rect(), snap_type::bottom, 0.f);
 	leccore_version
 		.events().action = [this]() {
@@ -107,6 +122,8 @@ void main_form::add_help_page() {
 	auto& lecui_version = lecui::widgets::label::add(help);
 	lecui_version
 		.text(lecui::version())
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(leccore_version.rect(), snap_type::bottom, 0.f);
 	lecui_version
 		.events().action = [this]() {
@@ -118,6 +135,8 @@ void main_form::add_help_page() {
 	auto& lecnet_version = lecui::widgets::label::add(help);
 	lecnet_version
 		.text(lecnet::version())
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(lecui_version.rect(), snap_type::bottom, 0.f);
 	lecnet_version
 		.events().action = [this]() {
@@ -130,11 +149,15 @@ void main_form::add_help_page() {
 	auto& addition_credits_caption = lecui::widgets::label::add(help);
 	addition_credits_caption
 		.text("<strong>Additional credits</strong>")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(lecnet_version.rect(), snap_type::bottom, _margin);
 
 	auto& freepik = lecui::widgets::label::add(help);
 	freepik
 		.text("Icons made by Freepik from https://www.flaticon.com")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(addition_credits_caption.rect(), snap_type::bottom, 0.f);
 	freepik
 		.events().action = [this]() {
@@ -146,6 +169,8 @@ void main_form::add_help_page() {
 	auto& dmitri13 = lecui::widgets::label::add(help);
 	dmitri13
 		.text("Icons made by dmitri13 from https://www.flaticon.com")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(freepik.rect(), snap_type::bottom, 0.f);
 	dmitri13
 		.events().action = [this]() {
@@ -155,24 +180,25 @@ void main_form::add_help_page() {
 	};
 
 	// add line
-	auto& license_line = lecui::widgets::line::add(help);
+	auto& license_line = lecui::widgets::rectangle::add(help);
 	license_line
-		.thickness(0.25f)
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect(lecui::rect(dmitri13.rect()));
 	license_line.rect().top(license_line.rect().bottom());
 	license_line.rect().top() += 5.f * _margin;
 	license_line.rect().bottom() += 5.f * _margin;
 
+	license_line.rect().height(.25f);
 	license_line
-		.points(
-			{
-				lecui::point().x(0.f).y(0.f),
-				lecui::point().x(license_line.rect().width()).y(0.f)
-			});
+		.border(.25f)
+		.color_fill().alpha(0);
 
 	// add license information
 	auto& license_notice = lecui::widgets::label::add(help);
 	license_notice
 		.text("This app is free software released under the MIT License.")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
 		.rect().width(width).snap_to(license_line.rect(), snap_type::bottom, _margin);
 }

@@ -43,7 +43,9 @@ void main_form::add_side_pane() {
 
 		// base the color of the side bar off the background color of the form
 		// slightly darker if in light them and slightly lighter if in dark theme
-		.color_fill(_setting_darktheme ? _apprnc.get_background().lighten(5.f) : _apprnc.get_background().darken(5.f));
+		.color_fill(_setting_darktheme ? _apprnc.get_background().lighten(5.f) : _apprnc.get_background().darken(5.f))
+		.on_resize(lecui::resize_params()
+			.height_rate(100.f));
 
 	// define size of side bar icons
 	const float icon_size = side_pane_rect.width();
@@ -59,6 +61,8 @@ void main_form::add_side_pane() {
 			.height(side_pane_rect.width())
 			.place(side_pane_rect, 50.f, 100.f)
 			.move(side_pane_rect.get_left(), side_pane_rect.get_bottom() - 3.f * (icon_size + _icon_gap) + _icon_gap))
+		.on_resize(lecui::resize_params()
+			.y_rate(100.f))
 		.png_resource(png_updates)
 		.events().action = [&]() {
 		if (_page_man.current() != "home") {
@@ -81,6 +85,8 @@ void main_form::add_side_pane() {
 			.height(side_pane_rect.width())
 			.place(side_pane_rect, 50.f, 100.f)
 			.move(side_pane_rect.get_left(), side_pane_rect.get_bottom() - 2.f * (icon_size + _icon_gap) + _icon_gap))
+		.on_resize(lecui::resize_params()
+			.y_rate(100.f))
 		.png_resource(png_settings)
 		.events().action = [&]() {
 		try {
@@ -99,6 +105,8 @@ void main_form::add_side_pane() {
 			.height(side_pane_rect.width())
 			.place(side_pane_rect, 50.f, 100.f)
 			.move(side_pane_rect.get_left(), side_pane_rect.get_bottom() - 1.f * (icon_size + _icon_gap) + _icon_gap))
+		.on_resize(lecui::resize_params()
+			.y_rate(100.f))
 		.png_resource(png_help)
 		.events().action = [this]() {
 		add_back_button();

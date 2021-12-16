@@ -329,14 +329,16 @@ bool main_form::on_initialize(std::string& error) {
 
 	// size and stuff
 	_ctrls
-		.allow_resize(false)
+		.allow_resize(true)
 		.start_hidden(_system_tray_mode);
 	_apprnc
 		.main_icon(ico_resource)
 		.mini_icon(ico_resource)
 		.theme(_setting_darktheme ? lecui::themes::dark : lecui::themes::light);
 
-	_dim.set_size(lecui::size().width(1000.f).height(600.f));
+	_dim
+		.set_size(lecui::size().width(1000.f).height(600.f))
+		.set_minimum(lecui::size().width(800.f).height(500.f));
 
 	// add form caption handler
 	form::on_caption([this]() {
