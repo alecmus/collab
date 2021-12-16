@@ -22,18 +22,16 @@
 ** SOFTWARE.
 */
 
-#pragma once
+#include "../../gui.h"
+#include "../../helper_functions.h"
 
-#include "resource.h"
+#include <liblec/lecui/widgets/label.h>
+#include <liblec/lecui/widgets/table_view.h>
+#include <liblec/lecui/widgets/image_view.h>
+#include <liblec/lecui/widgets/icon.h>
 
-ico_resource	ICON	"resources/ico/icon.ico"
-png_icon_256	PNG		"resources/png/icon_256.png"
+#include <liblec/leccore/system.h>
 
-png_error		PNG		"resources/png/error.png"
-png_settings	PNG		"resources/png/settings.png"
-png_back_light	PNG		"resources/png/back_light.png"
-png_back_dark	PNG		"resources/png/back_dark.png"
-png_help		PNG		"resources/png/info.png"
-png_updates		PNG		"resources/png/updates.png"
-splash_image_128	PNG	"resources/png/splash_128.png"
-splash_image_256	PNG	"resources/png/splash_256.png"
+void main_form::add_home_page() {
+	auto& home = _page_man.add("home");
+}

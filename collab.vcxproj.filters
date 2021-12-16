@@ -13,12 +13,27 @@
     <Filter Include="collab\resources\png">
       <UniqueIdentifier>{c77601bc-f1ea-4f6e-af22-e640c4457cc1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\gui">
+      <UniqueIdentifier>{cdc2d33b-eda8-403b-9b68-eb5abb5d2d2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form">
+      <UniqueIdentifier>{6c7774a4-22a1-43af-8cfa-c6ac893a676a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages">
+      <UniqueIdentifier>{93704f91-1b15-425d-9cc2-587b9d9fa46f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
       <Filter>collab</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>collab</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.h">
+      <Filter>collab</Filter>
+    </ClInclude>
+    <ClInclude Include="helper_functions.h">
       <Filter>collab</Filter>
     </ClInclude>
   </ItemGroup>
@@ -33,6 +48,33 @@
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>collab</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\main_form.cpp">
+      <Filter>collab\gui\main_form</Filter>
+    </ClCompile>
+    <ClCompile Include="helper_functions.cpp">
+      <Filter>collab</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\help.cpp">
+      <Filter>collab\gui\main_form\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home.cpp">
+      <Filter>collab\gui\main_form\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\settings.cpp">
+      <Filter>collab\gui\main_form\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\on_initialize.cpp">
+      <Filter>collab\gui\main_form</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\on_layout.cpp">
+      <Filter>collab\gui\main_form</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\on_start.cpp">
+      <Filter>collab\gui\main_form</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\side_pane.cpp">
+      <Filter>collab\gui\main_form</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
