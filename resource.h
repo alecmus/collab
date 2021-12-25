@@ -25,7 +25,9 @@
 #pragma once
 
 #define ico_resource	100
-#define png_icon_256	101
+#define icon_png_32		101
+#define icon_png_64		102
+#define icon_png_256	103
 
 #define png_error		110
 #define png_settings	111

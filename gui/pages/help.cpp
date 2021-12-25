@@ -53,7 +53,7 @@ void main_form::add_help_page() {
 	// add app icon
 	auto& app_icon = lecui::widgets::image_view::add(help);
 	app_icon
-		.png_resource(png_icon_256)
+		.png_resource(icon_png_256)
 		.rect()
 		.width(128.f)
 		.height(128.f)
