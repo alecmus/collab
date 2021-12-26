@@ -119,7 +119,7 @@ void main_form::add_home_page() {
 	auto& large_overlay = lecui::widgets::image_view::add(home, "large_overlay");
 	large_overlay
 		.png_resource(icon_png_512)
-		.opacity(5.f)
+		.opacity(3.f)
 		.rect(lecui::rect()
 			.width(256.f)
 			.height(256.f)
