@@ -179,12 +179,25 @@ void main_form::add_help_page() {
 			message(error);
 	};
 
+	auto& goodware = lecui::widgets::label::add(help);
+	goodware
+		.text("Icons made by Good Ware from https://www.flaticon.com")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect().width(width).snap_to(dmitri13.rect(), snap_type::bottom, 0.f);
+	goodware
+		.events().action = [this]() {
+		std::string error;
+		if (!leccore::shell::open("https://www.flaticon.com/authors/good-ware", error))
+			message(error);
+	};
+
 	// add line
 	auto& license_line = lecui::widgets::rectangle::add(help);
 	license_line
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect(lecui::rect(dmitri13.rect()));
+		.rect(lecui::rect(goodware.rect()));
 	license_line.rect().top(license_line.rect().bottom());
 	license_line.rect().top() += 5.f * _margin;
 	license_line.rect().bottom() += 5.f * _margin;

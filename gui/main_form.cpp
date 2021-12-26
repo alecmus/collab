@@ -42,6 +42,8 @@
 const float main_form::_margin = 10.f;
 const float main_form::_icon_size = 32.f;
 const float main_form::_info_size = 20.f;
+const lecui::color main_form::_online = lecui::color().red(0).green(150).blue(0).alpha(180);
+const lecui::color main_form::_busy = lecui::color().red(255).green(0).blue(0).alpha(180);
 
 void main_form::on_close() {
 	if (_installed)

@@ -193,6 +193,7 @@
     <ClCompile Include="gui\pages\home.cpp" />
     <ClCompile Include="gui\pages\settings.cpp" />
     <ClCompile Include="gui\side_pane.cpp" />
+    <ClCompile Include="gui\top_status_pane.cpp" />
     <ClCompile Include="helper_functions.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>

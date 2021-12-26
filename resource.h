@@ -28,6 +28,8 @@
 #define icon_png_32		101
 #define icon_png_64		102
 #define icon_png_256	103
+#define splash_image_128	104
+#define splash_image_256	105
 
 #define png_error		110
 #define png_settings	111
@@ -35,5 +37,6 @@
 #define png_back_dark	113
 #define png_help		114
 #define png_updates		115
-#define splash_image_128	116
-#define splash_image_256	117
+#define png_user		116
+#define png_new_session		117
+#define png_join_session	118

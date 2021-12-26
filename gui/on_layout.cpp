@@ -38,6 +38,9 @@ bool main_form::on_layout(std::string& error) {
 	// add side pane
 	add_side_pane();
 
+	// add status pane at the top
+	add_top_status_pane();
+
 	// add pages
 	add_home_page();
 	add_settings_page();

@@ -30,12 +30,15 @@ ico_resource	ICON	"resources/ico/icon.ico"
 icon_png_32		PNG		"resources/png/icon_32.png"
 icon_png_64		PNG		"resources/png/icon_64.png"
 icon_png_256	PNG		"resources/png/icon_256.png"
+splash_image_128	PNG	"resources/png/splash_128.png"
+splash_image_256	PNG	"resources/png/splash_256.png"
 
 png_error		PNG		"resources/png/error.png"
 png_settings	PNG		"resources/png/settings.png"
 png_back_light	PNG		"resources/png/back_light.png"
 png_back_dark	PNG		"resources/png/back_dark.png"
 png_help		PNG		"resources/png/info.png"
-png_updates		PNG		"resources/png/updates.png"
-splash_image_128	PNG	"resources/png/splash_128.png"
-splash_image_256	PNG	"resources/png/splash_256.png"
+png_updates		PNG		"resources/png/updates.png"		// dmitri13
+png_user		PNG		"resources/png/user.png"		// Freepik
+png_new_session		PNG	"resources/png/add.png"			// Good Ware
+png_join_session	PNG	"resources/png/team.png"		// Freepik

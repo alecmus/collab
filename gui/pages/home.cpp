@@ -25,13 +25,92 @@
 #include "../../gui.h"
 #include "../../helper_functions.h"
 
-#include <liblec/lecui/widgets/label.h>
-#include <liblec/lecui/widgets/table_view.h>
-#include <liblec/lecui/widgets/image_view.h>
+#include <liblec/lecui/containers/pane.h>
 #include <liblec/lecui/widgets/icon.h>
+#include <liblec/lecui/widgets/table_view.h>
 
 #include <liblec/leccore/system.h>
 
 void main_form::add_home_page() {
 	auto& home = _page_man.add("home");
+
+	auto& ref_rect = lecui::rect()
+		.left(_margin)
+		.top(_margin)
+		.width(home.size().get_width() - 2.f * _margin)
+		.height(home.size().get_height() - 2.f * _margin);
+
+	// add create new session pane
+	auto& new_session_pane = lecui::containers::pane::add(home, "new_session_pane");
+	new_session_pane
+		.rect(lecui::rect()
+			.width(500.f)
+			.height(80.f)
+			.place(ref_rect, 50.f, 0.f))
+		.on_resize(lecui::resize_params()
+			.x_rate(50.f)
+			.y_rate(0.f));
+
+	{
+		auto& ref_rect = lecui::rect()
+			.left(0.f)
+			.top(0.f)
+			.width(new_session_pane.size().get_width())
+			.height(new_session_pane.size().get_height());
+
+		// add create new session icon
+		auto& icon = lecui::widgets::icon::add(new_session_pane);
+		icon
+			.rect(icon.rect().width(ref_rect.width()).place(ref_rect, 0.f, 50.f))
+			.png_resource(png_new_session)
+			.text("Create New Session")
+			.description("Make a new session that other users on the local area network can join")
+			.events().action = []() {};
+	}
+
+	// add join session pane
+	auto& join_session_pane = lecui::containers::pane::add(home, "join_session_pane");
+	join_session_pane
+		.rect(lecui::rect()
+			.left(new_session_pane.rect().left())
+			.width(new_session_pane.rect().width())
+			.top(new_session_pane.rect().bottom() + _margin)
+			.bottom(ref_rect.bottom()))
+		.on_resize(lecui::resize_params()
+			.x_rate(50.f)
+			.y_rate(0.f)
+			.height_rate(100.f));
+
+	{
+		auto& ref_rect = lecui::rect()
+			.left(0.f)
+			.top(0.f)
+			.width(join_session_pane.size().get_width())
+			.height(join_session_pane.size().get_height());
+
+		// add join session icon
+		auto& icon = lecui::widgets::icon::add(join_session_pane);
+		icon
+			.rect(icon.rect().width(ref_rect.width()).place(ref_rect, 0.f, 0.f))
+			.png_resource(png_join_session)
+			.text("Join Existing Session")
+			.description("Join an existing session to collaborate with other users on the local area network");
+
+		// add session list
+		auto& session_list = lecui::widgets::table_view::add(join_session_pane, "session_list");
+		session_list
+			.rect(lecui::rect()
+				.left(icon.rect().left())
+				.width(icon.rect().width())
+				.top(icon.rect().bottom() + _margin)
+				.bottom(ref_rect.bottom()))
+			.on_resize(lecui::resize_params()
+				.x_rate(50.f)
+				.height_rate(100.f))
+			.fixed_number_column(true)
+			.columns({
+				{ "Name", 120 },
+				{ "Description", 300 }
+				});
+	}
 }

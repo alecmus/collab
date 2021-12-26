@@ -71,8 +71,8 @@ class main_form : public lecui::form {
 	static const std::string _sample_text;
 	static const std::string _font;
 	static const lecui::color _caption_color;
-	static const lecui::color _ok_color;
-	static const lecui::color _not_ok_color;
+	static const lecui::color _online;
+	static const lecui::color _busy;
 
 	lecui::controls _ctrls{ *this };
 	lecui::page_manager _page_man{ *this };
@@ -121,6 +121,7 @@ class main_form : public lecui::form {
 	void on_start() override;
 	void on_close() override;
 	void add_side_pane();
+	void add_top_status_pane();
 	void add_back_button();
 	void add_home_page();
 	void add_help_page();

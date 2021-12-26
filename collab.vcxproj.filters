@@ -76,6 +76,9 @@
     <ClCompile Include="gui\side_pane.cpp">
       <Filter>collab\gui\main_form</Filter>
     </ClCompile>
+    <ClCompile Include="gui\top_status_pane.cpp">
+      <Filter>collab\gui\main_form</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\ico\icon.ico">
