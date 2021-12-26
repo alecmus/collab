@@ -28,8 +28,9 @@
 #define icon_png_32		101
 #define icon_png_64		102
 #define icon_png_256	103
-#define splash_image_128	104
-#define splash_image_256	105
+#define icon_png_512	104
+#define splash_image_128	105
+#define splash_image_256	106
 
 #define png_error		110
 #define png_settings	111

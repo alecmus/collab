@@ -30,6 +30,7 @@ ico_resource	ICON	"resources/ico/icon.ico"
 icon_png_32		PNG		"resources/png/icon_32.png"
 icon_png_64		PNG		"resources/png/icon_64.png"
 icon_png_256	PNG		"resources/png/icon_256.png"
+icon_png_512	PNG		"resources/png/icon_512.png"
 splash_image_128	PNG	"resources/png/splash_128.png"
 splash_image_256	PNG	"resources/png/splash_256.png"
 

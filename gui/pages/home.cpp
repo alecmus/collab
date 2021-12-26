@@ -28,6 +28,7 @@
 #include <liblec/lecui/containers/pane.h>
 #include <liblec/lecui/widgets/icon.h>
 #include <liblec/lecui/widgets/table_view.h>
+#include <liblec/lecui/widgets/image_view.h>
 
 #include <liblec/leccore/system.h>
 
@@ -113,4 +114,41 @@ void main_form::add_home_page() {
 				{ "Description", 300 }
 				});
 	}
+
+	// add overlay images
+	auto& large_overlay = lecui::widgets::image_view::add(home, "large_overlay");
+	large_overlay
+		.png_resource(icon_png_512)
+		.opacity(5.f)
+		.rect(lecui::rect()
+			.width(256.f)
+			.height(256.f)
+			.place(ref_rect, 70.f, 0.f))
+		.on_resize(lecui::resize_params()
+			.x_rate(70.f)
+			.y_rate(40.f));
+
+	auto& medium_overlay = lecui::widgets::image_view::add(home, "medium_overlay");
+	medium_overlay
+		.png_resource(icon_png_512)
+		.opacity(5.f)
+		.rect(lecui::rect()
+			.width(192.f)
+			.height(192.f)
+			.place(ref_rect, 100.f, 100.f))
+		.on_resize(lecui::resize_params()
+			.x_rate(60.f)
+			.y_rate(10.f));
+
+	auto& small_overlay = lecui::widgets::image_view::add(home, "small_overlay");
+	small_overlay
+		.png_resource(icon_png_512)
+		.opacity(5.f)
+		.rect(lecui::rect()
+			.width(128.f)
+			.height(128.f)
+			.place(ref_rect, 20.f, 70.f))
+		.on_resize(lecui::resize_params()
+			.x_rate(-10.f)
+			.y_rate(-20.f));
 }
