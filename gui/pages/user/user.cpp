@@ -107,7 +107,7 @@ void main_form::user() {
 			};
 			user_image.events().right_click = [&]() {
 				lecui::context_menu::specs menu_specs;
-				menu_specs.items.push_back({ "Remove", "resources\\png\\delete.png" });
+				menu_specs.items.push_back({ "Remove", png_delete });
 
 				auto selected = lecui::context_menu::context_menu()(* this, menu_specs);
 
