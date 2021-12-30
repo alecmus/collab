@@ -41,3 +41,4 @@
 #define png_user		116
 #define png_new_session		117
 #define png_join_session	118
+#define png_delete			119

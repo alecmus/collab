@@ -150,6 +150,7 @@ class main_form : public lecui::form {
 	void on_select_location();
 
 	void new_session();
+	void user();
 
 public:
 	main_form(const std::string& caption, bool restarted);

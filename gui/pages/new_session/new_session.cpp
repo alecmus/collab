@@ -205,9 +205,7 @@ void main_form::new_session() {
 			auto& save_session = lecui::widgets::button::add(home, "save_session");
 			save_session
 				.text("Save")
-				.rect(lecui::rect(save_session.rect()).snap_to(session_password_pane.rect(), snap_type::bottom, _margin));
-
-			save_session
+				.rect(lecui::rect(save_session.rect()).snap_to(session_password_pane.rect(), snap_type::bottom, _margin))
 				.events().action = [&]() { on_save(); };
 
 			_page_man.show("home");
@@ -233,9 +231,7 @@ void main_form::new_session() {
 				else
 					message("Passwords do not match!");
 			}
-			catch (const std::exception&) {
-
-			}
+			catch (const std::exception&) {}
 		}
 
 	public:

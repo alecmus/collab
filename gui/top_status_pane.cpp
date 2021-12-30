@@ -56,9 +56,7 @@ void main_form::add_top_status_pane() {
 		.png_resource(png_user)
 		.tooltip("Click to view and edit user information, right click to change status");
 
-	user_icon.events().action = [&]() {
-		// to-do: add implementation
-	};
+	user_icon.events().action = [&]() { user(); };
 
 	user_icon.events().right_click = [&]() {
 		// to-do: add implementation

@@ -25,6 +25,9 @@
     <Filter Include="collab\gui\main_form\pages\new_session">
       <UniqueIdentifier>{9cb42a16-a2a0-49d9-a2be-a669dec1fb71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\gui\main_form\pages\user">
+      <UniqueIdentifier>{0ce4fb91-d4fa-4a06-b217-22fce4157a4a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
@@ -85,6 +88,9 @@
     <ClCompile Include="gui\pages\new_session\new_session.cpp">
       <Filter>collab\gui\main_form\pages\new_session</Filter>
     </ClCompile>
+    <ClCompile Include="gui\pages\user\user.cpp">
+      <Filter>collab\gui\main_form\pages\user</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\ico\icon.ico">
@@ -118,6 +124,27 @@
       <Filter>collab\resources\png</Filter>
     </Image>
     <Image Include="resources\png\user.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\back_dark.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\back_light.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\delete.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\error.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\info.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\settings.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\updates.png">
       <Filter>collab\resources\png</Filter>
     </Image>
   </ItemGroup>

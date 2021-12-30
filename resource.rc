@@ -43,3 +43,4 @@ png_updates		PNG		"resources/png/updates.png"		// dmitri13
 png_user		PNG		"resources/png/user.png"		// Freepik
 png_new_session		PNG	"resources/png/add.png"			// Good Ware
 png_join_session	PNG	"resources/png/team.png"		// Freepik
+png_delete			PNG	"resources/png/delete.png"		// GoodWare
