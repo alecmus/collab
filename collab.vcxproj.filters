@@ -22,6 +22,9 @@
     <Filter Include="collab\gui\main_form\pages">
       <UniqueIdentifier>{93704f91-1b15-425d-9cc2-587b9d9fa46f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\gui\main_form\pages\new_session">
+      <UniqueIdentifier>{9cb42a16-a2a0-49d9-a2be-a669dec1fb71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
@@ -79,6 +82,9 @@
     <ClCompile Include="gui\top_status_pane.cpp">
       <Filter>collab\gui\main_form</Filter>
     </ClCompile>
+    <ClCompile Include="gui\pages\new_session\new_session.cpp">
+      <Filter>collab\gui\main_form\pages\new_session</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\ico\icon.ico">
@@ -103,6 +109,15 @@
       <Filter>collab\resources\png</Filter>
     </Image>
     <Image Include="resources\png\splash_256.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\add.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\team.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\user.png">
       <Filter>collab\resources\png</Filter>
     </Image>
   </ItemGroup>

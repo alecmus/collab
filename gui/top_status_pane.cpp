@@ -54,8 +54,13 @@ void main_form::add_top_status_pane() {
 		.corner_radius_x(user_icon.rect().width() / 2.f)
 		.corner_radius_y(user_icon.rect().width() / 2.f)
 		.png_resource(png_user)
-		.tooltip("Click to view and edit user information, right click to change status")
-		.events().action = [&]() {
+		.tooltip("Click to view and edit user information, right click to change status");
+
+	user_icon.events().action = [&]() {
+		// to-do: add implementation
+	};
+
+	user_icon.events().right_click = [&]() {
 		// to-do: add implementation
 	};
 

@@ -35,6 +35,13 @@
 void main_form::add_home_page() {
 	auto& home = _page_man.add("home");
 
+	// compute label heights
+	const lecui::rect page_rect = { 0.f, home.size().get_width(), 0.f, home.size().get_height() };
+	_title_height = _dim.measure_label(_sample_text, _font, _title_font_size, true, false, page_rect).height();
+	_highlight_height = _dim.measure_label(_sample_text, _font, _highlight_font_size, true, false, page_rect).height();
+	_detail_height = _dim.measure_label(_sample_text, _font, _detail_font_size, true, false, page_rect).height();
+	_caption_height = _dim.measure_label(_sample_text, _font, _caption_font_size, true, false, page_rect).height();
+
 	auto& ref_rect = lecui::rect()
 		.left(_margin)
 		.top(_margin)
@@ -66,7 +73,9 @@ void main_form::add_home_page() {
 			.png_resource(png_new_session)
 			.text("Create New Session")
 			.description("Make a new session that other users on the local area network can join")
-			.events().action = []() {};
+			.events().action = [&]() {
+			new_session();
+		};
 	}
 
 	// add join session pane

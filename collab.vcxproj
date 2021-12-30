@@ -191,6 +191,7 @@
     <ClCompile Include="gui\on_start.cpp" />
     <ClCompile Include="gui\pages\help.cpp" />
     <ClCompile Include="gui\pages\home.cpp" />
+    <ClCompile Include="gui\pages\new_session\new_session.cpp" />
     <ClCompile Include="gui\pages\settings.cpp" />
     <ClCompile Include="gui\side_pane.cpp" />
     <ClCompile Include="gui\top_status_pane.cpp" />
@@ -199,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\ico\icon.ico" />
+    <Image Include="resources\png\add.png" />
     <Image Include="resources\png\icon_128.png" />
     <Image Include="resources\png\icon_256.png" />
     <Image Include="resources\png\icon_32.png" />
@@ -206,6 +208,8 @@
     <Image Include="resources\png\icon_64.png" />
     <Image Include="resources\png\splash_128.png" />
     <Image Include="resources\png\splash_256.png" />
+    <Image Include="resources\png\team.png" />
+    <Image Include="resources\png\user.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
