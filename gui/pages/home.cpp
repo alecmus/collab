@@ -37,10 +37,10 @@ void main_form::add_home_page() {
 
 	// compute label heights
 	const lecui::rect page_rect = { 0.f, home.size().get_width(), 0.f, home.size().get_height() };
-	_title_height = _dim.measure_label(_sample_text, _font, _title_font_size, true, false, page_rect).height();
-	_highlight_height = _dim.measure_label(_sample_text, _font, _highlight_font_size, true, false, page_rect).height();
-	_detail_height = _dim.measure_label(_sample_text, _font, _detail_font_size, true, false, page_rect).height();
-	_caption_height = _dim.measure_label(_sample_text, _font, _caption_font_size, true, false, page_rect).height();
+	_title_height = _dim.measure_label(_sample_text, _font, _title_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
+	_highlight_height = _dim.measure_label(_sample_text, _font, _highlight_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
+	_detail_height = _dim.measure_label(_sample_text, _font, _detail_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
+	_caption_height = _dim.measure_label(_sample_text, _font, _caption_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
 
 	auto& ref_rect = lecui::rect()
 		.left(_margin)

@@ -177,7 +177,7 @@ void main_form::new_session() {
 				auto& session_password_strength_caption = lecui::widgets::label::add(session_password_pane, "session_password_strength_caption");
 				session_password_strength_caption
 					.text("Password quality")
-					.center_h(true)
+					.alignment(lecui::text_alignment::center)
 					.font_size(_caption_font_size)
 					.color_text(_caption_color)
 					.rect(lecui::rect(confirm_session_password_caption.rect()).snap_to(confirm_session_password.rect(), snap_type::bottom, _margin));

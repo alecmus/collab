@@ -81,24 +81,26 @@ void main_form::user() {
 
 			user_image.events().action = [&]() {
 				lecui::open_file_params params;
-				params.title = "Select Image";
-				params.include_all_supported_types = true;
-				params.file_types = {
+				params
+					.title("Select Image")
+					.include_all_supported_types(true)
+					.allow_multi_select(false)
+					.file_types({
 					{ "jpg", "JPG Image" },
 					{ "jpeg", "JPEG Image" },
 					{ "png", "PNG Image" },
 					{ "bmp", "Bitmap Image" },
-				};
+					});
 
 				lecui::filesystem _file_system{ *this };
-				std::string file = _file_system.open_file(params);
+				std::vector<std::string> file = _file_system.open_file(params);
 
 				if (!file.empty()) {
 					try {
 						auto& user_image = get_image_view("home/user_image");
 						user_image
 							.png_resource(0)
-							.file(file);
+							.file(file[0]);
 
 						update();
 					}
