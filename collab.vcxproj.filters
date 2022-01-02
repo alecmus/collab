@@ -42,6 +42,9 @@
     <ClInclude Include="helper_functions.h">
       <Filter>collab</Filter>
     </ClInclude>
+    <ClInclude Include="collab.h">
+      <Filter>collab</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="version_info.rc">
@@ -81,6 +84,9 @@
     </ClCompile>
     <ClCompile Include="gui\side_pane.cpp">
       <Filter>collab\gui\main_form</Filter>
+    </ClCompile>
+    <ClCompile Include="collab.cpp">
+      <Filter>collab</Filter>
     </ClCompile>
     <ClCompile Include="gui\top_status_pane.cpp">
       <Filter>collab\gui\main_form</Filter>
