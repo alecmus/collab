@@ -325,6 +325,47 @@ bool main_form::on_initialize(std::string& error) {
 		else
 			// default to the current directory in portable mode
 			_folder = get_current_folder() + "\\Collab";
+
+		// create the folder
+		if (!leccore::file::create_directory(_folder, error)) {
+			message("Error creating Collab directory: " + error);
+			return false;
+		}
+
+		// lock the folder to prevent its deletion as long as the app is running by
+		// making a .lock file in it
+		const std::string lock_file_full_path = _folder + "\\.lock";
+
+		_lock_file = new leccore::file::exclusive_lock(lock_file_full_path);
+
+		if (!_lock_file->lock(error)) {
+			message(error);
+			return false;
+		}
+
+		// set the database file path
+		_database_file = _folder + "\\collab.db";
+
+		// set the avatar file path
+		_avatar_file = _folder + "\\avatar.jpg";
+	}
+
+	if (_collab.user_exists(_database_file, _collab.unique_id())) {
+		// schedule timer for setting avatar
+		_timer_man.add("avatar_set", 1000, [&]() {
+			// stop the timer
+			_timer_man.stop("avatar_set");
+
+			std::string _existing_username;
+			std::string _existing_display_name;
+			std::string _existing_user_image;
+
+			if (!_collab.get_user(_database_file, _collab.unique_id(),
+				_existing_username, _existing_display_name, _existing_user_image, error))
+				return;
+
+			set_user_image_icon(_existing_user_image);
+			});
 	}
 
 	// size and stuff

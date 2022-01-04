@@ -59,6 +59,11 @@ void main_form::on_close() {
 		close();
 }
 
+void main_form::on_shutdown() {
+	// remove the avatar so we can be able to delete the avatar file in the destructor
+	set_user_image_icon("");
+}
+
 void main_form::updates() {
 	if (_check_update.checking() || _timer_man.running("update_check"))
 		return;
@@ -453,4 +458,12 @@ main_form::main_form(const std::string& caption, bool restarted) :
 }
 
 main_form::~main_form() {
+	// delete avatar file
+	std::string error;
+	if (!leccore::file::remove(_avatar_file, error)) {}
+
+	if (_lock_file) {
+		delete _lock_file;
+		_lock_file = nullptr;
+	}
 }

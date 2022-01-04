@@ -29,6 +29,8 @@
 
 /// <summary>Collaboration class.</summary>
 class collab {
+	std::string _unique_id;
+
 	enum class node_status {
 		unknown,
 		available,
@@ -59,4 +61,30 @@ class collab {
 public:
 	collab ();
 	~collab ();
+
+	const std::string& unique_id();
+	
+	bool save_user(const std::string& database_file,
+		const std::string& unique_id,
+		const std::string& username,
+		const std::string& display_name,
+		const std::string& user_image,
+		std::string& error);
+
+	bool user_exists(const std::string& database_file,
+		const std::string& unique_id);
+
+	bool get_user(const std::string& database_file,
+		const std::string& unique_id,
+		std::string& username,
+		std::string& display_name,
+		std::string& user_image,
+		std::string& error);
+
+	bool edit_user(const std::string& database_file,
+		const std::string& unique_id,
+		const std::string& username,
+		const std::string& display_name,
+		const std::string& user_image,
+		std::string& error);
 };

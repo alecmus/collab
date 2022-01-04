@@ -24,8 +24,132 @@
 
 #include "collab.h"
 
+// leccore
+#include <liblec/leccore/pc_info.h>
+#include <liblec/leccore/hash.h>
+#include <liblec/leccore/database.h>
+
 collab::collab() {
+	// make unique id from computer bios serial number
+	std::string error;
+	liblec::leccore::pc_info _pc_info;
+	liblec::leccore::pc_info::pc_details _pc_details;
+	if (_pc_info.pc(_pc_details, error)) {
+		if (!_pc_details.bios_serial_number.empty())
+			_unique_id = _pc_details.bios_serial_number;
+	}
+
+	// mask with a hash
+	_unique_id = liblec::leccore::hash_string::sha256(_unique_id);
 }
 
 collab::~collab() {
+}
+
+const std::string& collab::unique_id() { return _unique_id; }
+
+bool collab::save_user(const std::string& database_file,
+	const std::string& unique_id,
+	const std::string& username,
+	const std::string& display_name,
+	const std::string& user_image,
+	std::string& error) {
+	// make database connection object
+	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+
+	// connect to the database
+	if (!con.connect(error))
+		return false;
+
+	// create table if it doesn't exist
+	if (!con.execute("CREATE TABLE IF NOT EXISTS Users "
+		"(UniqueID TEXT, Username TEXT, DisplayName TEXT, UserImage BLOB, PRIMARY KEY(UniqueID));",
+		{}, error))
+		return false;
+
+	// insert data into table
+	if (!con.execute("INSERT INTO Users VALUES(?, ?, ?, ?);",
+		{ unique_id, username, display_name, liblec::leccore::database::blob{ user_image } },
+		error))
+		return false;
+
+	return true;
+}
+
+bool collab::user_exists(const std::string& database_file, const std::string& unique_id) {
+	if (unique_id.empty())
+		return false;
+
+	std::string error;
+
+	// make database connection object
+	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+
+	// connect to the database
+	if (!con.connect(error))
+		return false;
+
+	liblec::leccore::database::table results;
+	if (!con.execute_query("SELECT * FROM Users WHERE UniqueID = ?;", { unique_id }, results, error))
+		return false;
+
+	return !results.data.empty();
+}
+
+bool collab::get_user(const std::string& database_file,
+	const std::string& unique_id, std::string& username, std::string& display_name,
+	std::string& user_image, std::string& error) {
+	username.clear();
+	display_name.clear();
+	user_image.clear();
+
+	if (unique_id.empty())
+		return false;
+
+	// make database connection object
+	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+
+	// connect to the database
+	if (!con.connect(error))
+		return false;
+
+	liblec::leccore::database::table results;
+	if (!con.execute_query("SELECT * FROM Users WHERE UniqueID = ?;", { unique_id }, results, error))
+		return false;
+
+	try {
+		if (results.data[0].at("Username").has_value())
+			username = liblec::leccore::database::get::text(results.data[0].at("Username"));
+
+		if (results.data[0].at("DisplayName").has_value())
+			display_name = liblec::leccore::database::get::text(results.data[0].at("DisplayName"));
+
+		if (results.data[0].at("UserImage").has_value())
+			user_image = liblec::leccore::database::get::blob(results.data[0].at("UserImage")).data;
+
+		return true;
+	}
+	catch (const std::exception& e) {
+		error = e.what();
+		return false;
+	}
+}
+
+bool collab::edit_user(const std::string& database_file,
+	const std::string& unique_id, const std::string& username,
+	const std::string& display_name, const std::string& user_image, std::string& error) {
+	// make database connection object
+	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+
+	// connect to the database
+	if (!con.connect(error))
+		return false;
+
+	// insert data into table
+	if (!con.execute("UPDATE Users SET Username = ?, DisplayName = ?, UserImage = ? WHERE UniqueID = ?",
+		{ username, display_name, liblec::leccore::database::blob{ user_image }, unique_id },
+		error))
+		return false;
+
+	return true;
 }

@@ -26,6 +26,7 @@
 
 #include "version_info.h"
 #include "resource.h"
+#include "collab.h"
 
 // lecui
 #include <liblec/lecui/instance.h>
@@ -40,6 +41,7 @@
 // leccore
 #include <liblec/leccore/settings.h>
 #include <liblec/leccore/web_update.h>
+#include <liblec/leccore/file.h>
 
 // lecnet
 #include <liblec/lecnet.h>
@@ -124,10 +126,17 @@ class main_form : public lecui::form {
 
 	bool _update_details_displayed = false;
 
+	leccore::file::exclusive_lock* _lock_file = nullptr;
+
+	std::string _database_file;
+	std::string _avatar_file;
+	collab _collab;	// collaboration object
+
 	bool on_initialize(std::string& error) override;
 	bool on_layout(std::string& error) override;
 	void on_start() override;
 	void on_close() override;
+	void on_shutdown() override;
 	void add_side_pane();
 	void add_top_status_pane();
 	void add_back_button();
@@ -151,6 +160,8 @@ class main_form : public lecui::form {
 
 	void new_session();
 	void user();
+
+	void set_user_image_icon(const std::string& image_data);
 
 public:
 	main_form(const std::string& caption, bool restarted);

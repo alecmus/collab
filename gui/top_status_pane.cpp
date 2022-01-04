@@ -64,3 +64,29 @@ void main_form::add_top_status_pane() {
 
 	user_icon.badge().font_size(6.f).text(" ").color(_online);
 }
+
+void main_form::set_user_image_icon(const std::string& image_data) {
+	try {
+		std::string error;
+
+		auto& user_icon = get_image_view("status::top/user_icon");
+		user_icon
+			.png_resource(png_user)
+			.file("");
+
+		// refresh so image is released if it exists
+		if (!_widget_man.refresh("status::top/user_icon", error)) {}
+
+		if (!image_data.empty()) {
+			// save to file
+			if (leccore::file::write(_avatar_file, image_data, error)) {
+				user_icon
+					.png_resource(0)
+					.file(_avatar_file);
+
+				if (!_widget_man.refresh("status::top/user_icon", error)) {}
+			}
+		}
+	}
+	catch (const std::exception&) {}
+}
