@@ -46,24 +46,26 @@ class collab {
 		std::string signed_in_session_id;
 		node_status status;
 	};
-
-	struct session {
-		std::string id;
-		std::string name;
-		std::string description;
-		std::string passphrase_hash;
-	};
 	
 	struct token {
 
 	};
 
 public:
+	struct session {
+		std::string id;
+		std::string name;
+		std::string description;
+		std::string passphrase_hash;
+	};
+
 	collab ();
 	~collab ();
 
 	const std::string& unique_id();
 	
+	// users
+
 	bool save_user(const std::string& database_file,
 		const std::string& unique_id,
 		const std::string& username,
@@ -86,5 +88,15 @@ public:
 		const std::string& username,
 		const std::string& display_name,
 		const std::string& user_image,
+		std::string& error);
+
+	// sessions
+
+	bool create_session(const std::string& database_file,
+		session& session,
+		std::string& error);
+
+	bool get_sessions(const std::string& database_file,
+		std::vector<session>& sessions,
 		std::string& error);
 };

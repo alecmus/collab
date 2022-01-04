@@ -153,3 +153,62 @@ bool collab::edit_user(const std::string& database_file,
 
 	return true;
 }
+
+bool collab::create_session(const std::string& database_file, session& session, std::string& error) {
+	// make database connection object
+	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+
+	// connect to the database
+	if (!con.connect(error))
+		return false;
+
+	// create table if it doesn't exist
+	if (!con.execute("CREATE TABLE IF NOT EXISTS Sessions "
+		"(UniqueID TEXT, Name TEXT, Description TEXT, PassphraseHash TEXT, PRIMARY KEY(UniqueID));",
+		{}, error))
+		return false;
+
+	// insert data into table
+	if (!con.execute("INSERT INTO Sessions VALUES(?, ?, ?, ?);",
+		{ session.id, session.name, session.description, session.passphrase_hash },
+		error))
+		return false;
+
+	return true;
+}
+
+bool collab::get_sessions(const std::string& database_file,
+	std::vector<session>& sessions, std::string& error) {
+	sessions.clear();
+
+	// make database connection object
+	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+
+	// connect to the database
+	if (!con.connect(error))
+		return false;
+
+	liblec::leccore::database::table results;
+	if (!con.execute_query("SELECT Name, Description FROM Sessions;", {}, results, error))
+		return false;
+
+	for (auto& row : results.data) {
+		collab::session session;
+
+		try {
+			if (row.at("Name").has_value())
+				session.name = liblec::leccore::database::get::text(row.at("Name"));
+
+			if (row.at("Description").has_value())
+				session.description = liblec::leccore::database::get::text(row.at("Description"));
+
+			sessions.push_back(session);
+		}
+		catch (const std::exception& e) {
+			error = e.what();
+			return false;
+		}
+	}
+
+	return true;
+}

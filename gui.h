@@ -162,6 +162,7 @@ class main_form : public lecui::form {
 	void user();
 
 	void set_avatar(const std::string& image_data);
+	void update_session_list();
 
 public:
 	main_form(const std::string& caption, bool restarted);

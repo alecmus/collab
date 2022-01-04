@@ -437,6 +437,42 @@ void main_form::on_close_update_status() {
 	_update_details_displayed = false;
 }
 
+void main_form::update_session_list() {
+	// stop the timer
+	_timer_man.stop("update_session_list");
+
+	std::vector<collab::session> sessions;
+
+	std::string error;
+	if (_collab.get_sessions(_database_file, sessions, error)) {
+		try {
+			auto& session_list = get_table_view("home/join_session_pane/session_list");
+
+			// clear session list
+			session_list
+				.data().clear();
+
+			// populate session list with latest data
+			for (auto& session : sessions) {
+				liblec::lecui::table_row row;
+				row.insert(std::make_pair("Name", session.name));
+				row.insert(std::make_pair("Description", session.description));
+
+				session_list.data().push_back(row);
+			}
+
+			// update
+			update();
+		}
+		catch (const std::exception&) {}
+	}
+
+	// resume the timer (5000ms looping ... room to breathe)
+	_timer_man.add("update_session_list", 5000, [&]() {
+		update_session_list();
+		});
+}
+
 main_form::main_form(const std::string& caption, bool restarted) :
 	_cleanup_mode(restarted ? false : leccore::commandline_arguments::contains("/cleanup")),
 	_update_mode(restarted ? false : leccore::commandline_arguments::contains("/update")),

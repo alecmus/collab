@@ -23,12 +23,17 @@
 */
 
 #include "../../../gui.h"
+
+// lecui
 #include <liblec/lecui/containers/pane.h>
 #include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/widgets/text_field.h>
 #include <liblec/lecui/widgets/password_field.h>
 #include <liblec/lecui/widgets/strength_bar.h>
 #include <liblec/lecui/widgets/button.h>
+
+// leccore
+#include <liblec/leccore/hash.h>
 
 void main_form::new_session() {
 	class new_session_form : public form {
@@ -226,7 +231,19 @@ void main_form::new_session() {
 					return;
 
 				if (session_password.text() == confirm_session_password.text()) {
-					// to-do: implement session saving
+					collab::session session;
+					session.id = leccore::hash_string::uuid();
+					session.name = session_name.text();
+					session.description = session_description.text();
+					session.passphrase_hash = leccore::hash_string::sha256(session_password.text());
+					
+					std::string error;
+					if (_main_form._collab.create_session(_main_form._database_file, session, error)) {
+						message("Session created successfully!");
+						close();
+					}
+					else
+						message(error);
 				}
 				else
 					message("Passwords do not match!");
