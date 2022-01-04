@@ -41,9 +41,9 @@ void main_form::add_top_status_pane() {
 		.width(status_pane.size().get_width() - _margin)
 		.height(status_pane.size().get_height());
 
-	// add user icon
-	auto& user_icon = lecui::widgets::image_view::add(status_pane, "user_icon");
-	user_icon
+	// add avatar
+	auto& avatar = lecui::widgets::image_view::add(status_pane, "avatar");
+	avatar
 		.rect(lecui::rect()
 			.width(specs.thickness() - 6.f)
 			.height(specs.thickness() - 6.f)
@@ -51,40 +51,40 @@ void main_form::add_top_status_pane() {
 		.on_resize(lecui::resize_params()
 			.x_rate(100.f))
 		.quality(lecui::image_quality::high)
-		.corner_radius_x(user_icon.rect().width() / 2.f)
-		.corner_radius_y(user_icon.rect().width() / 2.f)
+		.corner_radius_x(avatar.rect().width() / 2.f)
+		.corner_radius_y(avatar.rect().width() / 2.f)
 		.png_resource(png_user)
 		.tooltip("Click to view and edit user information, right click to change status");
 
-	user_icon.events().action = [&]() { user(); };
+	avatar.events().action = [&]() { user(); };
 
-	user_icon.events().right_click = [&]() {
+	avatar.events().right_click = [&]() {
 		// to-do: add implementation
 	};
 
-	user_icon.badge().font_size(6.f).text(" ").color(_online);
+	avatar.badge().font_size(6.f).text(" ").color(_online);
 }
 
-void main_form::set_user_image_icon(const std::string& image_data) {
+void main_form::set_avatar(const std::string& image_data) {
 	try {
 		std::string error;
 
-		auto& user_icon = get_image_view("status::top/user_icon");
-		user_icon
+		auto& avatar = get_image_view("status::top/avatar");
+		avatar
 			.png_resource(png_user)
 			.file("");
 
 		// refresh so image is released if it exists
-		if (!_widget_man.refresh("status::top/user_icon", error)) {}
+		if (!_widget_man.refresh("status::top/avatar", error)) {}
 
 		if (!image_data.empty()) {
 			// save to file
 			if (leccore::file::write(_avatar_file, image_data, error)) {
-				user_icon
+				avatar
 					.png_resource(0)
 					.file(_avatar_file);
 
-				if (!_widget_man.refresh("status::top/user_icon", error)) {}
+				if (!_widget_man.refresh("status::top/avatar", error)) {}
 			}
 		}
 	}

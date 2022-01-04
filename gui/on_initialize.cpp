@@ -352,7 +352,7 @@ bool main_form::on_initialize(std::string& error) {
 
 	if (_collab.user_exists(_database_file, _collab.unique_id())) {
 		// schedule timer for setting avatar
-		_timer_man.add("avatar_set", 1000, [&]() {
+		_timer_man.add("avatar_set", 0, [&]() {
 			// stop the timer
 			_timer_man.stop("avatar_set");
 
@@ -364,7 +364,7 @@ bool main_form::on_initialize(std::string& error) {
 				_existing_username, _existing_display_name, _existing_user_image, error))
 				return;
 
-			set_user_image_icon(_existing_user_image);
+			set_avatar(_existing_user_image);
 			});
 	}
 

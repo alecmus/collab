@@ -294,7 +294,7 @@ void main_form::user() {
 					}
 				}
 
-				_main_form.set_user_image_icon(user_image_data);
+				_main_form.set_avatar(user_image_data);
 
 				close();
 			}

@@ -61,7 +61,7 @@ void main_form::on_close() {
 
 void main_form::on_shutdown() {
 	// remove the avatar so we can be able to delete the avatar file in the destructor
-	set_user_image_icon("");
+	set_avatar("");
 }
 
 void main_form::updates() {
