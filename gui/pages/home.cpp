@@ -25,11 +25,14 @@
 #include "../../gui.h"
 #include "../../helper_functions.h"
 
+// lecui
 #include <liblec/lecui/containers/pane.h>
 #include <liblec/lecui/widgets/icon.h>
 #include <liblec/lecui/widgets/table_view.h>
 #include <liblec/lecui/widgets/image_view.h>
+#include <liblec/lecui/menus/context_menu.h>
 
+// leccore
 #include <liblec/leccore/system.h>
 
 void main_form::add_home_page() {
@@ -122,6 +125,18 @@ void main_form::add_home_page() {
 				{ "Name", 120 },
 				{ "Description", 300 }
 				});
+
+		session_list
+			.events().context_menu = [&](const std::vector<lecui::table_row>& rows) {
+			lecui::context_menu::specs menu_specs;
+			menu_specs.items.push_back({ "Join", png_join_session });
+
+			auto selected = lecui::context_menu::context_menu()(*this, menu_specs);
+
+			if (selected == "Join") {
+				// to-do: implement session joining
+			}
+		};
 	}
 
 	// add overlay images
