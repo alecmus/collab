@@ -83,6 +83,12 @@ void main_form::user() {
 			return true;
 		}
 
+		void on_start() override {
+			on_drop_files([&](const std::string& file) {
+				set_user_image(file);
+				});
+		}
+
 		bool on_layout(std::string& error) override {
 			// add home page
 			auto& home = _page_man.add("home");
@@ -125,48 +131,7 @@ void main_form::user() {
 				if (!file.empty()) {
 					// get the full path to the file
 					std::string full_path = file[0];
-
-					// save the image to a temporary file of size 256x256 pixels
-					leccore::image image(full_path);
-
-					// a simple name for the file
-					_resized_profile_image = _main_form._folder + "\\rpi";	// rpi for resized profile image
-
-					leccore::image::image_options options;
-					options
-						.size(leccore::size().width(256.f).height(256.f))
-						.crop(true)
-						.keep_aspect_ratio(true)
-						.format(leccore::image::format::jpg)
-						.quality(leccore::image_quality::medium);
-
-					try {
-						auto& user_image = get_image_view("home/user_image");
-						user_image
-							.png_resource(png_user)
-							.file("");
-
-						// this will cause the image file to be freed so we can overwrite it
-						if (!_widget_man.refresh("home/user_image", error)) {}
-					}
-					catch (const std::exception&) {}
-
-					// overwrite the image file (or create a new one if it doesn't exist)
-					if (!image.save(_resized_profile_image, options, error)) {
-						message("Error optimizing profile image: " + error);
-					}
-					else {
-						try {
-							// change the image
-							auto& user_image = get_image_view("home/user_image");
-							user_image
-								.png_resource(0)
-								.file(_resized_profile_image);
-
-							update();
-						}
-						catch (const std::exception&) {}
-					}
+					set_user_image(full_path);
 				}
 			};
 			user_image.events().right_click = [&]() {
@@ -249,6 +214,52 @@ void main_form::user() {
 
 			_page_man.show("home");
 			return true;
+		}
+
+		void set_user_image(const std::string& full_path) {
+			// save the image to a temporary file of size 256x256 pixels
+			leccore::image image(full_path);
+
+			// a simple name for the file
+			_resized_profile_image = _main_form._folder + "\\rpi";	// rpi for resized profile image
+
+			leccore::image::image_options options;
+			options
+				.size(leccore::size().width(256.f).height(256.f))
+				.crop(true)
+				.keep_aspect_ratio(true)
+				.format(leccore::image::format::jpg)
+				.quality(leccore::image_quality::medium);
+
+			std::string error;
+
+			try {
+				auto& user_image = get_image_view("home/user_image");
+				user_image
+					.png_resource(png_user)
+					.file("");
+
+				// this will cause the image file to be freed so we can overwrite it
+				if (!_widget_man.refresh("home/user_image", error)) {}
+			}
+			catch (const std::exception&) {}
+
+			// overwrite the image file (or create a new one if it doesn't exist)
+			if (!image.save(_resized_profile_image, options, error)) {
+				message("Error optimizing profile image: " + error);
+			}
+			else {
+				try {
+					// change the image
+					auto& user_image = get_image_view("home/user_image");
+					user_image
+						.png_resource(0)
+						.file(_resized_profile_image);
+
+					update();
+				}
+				catch (const std::exception&) {}
+			}
 		}
 
 		void on_save() {
