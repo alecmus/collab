@@ -444,7 +444,7 @@ void main_form::update_session_list() {
 	std::vector<collab::session> sessions;
 
 	std::string error;
-	if (_collab.get_sessions(_database_file, sessions, error)) {
+	if (_collab.get_sessions(sessions, error)) {
 		try {
 			auto& session_list = get_table_view("home/join_session_pane/session_list");
 

@@ -63,28 +63,34 @@ public:
 	~collab ();
 
 	const std::string& unique_id();
+
+	/// <summary>Initialize the collaboration class.</summary>
+	/// <param name="database_file">The full path to the database file.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>This method creates the database connection. Calling any methods that need a
+	/// database connection before calling it will only result in those methods returning
+	/// a 'No database connection' error.</remarks>
+	bool initialize(const std::string& database_file,
+		std::string& error);
 	
 	// users
 
-	bool save_user(const std::string& database_file,
-		const std::string& unique_id,
+	bool save_user(const std::string& unique_id,
 		const std::string& username,
 		const std::string& display_name,
 		const std::string& user_image,
 		std::string& error);
 
-	bool user_exists(const std::string& database_file,
-		const std::string& unique_id);
+	bool user_exists(const std::string& unique_id);
 
-	bool get_user(const std::string& database_file,
-		const std::string& unique_id,
+	bool get_user(const std::string& unique_id,
 		std::string& username,
 		std::string& display_name,
 		std::string& user_image,
 		std::string& error);
 
-	bool edit_user(const std::string& database_file,
-		const std::string& unique_id,
+	bool edit_user(const std::string& unique_id,
 		const std::string& username,
 		const std::string& display_name,
 		const std::string& user_image,
@@ -92,11 +98,13 @@ public:
 
 	// sessions
 
-	bool create_session(const std::string& database_file,
-		session& session,
+	bool create_session(session& session,
 		std::string& error);
 
-	bool get_sessions(const std::string& database_file,
-		std::vector<session>& sessions,
+	bool get_sessions(std::vector<session>& sessions,
 		std::string& error);
+
+private:
+	class impl;
+	impl& _d;
 };

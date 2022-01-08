@@ -350,7 +350,11 @@ bool main_form::on_initialize(std::string& error) {
 		_avatar_file = _folder + "\\avatar.jpg";
 	}
 
-	if (_collab.user_exists(_database_file, _collab.unique_id())) {
+	// initialize collab
+	if (!_collab.initialize(_database_file, error))
+		return false;
+
+	if (_collab.user_exists(_collab.unique_id())) {
 		// schedule timer for setting avatar
 		_timer_man.add("avatar_set", 0, [&]() {
 			// stop the timer
@@ -360,7 +364,7 @@ bool main_form::on_initialize(std::string& error) {
 			std::string _existing_display_name;
 			std::string _existing_user_image;
 
-			if (!_collab.get_user(_database_file, _collab.unique_id(),
+			if (!_collab.get_user(_collab.unique_id(),
 				_existing_username, _existing_display_name, _existing_user_image, error))
 				return;
 

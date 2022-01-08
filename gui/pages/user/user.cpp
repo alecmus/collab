@@ -67,7 +67,7 @@ void main_form::user() {
 			_dim.set_size(lecui::size().width(300.f).height(340.f));
 
 			if (_editing_mode) {
-				if (!_main_form._collab.get_user(_main_form._database_file, _main_form._collab.unique_id(),
+				if (!_main_form._collab.get_user(_main_form._collab.unique_id(),
 					_existing_username, _existing_display_name, _existing_user_image, error))
 					return false;
 
@@ -290,7 +290,7 @@ void main_form::user() {
 
 				if (_editing_mode) {
 					// edit existing user
-					if (!_main_form._collab.edit_user(_main_form._database_file, _main_form._collab.unique_id(),
+					if (!_main_form._collab.edit_user(_main_form._collab.unique_id(),
 						username.text(), display_name.text(), user_image_data, error)) {
 						message(error);
 						return;
@@ -298,7 +298,7 @@ void main_form::user() {
 				}
 				else {
 					// save new user
-					if (!_main_form._collab.save_user(_main_form._database_file, _main_form._collab.unique_id(),
+					if (!_main_form._collab.save_user(_main_form._collab.unique_id(),
 						username.text(), display_name.text(), user_image_data, error)) {
 						message(error);
 						return;
@@ -339,7 +339,7 @@ void main_form::user() {
 		}
 	};
 
-	const bool editing_mode = _collab.user_exists(_database_file, _collab.unique_id());
+	const bool editing_mode = _collab.user_exists(_collab.unique_id());
 
 	user_form fm(editing_mode ? std::string(appname) + " - Edit User" : std::string(appname) + " - User", *this, editing_mode);
 	std::string error;

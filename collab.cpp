@@ -29,7 +29,34 @@
 #include <liblec/leccore/hash.h>
 #include <liblec/leccore/database.h>
 
-collab::collab() {
+#include <optional>
+
+class collab::impl {
+	liblec::leccore::database::connection* _p_con;
+
+public:
+	impl() : _p_con(nullptr) {}
+	~impl() {
+		if (_p_con) {
+			delete _p_con;
+			_p_con = nullptr;
+		}
+	}
+
+	bool initialize(const std::string& database_file, std::string& error) {
+		if (_p_con)
+			return true;
+		
+		_p_con = new liblec::leccore::database::connection("sqlcipher", database_file, "");
+		return _p_con->connect(error);
+	}
+
+	std::optional<std::reference_wrapper<liblec::leccore::database::connection>> get_connection() {
+		return _p_con ? std::optional<std::reference_wrapper<liblec::leccore::database::connection>>{ *_p_con } : std::nullopt;
+	}
+};
+
+collab::collab() : _d(*new impl()) {
 	// make unique id from computer bios serial number
 	std::string error;
 	liblec::leccore::pc_info _pc_info;
@@ -44,22 +71,30 @@ collab::collab() {
 }
 
 collab::~collab() {
+	delete& _d;
 }
 
 const std::string& collab::unique_id() { return _unique_id; }
 
-bool collab::save_user(const std::string& database_file,
-	const std::string& unique_id,
+bool collab::initialize(const std::string& database_file, std::string& error) {
+	return _d.initialize(database_file, error);
+}
+
+bool collab::save_user(const std::string& unique_id,
 	const std::string& username,
 	const std::string& display_name,
 	const std::string& user_image,
 	std::string& error) {
-	// make database connection object
-	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+	// get optional object
+	auto con_opt = _d.get_connection();
 
-	// connect to the database
-	if (!con.connect(error))
+	if (!con_opt.has_value()) {
+		error = "No database connection";
 		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
 
 	// create table if it doesn't exist
 	if (!con.execute("CREATE TABLE IF NOT EXISTS Users "
@@ -76,18 +111,22 @@ bool collab::save_user(const std::string& database_file,
 	return true;
 }
 
-bool collab::user_exists(const std::string& database_file, const std::string& unique_id) {
+bool collab::user_exists(const std::string& unique_id) {
 	if (unique_id.empty())
 		return false;
 
 	std::string error;
 
-	// make database connection object
-	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+	// get optional object
+	auto con_opt = _d.get_connection();
 
-	// connect to the database
-	if (!con.connect(error))
+	if (!con_opt.has_value()) {
+		error = "No database connection";
 		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
 
 	liblec::leccore::database::table results;
 	if (!con.execute_query("SELECT * FROM Users WHERE UniqueID = ?;", { unique_id }, results, error))
@@ -96,8 +135,7 @@ bool collab::user_exists(const std::string& database_file, const std::string& un
 	return !results.data.empty();
 }
 
-bool collab::get_user(const std::string& database_file,
-	const std::string& unique_id, std::string& username, std::string& display_name,
+bool collab::get_user(const std::string& unique_id, std::string& username, std::string& display_name,
 	std::string& user_image, std::string& error) {
 	username.clear();
 	display_name.clear();
@@ -106,12 +144,16 @@ bool collab::get_user(const std::string& database_file,
 	if (unique_id.empty())
 		return false;
 
-	// make database connection object
-	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+	// get optional object
+	auto con_opt = _d.get_connection();
 
-	// connect to the database
-	if (!con.connect(error))
+	if (!con_opt.has_value()) {
+		error = "No database connection";
 		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
 
 	liblec::leccore::database::table results;
 	if (!con.execute_query("SELECT * FROM Users WHERE UniqueID = ?;", { unique_id }, results, error))
@@ -135,15 +177,18 @@ bool collab::get_user(const std::string& database_file,
 	}
 }
 
-bool collab::edit_user(const std::string& database_file,
-	const std::string& unique_id, const std::string& username,
+bool collab::edit_user(const std::string& unique_id, const std::string& username,
 	const std::string& display_name, const std::string& user_image, std::string& error) {
-	// make database connection object
-	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+	// get optional object
+	auto con_opt = _d.get_connection();
 
-	// connect to the database
-	if (!con.connect(error))
+	if (!con_opt.has_value()) {
+		error = "No database connection";
 		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
 
 	// insert data into table
 	if (!con.execute("UPDATE Users SET Username = ?, DisplayName = ?, UserImage = ? WHERE UniqueID = ?",
@@ -154,13 +199,17 @@ bool collab::edit_user(const std::string& database_file,
 	return true;
 }
 
-bool collab::create_session(const std::string& database_file, session& session, std::string& error) {
-	// make database connection object
-	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+bool collab::create_session(session& session, std::string& error) {
+	// get optional object
+	auto con_opt = _d.get_connection();
 
-	// connect to the database
-	if (!con.connect(error))
+	if (!con_opt.has_value()) {
+		error = "No database connection";
 		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
 
 	// create table if it doesn't exist
 	if (!con.execute("CREATE TABLE IF NOT EXISTS Sessions "
@@ -177,16 +226,19 @@ bool collab::create_session(const std::string& database_file, session& session, 
 	return true;
 }
 
-bool collab::get_sessions(const std::string& database_file,
-	std::vector<session>& sessions, std::string& error) {
+bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 	sessions.clear();
 
-	// make database connection object
-	liblec::leccore::database::connection con("sqlcipher", database_file, "");
+	// get optional object
+	auto con_opt = _d.get_connection();
 
-	// connect to the database
-	if (!con.connect(error))
+	if (!con_opt.has_value()) {
+		error = "No database connection";
 		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
 
 	liblec::leccore::database::table results;
 	if (!con.execute_query("SELECT Name, Description FROM Sessions;", {}, results, error))
