@@ -134,7 +134,12 @@ void main_form::add_home_page() {
 			auto selected = lecui::context_menu::context_menu()(*this, menu_specs);
 
 			if (selected == "Join") {
-				// to-do: implement session joining
+				try {
+					const std::string unique_id = lecui::get::text(rows[0].at("UniqueID"));
+
+					// to-do: implement session joining for first item in selection
+				}
+				catch (const std::exception&) {}
 			}
 		};
 	}

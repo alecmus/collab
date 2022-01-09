@@ -241,13 +241,16 @@ bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 	auto& con = con_opt.value().get();
 
 	liblec::leccore::database::table results;
-	if (!con.execute_query("SELECT Name, Description FROM Sessions;", {}, results, error))
+	if (!con.execute_query("SELECT UniqueID, Name, Description FROM Sessions;", {}, results, error))
 		return false;
 
 	for (auto& row : results.data) {
 		collab::session session;
 
 		try {
+			if (row.at("UniqueID").has_value())
+				session.id = liblec::leccore::database::get::text(row.at("UniqueID"));
+
 			if (row.at("Name").has_value())
 				session.name = liblec::leccore::database::get::text(row.at("Name"));
 

@@ -455,6 +455,7 @@ void main_form::update_session_list() {
 			// populate session list with latest data
 			for (auto& session : sessions) {
 				liblec::lecui::table_row row;
+				row.insert(std::make_pair("UniqueID", session.id));
 				row.insert(std::make_pair("Name", session.name));
 				row.insert(std::make_pair("Description", session.description));
 
