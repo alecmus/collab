@@ -166,8 +166,8 @@ void main_form::add_home_page() {
 			.height(192.f)
 			.place(ref_rect, 100.f, 100.f))
 		.on_resize(lecui::resize_params()
-			.x_rate(60.f)
-			.y_rate(10.f));
+			.x_rate(100.f)
+			.y_rate(100.f));
 
 	auto& small_overlay = lecui::widgets::image_view::add(home, "small_overlay");
 	small_overlay
