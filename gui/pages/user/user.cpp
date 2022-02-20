@@ -341,7 +341,7 @@ void main_form::user() {
 
 	const bool editing_mode = _collab.user_exists(_collab.unique_id());
 
-	user_form fm(editing_mode ? std::string(appname) + " - Edit User" : std::string(appname) + " - User", *this, editing_mode);
+	user_form fm(editing_mode ? "Edit User" : "User", *this, editing_mode);
 	std::string error;
 	if (!fm.create(error))
 		message(error);

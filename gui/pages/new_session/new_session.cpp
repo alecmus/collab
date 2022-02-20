@@ -259,7 +259,7 @@ void main_form::new_session() {
 		~new_session_form() {}
 	};
 
-	new_session_form fm(std::string(appname) + " - New Session", *this);
+	new_session_form fm("New Session", *this);
 	std::string error;
 	if (!fm.create(error))
 		message(error);
