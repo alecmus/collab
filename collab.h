@@ -62,6 +62,8 @@ public:
 	collab ();
 	~collab ();
 
+	/// <summary>Get the unique id associated with this PC.</summary>
+	/// <returns>The unique id string (a unique sha256 hash).</returns>
 	const std::string& unique_id();
 
 	/// <summary>Initialize the collaboration class.</summary>
@@ -74,33 +76,73 @@ public:
 	bool initialize(const std::string& database_file,
 		std::string& error);
 	
+	//------------------------------------------------------------------------------------------------
 	// users
 
+	/// <summary>Save a new user.</summary>
+	/// <param name="unique_id">The user's unique id.</param>
+	/// <param name="username">The username, e.g. alecmus.</param>
+	/// <param name="display_name">The user's display name, e.g. Alec Musasa.</param>
+	/// <param name="user_image">The user's image (blob data).</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Saves to the local database.</remarks>
 	bool save_user(const std::string& unique_id,
 		const std::string& username,
 		const std::string& display_name,
 		const std::string& user_image,
 		std::string& error);
 
+	/// <summary>Check if a user exists.</summary>
+	/// <param name="unique_id">The user's unique id.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Checks the local database.</remarks>
 	bool user_exists(const std::string& unique_id);
 
+	/// <summary>Gets user info from the local database.</summary>
+	/// <param name="unique_id">The unique id of the user.</param>
+	/// <param name="username">The username, e.g. alecmus.</param>
+	/// <param name="display_name">The user's display name,e.g. Alec Musasa.</param>
+	/// <param name="user_image">The user's image (blob data).</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Reads from the local database.</remarks>
 	bool get_user(const std::string& unique_id,
 		std::string& username,
 		std::string& display_name,
 		std::string& user_image,
 		std::string& error);
 
+	/// <summary>Edit an existing user.</summary>
+	/// <param name="unique_id">The user's unique id.</param>
+	/// <param name="username">The new username.</param>
+	/// <param name="display_name">The new display name.</param>
+	/// <param name="user_image">The new image (blob data).</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Saves changes to the local database.</remarks>
 	bool edit_user(const std::string& unique_id,
 		const std::string& username,
 		const std::string& display_name,
 		const std::string& user_image,
 		std::string& error);
 
+	//------------------------------------------------------------------------------------------------
 	// sessions
 
+	/// <summary>Create a new session.</summary>
+	/// <param name="session">The session information as defined in the session structure.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Adds a new entry to the local database.</remarks>
 	bool create_session(session& session,
 		std::string& error);
 
+	/// <summary>Get all available sessions.</summary>
+	/// <param name="sessions">The list of all available sessions.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Reads from the local database.</remarks>
 	bool get_sessions(std::vector<session>& sessions,
 		std::string& error);
 
