@@ -232,7 +232,7 @@ void main_form::new_session() {
 
 				if (session_password.text() == confirm_session_password.text()) {
 					collab::session session;
-					session.id = leccore::hash_string::uuid();
+					session.unique_id = leccore::hash_string::uuid();
 					session.name = session_name.text();
 					session.description = session_description.text();
 					session.passphrase_hash = leccore::hash_string::sha256(session_password.text());

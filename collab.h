@@ -53,7 +53,7 @@ class collab {
 
 public:
 	struct session {
-		std::string id;
+		std::string unique_id;
 		std::string name;
 		std::string description;
 		std::string passphrase_hash;
@@ -95,7 +95,7 @@ public:
 
 	/// <summary>Check if a user exists.</summary>
 	/// <param name="unique_id">The user's unique id.</param>
-	/// <returns>Returns true if successful, else false.</returns>
+	/// <returns>Returns true if the user exists, else false.</returns>
 	/// <remarks>Checks the local database.</remarks>
 	bool user_exists(const std::string& unique_id);
 
@@ -137,6 +137,12 @@ public:
 	/// <remarks>Adds a new entry to the local database.</remarks>
 	bool create_session(session& session,
 		std::string& error);
+
+	/// <summary>Check if a session exists.</summary>
+	/// <param name="unique_id">The session's unique id.</param>
+	/// <returns>Returns true if the session exists, else false.</returns>
+	/// <remarks>Checks the local database.</remarks>
+	bool session_exists(const std::string& unique_id);
 
 	/// <summary>Get all available sessions.</summary>
 	/// <param name="sessions">The list of all available sessions.</param>

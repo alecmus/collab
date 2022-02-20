@@ -219,11 +219,35 @@ bool collab::create_session(session& session, std::string& error) {
 
 	// insert data into table
 	if (!con.execute("INSERT INTO Sessions VALUES(?, ?, ?, ?);",
-		{ session.id, session.name, session.description, session.passphrase_hash },
+		{ session.unique_id, session.name, session.description, session.passphrase_hash },
 		error))
 		return false;
 
 	return true;
+}
+
+bool collab::session_exists(const std::string& unique_id) {
+	if (unique_id.empty())
+		return false;
+
+	std::string error;
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+	if (!con.execute_query("SELECT * FROM Sessions WHERE UniqueID = ?;", { unique_id }, results, error))
+		return false;
+
+	return !results.data.empty();
 }
 
 bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
@@ -249,7 +273,7 @@ bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 
 		try {
 			if (row.at("UniqueID").has_value())
-				session.id = liblec::leccore::database::get::text(row.at("UniqueID"));
+				session.unique_id = liblec::leccore::database::get::text(row.at("UniqueID"));
 
 			if (row.at("Name").has_value())
 				session.name = liblec::leccore::database::get::text(row.at("Name"));
