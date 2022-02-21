@@ -550,6 +550,9 @@ bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 			if (row.at("Description").has_value())
 				session.description = liblec::leccore::database::get::text(row.at("Description"));
 
+			if (row.at("PassphraseHash").has_value())
+				session.passphrase_hash = liblec::leccore::database::get::text(row.at("PassphraseHash"));
+
 			sessions.push_back(session);
 		}
 		catch (const std::exception& e) {
