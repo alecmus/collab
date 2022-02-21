@@ -180,6 +180,21 @@ public:
 		if (!_p_con->connect(error))
 			return false;
 
+		// remove all temporary sessions from the local database
+		std::vector<session> sessions;
+
+		if (_collab.get_sessions(sessions, error)) {}
+
+		for (const auto& it : sessions) {
+			if (_collab.is_temporary_session_entry(it.unique_id)) {
+				// remove session
+				if (_collab.remove_session(it.unique_id, error)) {}
+
+				// remove from temporary session list
+				if (_collab.remove_temporary_session_entry(it.unique_id, error)) {}
+			}
+		}
+
 		// start session broadcast threads
 		try {
 			_session_broadcast_sender = std::async(std::launch::async, session_broadcast_sender_func, this);
@@ -298,7 +313,8 @@ public:
 							if (!found) {
 								// add this session to the local database
 								if (p_impl->_collab.create_session(it, error)) {
-									// session added successfully to the local database
+									// session added successfully to the local database, add it to the temporary session list
+									if (p_impl->_collab.create_temporary_session_entry(it.unique_id, error)) {}
 								}
 							}
 						}
@@ -517,6 +533,30 @@ bool collab::session_exists(const std::string& unique_id) {
 	return !results.data.empty();
 }
 
+bool collab::remove_session(const std::string& unique_id, std::string& error) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	if (unique_id.empty())
+		return false;
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	// insert data into table
+	if (!con.execute("DELETE FROM Sessions WHERE UniqueID = ?;", { unique_id }, error))
+		return false;
+
+	return true;
+}
+
 bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
 
@@ -534,7 +574,7 @@ bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 	auto& con = con_opt.value().get();
 
 	liblec::leccore::database::table results;
-	if (!con.execute_query("SELECT UniqueID, Name, Description FROM Sessions;", {}, results, error))
+	if (!con.execute_query("SELECT UniqueID, Name, Description, PassphraseHash FROM Sessions;", {}, results, error))
 		return false;
 
 	for (auto& row : results.data) {
@@ -560,6 +600,85 @@ bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 			return false;
 		}
 	}
+
+	return true;
+}
+
+bool collab::create_temporary_session_entry(const std::string& unique_id, std::string& error) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	// create table if it doesn't exist
+	if (!con.execute("CREATE TABLE IF NOT EXISTS TemporarySessions "
+		"(UniqueID TEXT, PRIMARY KEY(UniqueID));",
+		{}, error))
+		return false;
+
+	// insert data into table
+	if (!con.execute("INSERT INTO TemporarySessions VALUES(?);",
+		{ unique_id },
+		error))
+		return false;
+
+	return true;
+}
+
+bool collab::is_temporary_session_entry(const std::string& unique_id) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	if (unique_id.empty())
+		return false;
+
+	std::string error;
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+	if (!con.execute_query("SELECT * FROM TemporarySessions WHERE UniqueID = ?;", { unique_id }, results, error))
+		return false;
+
+	return !results.data.empty();
+}
+
+bool collab::remove_temporary_session_entry(const std::string& unique_id, std::string& error) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	if (unique_id.empty())
+		return false;
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	// insert data into table
+	if (!con.execute("DELETE FROM TemporarySessions WHERE UniqueID = ?;", { unique_id }, error))
+		return false;
 
 	return true;
 }

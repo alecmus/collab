@@ -144,12 +144,42 @@ public:
 	/// <remarks>Checks the local database.</remarks>
 	bool session_exists(const std::string& unique_id);
 
+	/// <summary>Remove a session from the local database.</summary>
+	/// <param name="unique_id">The session's unique id.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	bool remove_session(const std::string& unique_id,
+		std::string& error);
+
 	/// <summary>Get all available sessions.</summary>
 	/// <param name="sessions">The list of all available sessions.</param>
 	/// <param name="error">Error information.</param>
 	/// <returns>Returns true if successful, else false.</returns>
 	/// <remarks>Reads from the local database.</remarks>
 	bool get_sessions(std::vector<session>& sessions,
+		std::string& error);
+
+	/// <summary>Create temporary session entry.</summary>
+	/// <param name="unique_id">The session's unique id.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>A session remains on a temporary session list if it is imported and
+	/// has not yet been joined. This way if the app is closed and re-opened when the
+	/// source of the imported session is no longer available it will not continue to
+	/// be listed. This is an essential auto-cleanup mechanism.</remarks>
+	bool create_temporary_session_entry(const std::string& unique_id,
+		std::string& error);
+
+	/// <summary>Check if a unique id belongs to a session in the temporary session list.</summary>
+	/// <param name="unique_id">The session's unique id.</param>
+	/// <returns>Returns true if the session is in the temporary session list, else false.</returns>
+	bool is_temporary_session_entry(const std::string& unique_id);
+
+	/// <summary>Remove a session from the temporary session list.</summary>
+	/// <param name="unique_id">The session's unique id.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	bool remove_temporary_session_entry(const std::string& unique_id,
 		std::string& error);
 
 private:
