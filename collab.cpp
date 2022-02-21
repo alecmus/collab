@@ -280,29 +280,33 @@ public:
 						std::vector<session> local_session_list;
 
 						// get session list from local database
-						if (p_impl->_collab.get_sessions(local_session_list, error)) {
-							// check if any session is missing in the local database
-							for (const auto& it : cls.session_list) {
-								bool found = false;
+						if (!p_impl->_collab.get_sessions(local_session_list, error)) {
+							// database may be empty or table may not exist, so ignore
+						}
+						
+						// check if any session is missing in the local database
+						for (const auto& it : cls.session_list) {
+							bool found = false;
 
-								for (const auto& m_it : local_session_list) {
-									if (it.unique_id == m_it.unique_id) {
-										found = true;
-										break;
-									}
+							for (const auto& m_it : local_session_list) {
+								if (it.unique_id == m_it.unique_id) {
+									found = true;
+									break;
 								}
+							}
 
-								if (!found) {
-									// add this session to the local database
-									if (p_impl->_collab.create_session(it, error)) {
-										// session added successfully to the local database
-									}
+							if (!found) {
+								// add this session to the local database
+								if (p_impl->_collab.create_session(it, error)) {
+									// session added successfully to the local database
 								}
 							}
 						}
 					}
 				}
 			}
+
+			receiver.stop();
 		}
 	}
 };
