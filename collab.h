@@ -135,7 +135,7 @@ public:
 	/// <param name="error">Error information.</param>
 	/// <returns>Returns true if successful, else false.</returns>
 	/// <remarks>Adds a new entry to the local database.</remarks>
-	bool create_session(session& session,
+	bool create_session(const session& session,
 		std::string& error);
 
 	/// <summary>Check if a session exists.</summary>

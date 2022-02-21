@@ -26,6 +26,8 @@
 #include <Windows.h>
 #include <strsafe.h>	// for StringCchPrintfA
 
+#include <mutex>
+
 /// <summary>
 /// Get current module's full path, whether it's a .exe or a .dll.
 /// </summary>
@@ -90,4 +92,70 @@ std::string get_current_folder() {
 	}
 	else
 		return std::string();
+}
+
+class mutex;
+
+/// <summary>
+/// Wrapper for the std::mutex object.
+/// </summary>
+class liblec::mutex::mutex_impl {
+public:
+	mutex_impl() {}
+	~mutex_impl() {}
+
+	void lock() {
+		_mtx.lock();
+	}
+
+	void unlock() {
+		_mtx.unlock();
+	}
+
+	std::mutex _mtx;
+};
+
+liblec::mutex::mutex() {
+	_d = new mutex_impl;
+}
+
+liblec::mutex::~mutex() {
+	if (_d) {
+		delete _d;
+		_d = nullptr;
+	}
+}
+
+class liblec::auto_mutex::auto_mutex_impl {
+public:
+	auto_mutex_impl(mutex& mtx) :
+		_p_mtx(&mtx) {
+		_p_mtx->_d->lock();
+	}
+
+	~auto_mutex_impl() {
+		_p_mtx->_d->unlock();
+	}
+
+private:
+	mutex* _p_mtx;
+};
+
+liblec::auto_mutex::auto_mutex(mutex& mtx) {
+	_d = new auto_mutex_impl(mtx);
+}
+
+liblec::auto_mutex::~auto_mutex() {
+	if (_d) {
+		delete _d;
+		_d = nullptr;
+	}
+}
+
+void liblec::log(const std::string& string) {
+#if defined(_DEBUG)
+	std::string _string = "-->" + string + "\n";
+	printf(_string.c_str());
+	OutputDebugStringA(_string.c_str());
+#endif
 }
