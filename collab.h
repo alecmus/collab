@@ -159,6 +159,15 @@ public:
 	bool get_sessions(std::vector<session>& sessions,
 		std::string& error);
 
+	/// <summary>Get all available local sessions.</summary>
+	/// <param name="sessions">The list of available local sessions.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>This is effectively all available sessions less the temporary
+	/// sessions.</remarks>
+	bool get_local_sessions(std::vector<session>& sessions,
+		std::string& error);
+
 	/// <summary>Create temporary session entry.</summary>
 	/// <param name="unique_id">The session's unique id.</param>
 	/// <param name="error">Error information.</param>

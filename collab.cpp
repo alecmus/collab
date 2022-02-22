@@ -233,7 +233,7 @@ public:
 			std::vector<session> local_session_list;
 
 			// get session list from local database
-			if (p_impl->_collab.get_sessions(local_session_list, error)) {
+			if (p_impl->_collab.get_local_sessions(local_session_list, error)) {
 
 				// make a session broadcast object
 				std::string serialized_session_list;
@@ -599,6 +599,21 @@ bool collab::get_sessions(std::vector<session>& sessions, std::string& error) {
 			error = e.what();
 			return false;
 		}
+	}
+
+	return true;
+}
+
+bool collab::get_local_sessions(std::vector<session>& sessions, std::string& error) {
+	sessions.clear();
+	error.clear();
+	std::vector<session> all_sessions;
+	if (!get_sessions(all_sessions, error))
+		return false;
+
+	for (const auto& it : all_sessions) {
+		if (!is_temporary_session_entry(it.unique_id))
+			sessions.push_back(it);
 	}
 
 	return true;
