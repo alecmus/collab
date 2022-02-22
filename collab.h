@@ -151,6 +151,14 @@ public:
 	bool remove_session(const std::string& unique_id,
 		std::string& error);
 
+	/// <summary>Get a session.</summary>
+	/// <param name="unique_id">The session's unique id.</param>
+	/// <param name="session_info">The session.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	bool get_session(const std::string& unique_id,
+		session& session_info, std::string& error);
+
 	/// <summary>Get all available sessions.</summary>
 	/// <param name="sessions">The list of all available sessions.</param>
 	/// <param name="error">Error information.</param>

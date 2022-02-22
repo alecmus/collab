@@ -418,8 +418,10 @@ bool collab::get_user(const std::string& unique_id, std::string& username, std::
 	display_name.clear();
 	user_image.clear();
 
-	if (unique_id.empty())
+	if (unique_id.empty()) {
+		error = "User unique id not supplied";
 		return false;
+	}
 
 	// get optional object
 	auto con_opt = _d.get_connection();
@@ -457,6 +459,11 @@ bool collab::get_user(const std::string& unique_id, std::string& username, std::
 bool collab::edit_user(const std::string& unique_id, const std::string& username,
 	const std::string& display_name, const std::string& user_image, std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
+
+	if (unique_id.empty()) {
+		error = "User unique id not supplied";
+		return false;
+	}
 
 	// get optional object
 	auto con_opt = _d.get_connection();
@@ -536,8 +543,10 @@ bool collab::session_exists(const std::string& unique_id) {
 bool collab::remove_session(const std::string& unique_id, std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
 
-	if (unique_id.empty())
+	if (unique_id.empty()) {
+		error = "Session unique id not supplied";
 		return false;
+	}
 
 	// get optional object
 	auto con_opt = _d.get_connection();
@@ -553,6 +562,56 @@ bool collab::remove_session(const std::string& unique_id, std::string& error) {
 	// insert data into table
 	if (!con.execute("DELETE FROM Sessions WHERE UniqueID = ?;", { unique_id }, error))
 		return false;
+
+	return true;
+}
+
+bool collab::get_session(const std::string& unique_id, session& session_info, std::string& error) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	session_info = {};
+
+	if (unique_id.empty()) {
+		error = "Session unique id not supplied";
+		return false;
+	}
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+	if (!con.execute_query("SELECT UniqueID, Name, Description, PassphraseHash FROM Sessions WHERE UniqueID = ?;", { unique_id }, results, error))
+		return false;
+
+	for (auto& row : results.data) {
+		try {
+			if (row.at("UniqueID").has_value())
+				session_info.unique_id = liblec::leccore::database::get::text(row.at("UniqueID"));
+
+			if (row.at("Name").has_value())
+				session_info.name = liblec::leccore::database::get::text(row.at("Name"));
+
+			if (row.at("Description").has_value())
+				session_info.description = liblec::leccore::database::get::text(row.at("Description"));
+
+			if (row.at("PassphraseHash").has_value())
+				session_info.passphrase_hash = liblec::leccore::database::get::text(row.at("PassphraseHash"));
+
+			break;	// only one row expected anyway
+		}
+		catch (const std::exception& e) {
+			error = e.what();
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -622,6 +681,11 @@ bool collab::get_local_sessions(std::vector<session>& sessions, std::string& err
 bool collab::create_temporary_session_entry(const std::string& unique_id, std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
 
+	if (unique_id.empty()) {
+		error = "Session unique id not supplied";
+		return false;
+	}
+
 	// get optional object
 	auto con_opt = _d.get_connection();
 
@@ -677,8 +741,10 @@ bool collab::is_temporary_session_entry(const std::string& unique_id) {
 bool collab::remove_temporary_session_entry(const std::string& unique_id, std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
 
-	if (unique_id.empty())
+	if (unique_id.empty()) {
+		error = "Session unique id not supplied";
 		return false;
+	}
 
 	// get optional object
 	auto con_opt = _d.get_connection();
