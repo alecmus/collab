@@ -60,7 +60,7 @@ void main_form::add_back_button() {
 
 	auto ref_rect = lecui::rect().size(status_pane.size());
 
-	// add settings icon
+	// add back icon
 	auto& back_icon = lecui::widgets::icon::add(status_pane, "back");
 	back_icon
 		.rect(lecui::rect()
