@@ -160,6 +160,7 @@ class main_form : public lecui::form {
 
 	void new_session();
 	void user();
+	bool join_session(const collab::session& session);
 
 	void set_avatar(const std::string& image_data);
 	void update_session_list();

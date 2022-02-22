@@ -86,6 +86,10 @@ void main_form::on_start() {
 	}
 
 	std::string error;
+
+	// hide collaboration pane
+	_widget_man.hide("home/collaboration_pane", error);
+
 	// disable autodownload_updates toggle button if autocheck_updates is off
 	if (_setting_autocheck_updates)
 		_widget_man.enable("settings/autodownload_updates", error);

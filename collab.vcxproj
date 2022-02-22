@@ -193,6 +193,7 @@
     <ClCompile Include="gui\on_start.cpp" />
     <ClCompile Include="gui\pages\help.cpp" />
     <ClCompile Include="gui\pages\home.cpp" />
+    <ClCompile Include="gui\pages\join_session\join_session.cpp" />
     <ClCompile Include="gui\pages\new_session\new_session.cpp" />
     <ClCompile Include="gui\pages\settings.cpp" />
     <ClCompile Include="gui\pages\user\user.cpp" />

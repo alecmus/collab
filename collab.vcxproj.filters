@@ -28,6 +28,9 @@
     <Filter Include="collab\gui\main_form\pages\user">
       <UniqueIdentifier>{0ce4fb91-d4fa-4a06-b217-22fce4157a4a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\gui\main_form\pages\join_session">
+      <UniqueIdentifier>{414fc153-b6de-4f81-9a40-480826b9f746}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
@@ -96,6 +99,9 @@
     </ClCompile>
     <ClCompile Include="gui\pages\user\user.cpp">
       <Filter>collab\gui\main_form\pages\user</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\join_session\join_session.cpp">
+      <Filter>collab\gui\main_form\pages\join_session</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

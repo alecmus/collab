@@ -30,6 +30,7 @@
 #include <liblec/lecui/widgets/icon.h>
 #include <liblec/lecui/widgets/table_view.h>
 #include <liblec/lecui/widgets/image_view.h>
+#include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/menus/context_menu.h>
 
 // leccore
@@ -137,11 +138,114 @@ void main_form::add_home_page() {
 				try {
 					const std::string unique_id = lecui::get::text(rows[0].at("UniqueID"));
 
+					collab::session session;
+
+					std::string error;
+					if (!_collab.get_session(unique_id, session, error)) {
+						message(error);
+						return;
+					}
+
 					// to-do: implement session joining for first item in selection
+					if (join_session(session)) {
+						std::string error;
+
+						// hide new session pane and join session pane
+						_widget_man.hide("home/new_session_pane", error);
+						_widget_man.hide("home/join_session_pane", error);
+
+						// set collaboration session name
+						try {
+							auto& session_name = get_label("home/collaboration_pane/session_name");
+							auto& session_description = get_label("home/collaboration_pane/session_description");
+							auto& session_id = get_label("home/collaboration_pane/session_id");
+
+							session_name.text(session.name);
+							session_description.text(session.description);
+							session_id.text("Session ID: " + session.unique_id);
+						}
+						catch (const std::exception&) {}
+
+						// show collaboration pane
+						_widget_man.show("home/collaboration_pane", error);
+					}
 				}
 				catch (const std::exception&) {}
 			}
 		};
+	}
+
+	// add collaboration pane (to be hidden by default)
+	auto& collaboration_pane = lecui::containers::pane::add(home, "collaboration_pane", 0.f);
+	collaboration_pane
+		.rect(ref_rect)
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f)
+			.height_rate(100.f));
+
+	collaboration_pane
+		.border(0.f);
+	collaboration_pane
+		.color_fill().alpha(0);
+
+	{
+		auto& ref_rect = lecui::rect()
+			.left(0.f)
+			.top(0.f)
+			.width(collaboration_pane.size().get_width())
+			.height(collaboration_pane.size().get_height());
+
+		// add back icon
+		auto& back_icon = lecui::widgets::icon::add(collaboration_pane, "back");
+		back_icon
+			.rect(lecui::rect()
+				.width(_title_height + _caption_height)
+				.height(_title_height + _caption_height))
+			.png_resource(_setting_darktheme ? png_back_dark : png_back_light)
+			.events().action = [this]() {
+			std::string error;
+
+			// hide collaboration pane
+			_widget_man.hide("home/collaboration_pane", error);
+
+			// hide new session pane and join session pane
+			_widget_man.show("home/new_session_pane", error);
+			_widget_man.show("home/join_session_pane", error);
+		};
+
+		// add session name label
+		auto& session_name = lecui::widgets::label::add(collaboration_pane, "session_name");
+		session_name
+			.rect(lecui::rect(session_name.rect())
+				.left(back_icon.rect().right() + _margin / 2.f)
+				.height(_title_height)
+				.width(ref_rect.width()))
+			.font_size(_title_font_size)
+			.on_resize(lecui::resize_params()
+				.width_rate(100.f));
+
+		// add session description label
+		auto& session_description = lecui::widgets::label::add(collaboration_pane, "session_description");
+		session_description
+			.rect(lecui::rect(session_name.rect())
+				.height(_caption_height)
+				.snap_to(session_name.rect(), snap_type::bottom, 0.f))
+			.font_size(_caption_font_size)
+			.color_text(_caption_color)
+			.on_resize(lecui::resize_params()
+				.width_rate(100.f));
+
+		// add session unique id label
+		auto& session_id = lecui::widgets::label::add(collaboration_pane, "session_id");
+		session_id
+			.rect(lecui::rect(session_description.rect())
+				.place(ref_rect, 100.f, 100.f))
+			.alignment(lecui::text_alignment::right)
+			.font_size(_caption_font_size)
+			.color_text(_caption_color)
+			.on_resize(lecui::resize_params()
+				.width_rate(100.f)
+				.y_rate(100.f));
 	}
 
 	// add overlay images
