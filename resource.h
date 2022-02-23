@@ -24,21 +24,23 @@
 
 #pragma once
 
-#define ico_resource	100
-#define icon_png_32		101
-#define icon_png_64		102
-#define icon_png_256	103
-#define icon_png_512	104
+#define ico_resource		100
+#define icon_png_32			101
+#define icon_png_64			102
+#define icon_png_256		103
+#define icon_png_512		104
 #define splash_image_128	105
 #define splash_image_256	106
 
-#define png_error		110
-#define png_settings	111
-#define png_back_light	112
-#define png_back_dark	113
-#define png_help		114
-#define png_updates		115
-#define png_user		116
+#define png_error			110
+#define png_settings		111
+#define png_back_light		112
+#define png_back_dark		113
+#define png_help			114
+#define png_updates			115
+#define png_user			116
 #define png_new_session		117
 #define png_join_session	118
 #define png_delete			119
+#define png_send			120
+#define png_chat			121

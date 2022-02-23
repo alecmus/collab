@@ -31,6 +31,7 @@
 #include <liblec/lecui/widgets/table_view.h>
 #include <liblec/lecui/widgets/image_view.h>
 #include <liblec/lecui/widgets/label.h>
+#include <liblec/lecui/widgets/text_field.h>
 #include <liblec/lecui/menus/context_menu.h>
 
 // leccore
@@ -156,6 +157,8 @@ void main_form::add_home_page() {
 
 						// set collaboration session name
 						try {
+							auto& collaboration_pane = get_pane("home/collaboration_pane");
+
 							auto& session_name = get_label("home/collaboration_pane/session_name");
 							auto& session_description = get_label("home/collaboration_pane/session_description");
 							auto& session_id = get_label("home/collaboration_pane/session_id");
@@ -163,6 +166,80 @@ void main_form::add_home_page() {
 							session_name.text(session.name);
 							session_description.text(session.description);
 							session_id.text("Session ID: " + session.unique_id);
+
+							// add chat pane (dynamic)
+							auto& ref_rect = lecui::rect()
+								.left(0.f)
+								.top(0.f)
+								.width(collaboration_pane.size().get_width())
+								.height(collaboration_pane.size().get_height());
+
+							auto& chat_pane = lecui::containers::pane::add(collaboration_pane, "chat_pane", 0.f);
+							chat_pane
+								.rect(lecui::rect()
+									.width(400.f)
+									.top(session_description.rect().bottom() + _margin)
+									.bottom(ref_rect.bottom() - 20.f))
+								.on_resize(lecui::resize_params().height_rate(100.f));
+
+							{
+								// add chat title
+								auto& title = lecui::widgets::icon::add(chat_pane);
+								title
+									.rect(title.rect()
+										.height(45.f)
+										.left(_margin)
+										.right(chat_pane.size().get_width() - _margin))
+									.png_resource(png_chat)
+									.text("Session Chat")
+									.description("Collaborate via text with other session subscribers");
+
+								// add messages pane
+								auto& messages_pane = lecui::containers::pane::add(chat_pane, "messages");
+								messages_pane
+									.rect(lecui::rect(chat_pane.size())
+										.top(title.rect().bottom() + _margin / 3.f)
+										.bottom(chat_pane.size().get_height() - 30.f - _margin / 2.f))
+									.on_resize(lecui::resize_params()
+										.width_rate(100.f)
+										.height_rate(100.f));
+
+								// make pane invisible
+								messages_pane
+									.border(0.f);
+								messages_pane
+									.color_fill().alpha(0);
+
+								// add message text field
+								auto& message = lecui::widgets::text_field::add(chat_pane, "message");
+								message
+									.rect(lecui::rect(message.rect())
+										.left(title.rect().left())
+										.width(title.rect().width() - message.rect().height() - _margin / 3.f)
+										.top(messages_pane.rect().bottom())
+										.height(message.rect().height()))
+									.on_resize(lecui::resize_params()
+										.width_rate(100.f)
+										.y_rate(100.f))
+									.prompt("Type message here")
+									.maximum_length(200);
+
+								// add send icon
+								auto& send_icon = lecui::widgets::icon::add(chat_pane, "send");
+								send_icon
+									.padding(2.f)
+									.rect(lecui::rect()
+										.width(message.rect().height())
+										.height(message.rect().height())
+										.snap_to(message.rect(), snap_type::right, _margin / 3.f))
+									.on_resize(lecui::resize_params()
+										.x_rate(100.f)
+										.y_rate(100.f))
+									.png_resource(png_send)
+									.events().action = [this]() {
+									// to-do: implement sending message
+								};
+							}
 						}
 						catch (const std::exception&) {}
 
@@ -183,6 +260,7 @@ void main_form::add_home_page() {
 			.width_rate(100.f)
 			.height_rate(100.f));
 
+	// make pane invisible
 	collaboration_pane
 		.border(0.f);
 	collaboration_pane
@@ -207,6 +285,9 @@ void main_form::add_home_page() {
 
 			// hide collaboration pane
 			_widget_man.hide("home/collaboration_pane", error);
+
+			// close chat pane
+			_widget_man.close("home/collaboration_pane/chat_pane");
 
 			// hide new session pane and join session pane
 			_widget_man.show("home/new_session_pane", error);

@@ -207,6 +207,7 @@
     <Image Include="resources\png\add.png" />
     <Image Include="resources\png\back_dark.png" />
     <Image Include="resources\png\back_light.png" />
+    <Image Include="resources\png\chat.png" />
     <Image Include="resources\png\delete.png" />
     <Image Include="resources\png\error.png" />
     <Image Include="resources\png\icon_128.png" />
@@ -215,6 +216,7 @@
     <Image Include="resources\png\icon_512.png" />
     <Image Include="resources\png\icon_64.png" />
     <Image Include="resources\png\info.png" />
+    <Image Include="resources\png\send.png" />
     <Image Include="resources\png\settings.png" />
     <Image Include="resources\png\splash_128.png" />
     <Image Include="resources\png\splash_256.png" />

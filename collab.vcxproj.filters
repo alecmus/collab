@@ -159,5 +159,11 @@
     <Image Include="resources\png\updates.png">
       <Filter>collab\resources\png</Filter>
     </Image>
+    <Image Include="resources\png\send.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\chat.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
   </ItemGroup>
 </Project>
