@@ -27,6 +27,16 @@
 #include <string>
 #include <vector>
 
+template <typename T>
+static inline T smallest(T a, T b) {
+	return (((a) < (b)) ? (a) : (b));
+}
+
+template <typename T>
+static inline T largest(T a, T b) {
+	return (((a) > (b)) ? (a) : (b));
+}
+
 /// <summary>
 /// Extract file name from full path.
 /// </summary>

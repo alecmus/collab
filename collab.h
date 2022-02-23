@@ -59,6 +59,14 @@ public:
 		std::string passphrase_hash;
 	};
 
+	struct message {
+		std::string unique_id;
+		long long time;
+		std::string session_id;
+		std::string sender_unique_id;
+		std::string text;
+	};
+
 	collab ();
 	~collab ();
 
@@ -198,6 +206,41 @@ public:
 	/// <returns>Returns true if successful, else false.</returns>
 	bool remove_temporary_session_entry(const std::string& unique_id,
 		std::string& error);
+
+	/// <summary>Set the current session's unique id.</summary>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	void set_current_session_unique_id(const std::string& session_unique_id);
+
+	//------------------------------------------------------------------------------------------------
+	// messages
+
+	/// <summary>Create a session message.</summary>
+	/// <param name="message">The session message as defined in <see cref="collab::message"></see>.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	bool create_message(const message& message,
+		std::string& error);
+
+	/// <summary>Get session messages.</summary>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <param name="messages">The list of messages.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Messages are ordered chronologically, starting with the oldest.</remarks>
+	bool get_messages(const std::string& session_unique_id,
+		std::vector<message>& messages,
+		std::string& error);
+
+	/// <summary>Get latest session messages.</summary>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <param name="messages">The list of messages.</param>
+	/// <param name="number">The number of latest messages (0 means unlimited).</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Messages are ordered chronologically, starting with the latest.</remarks>
+	bool get_latest_messages(const std::string& session_unique_id,
+		std::vector<message>& messages,
+		int number, std::string& error);
 
 private:
 	class impl;

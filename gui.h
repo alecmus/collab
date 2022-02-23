@@ -131,6 +131,7 @@ class main_form : public lecui::form {
 	std::string _database_file;
 	std::string _avatar_file;
 	collab _collab;	// collaboration object
+	std::string _current_session_unique_id;
 
 	bool on_initialize(std::string& error) override;
 	bool on_layout(std::string& error) override;
@@ -164,6 +165,7 @@ class main_form : public lecui::form {
 
 	void set_avatar(const std::string& image_data);
 	void update_session_list();
+	void update_session_chat_messages();
 
 public:
 	main_form(const std::string& caption, bool restarted);

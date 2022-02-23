@@ -375,6 +375,9 @@ bool main_form::on_initialize(std::string& error) {
 	// schedule timer for session list (1000ms kick start ... the method will do the timer looping)
 	_timer_man.add("update_session_list", 1000, [&]() { update_session_list(); });
 
+	// schedule timer for session chat messages list (1500ms kick start ... the method will do the timer looping)
+	_timer_man.add("update_session_chat_messages", 1500, [&]() { update_session_chat_messages(); });
+
 	// size and stuff
 	_ctrls
 		.allow_resize(true)

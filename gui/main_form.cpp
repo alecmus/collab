@@ -22,9 +22,14 @@
 ** SOFTWARE.
 */
 
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "../gui.h"
+
+// lecui
 #include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/widgets/table_view.h>
+#include <liblec/lecui/containers/pane.h>
 
 // leccore
 #include <liblec/leccore/system.h>
@@ -471,6 +476,87 @@ void main_form::update_session_list() {
 	// resume the timer (5000ms looping ... room to breathe)
 	_timer_man.add("update_session_list", 5000, [&]() {
 		update_session_list();
+		});
+}
+
+void main_form::update_session_chat_messages() {
+	if (_current_session_unique_id.empty())
+		return;	// exit immediately, user isn't currently part of any session
+
+	// stop the timer
+	_timer_man.stop("update_session_chat_messages");
+
+	std::vector<collab::message> messages;
+
+	std::string error;
+	if (_collab.get_messages(_current_session_unique_id, messages, error)) {
+		try {
+			auto& messages_pane = get_pane("home/collaboration_pane/chat_pane/messages");
+
+			const auto ref_rect = lecui::rect(messages_pane.size());
+
+			float bottom_margin = 0.f;
+
+			for (const auto& msg : messages) {
+				const bool own_message = msg.sender_unique_id == _collab.unique_id();
+
+				float text_height = _detail_height;
+				float font_size = _detail_font_size;
+
+				// measure text height
+				text_height = _dim.measure_label(msg.text, _font, font_size,
+					lecui::text_alignment::left, lecui::paragraph_alignment::top, ref_rect).height();
+
+				const float content_margin = 10.f;
+				float pane_height = _caption_height + text_height + (2 * content_margin);
+				std::string display_name;
+
+				for (size_t i = 0; i < 10; i++)
+					display_name += msg.sender_unique_id[i];
+
+				std::string send_time(6, '\0');
+
+				std::strftime(&send_time[0], send_time.size(), "%H:%M", std::localtime(&msg.time));
+
+				// add message pane
+				auto& pane = lecui::containers::pane::add(messages_pane, msg.unique_id, content_margin);
+				pane
+					.rect(lecui::rect(messages_pane.size())
+						.top(bottom_margin)
+						.height(pane_height))
+					.color_fill(_setting_darktheme ?
+						(own_message ?
+							lecui::color().red(30).green(60).blue(100) :
+							lecui::color().red(35).green(45).blue(60)) :
+						(own_message ?
+							lecui::color().red(245).green(255).blue(245) :
+							lecui::color().red(255).green(255).blue(255)));
+
+				// update bottom margin
+				bottom_margin = pane.rect().bottom() + _margin;
+
+				// add message label
+				auto& label = lecui::widgets::label::add(pane, msg.unique_id + "_label");
+				label
+					.text((own_message ? std::string("") : std::string("<strong>" + display_name + "</strong> "))
+						+ send_time)
+					.rect(lecui::rect(pane.size()).height(_caption_height))
+					.font_size(_caption_font_size);
+
+				// add message text
+				auto& text = lecui::widgets::label::add(pane, msg.unique_id + "_text");
+				text
+					.text(msg.text)
+					.rect(lecui::rect(label.rect()).height(text_height).snap_to(label.rect(), snap_type::bottom, 0.f))
+					.font_size(font_size);
+			}
+		}
+		catch (const std::exception&) {}
+	}
+
+	// resume the timer (1200ms looping ...)
+	_timer_man.add("update_session_chat_messages", 1200, [&]() {
+		update_session_chat_messages();
 		});
 }
 

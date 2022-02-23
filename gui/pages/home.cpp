@@ -36,6 +36,10 @@
 
 // leccore
 #include <liblec/leccore/system.h>
+#include <liblec/leccore/hash.h>
+
+// STL
+#include <chrono>
 
 void main_form::add_home_page() {
 	auto& home = _page_man.add("home");
@@ -130,6 +134,9 @@ void main_form::add_home_page() {
 
 		session_list
 			.events().context_menu = [&](const std::vector<lecui::table_row>& rows) {
+			if (rows.empty())
+				return;
+
 			lecui::context_menu::specs menu_specs;
 			menu_specs.items.push_back({ "Join", png_join_session });
 
@@ -149,6 +156,10 @@ void main_form::add_home_page() {
 
 					// to-do: implement session joining for first item in selection
 					if (join_session(session)) {
+						// capture current session unique id
+						_current_session_unique_id = session.unique_id;
+						_collab.set_current_session_unique_id(_current_session_unique_id);
+
 						std::string error;
 
 						// hide new session pane and join session pane
@@ -165,7 +176,7 @@ void main_form::add_home_page() {
 
 							session_name.text(session.name);
 							session_description.text(session.description);
-							session_id.text("Session ID: " + session.unique_id);
+							session_id.text("Session ID: " + _current_session_unique_id);
 
 							// add chat pane (dynamic)
 							auto& ref_rect = lecui::rect()
@@ -210,6 +221,34 @@ void main_form::add_home_page() {
 								messages_pane
 									.color_fill().alpha(0);
 
+								auto send_message = [this]() {
+									// make session message object
+									collab::message msg;
+									msg.unique_id = leccore::hash_string::uuid();
+									msg.time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+									msg.session_id = _current_session_unique_id;
+
+									msg.sender_unique_id = _collab.unique_id();
+
+									try {
+										auto& message = get_text_field("home/collaboration_pane/chat_pane/message");
+										msg.text = message.text();
+									}
+									catch (const std::exception&) {}
+
+									std::string error;
+									if (_collab.create_message(msg, error)) {
+										try {
+											auto& message = get_text_field("home/collaboration_pane/chat_pane/message");
+											message.text().clear();
+											update();
+										}
+										catch (const std::exception&) {}
+									}
+									else
+										lecui::form::message(error);
+								};
+
 								// add message text field
 								auto& message = lecui::widgets::text_field::add(chat_pane, "message");
 								message
@@ -222,7 +261,10 @@ void main_form::add_home_page() {
 										.width_rate(100.f)
 										.y_rate(100.f))
 									.prompt("Type message here")
-									.maximum_length(200);
+									.maximum_length(200)
+									.events().action = [send_message]() {
+									send_message();
+								};
 
 								// add send icon
 								auto& send_icon = lecui::widgets::icon::add(chat_pane, "send");
@@ -236,8 +278,8 @@ void main_form::add_home_page() {
 										.x_rate(100.f)
 										.y_rate(100.f))
 									.png_resource(png_send)
-									.events().action = [this]() {
-									// to-do: implement sending message
+									.events().action = [send_message]() {
+									send_message();
 								};
 							}
 						}
@@ -281,6 +323,10 @@ void main_form::add_home_page() {
 				.height(_title_height + _caption_height))
 			.png_resource(_setting_darktheme ? png_back_dark : png_back_light)
 			.events().action = [this]() {
+			// clear current session unique id
+			_current_session_unique_id.clear();
+			_collab.set_current_session_unique_id(_current_session_unique_id);
+
 			std::string error;
 
 			// hide collaboration pane
