@@ -29,28 +29,6 @@
 
 /// <summary>Collaboration class.</summary>
 class collab {
-	std::string _unique_id;
-
-	enum class node_status {
-		unknown,
-		available,
-		unavailable,
-		busy,
-	};
-
-	struct node {
-		std::string id;
-		std::string name;
-		std::string display_name;
-		std::vector<std::string> ip_address_list;
-		std::string signed_in_session_id;
-		node_status status;
-	};
-	
-	struct token {
-
-	};
-
 public:
 	struct session {
 		std::string unique_id;
@@ -65,6 +43,13 @@ public:
 		std::string session_id;
 		std::string sender_unique_id;
 		std::string text;
+	};
+
+	struct user {
+		std::string unique_id;
+		std::string username;
+		std::string display_name;
+		std::string user_image;
 	};
 
 	collab ();
@@ -88,17 +73,11 @@ public:
 	// users
 
 	/// <summary>Save a new user.</summary>
-	/// <param name="unique_id">The user's unique id.</param>
-	/// <param name="username">The username, e.g. alecmus.</param>
-	/// <param name="display_name">The user's display name, e.g. Alec Musasa.</param>
-	/// <param name="user_image">The user's image (blob data).</param>
+	/// <param name="user">The user's information, as defined in <see cref="collab::user"></see>.</param>
 	/// <param name="error">Error information.</param>
 	/// <returns>Returns true if successful, else false.</returns>
 	/// <remarks>Saves to the local database.</remarks>
-	bool save_user(const std::string& unique_id,
-		const std::string& username,
-		const std::string& display_name,
-		const std::string& user_image,
+	bool save_user(const user& user,
 		std::string& error);
 
 	/// <summary>Check if a user exists.</summary>
@@ -109,30 +88,21 @@ public:
 
 	/// <summary>Gets user info from the local database.</summary>
 	/// <param name="unique_id">The unique id of the user.</param>
-	/// <param name="username">The username, e.g. alecmus.</param>
-	/// <param name="display_name">The user's display name,e.g. Alec Musasa.</param>
-	/// <param name="user_image">The user's image (blob data).</param>
+	/// <param name="user">The user's information, as defined in <see cref="collab::user"></see>.</param>
 	/// <param name="error">Error information.</param>
 	/// <returns>Returns true if successful, else false.</returns>
 	/// <remarks>Reads from the local database.</remarks>
 	bool get_user(const std::string& unique_id,
-		std::string& username,
-		std::string& display_name,
-		std::string& user_image,
-		std::string& error);
+		user& user, std::string& error);
 
 	/// <summary>Edit an existing user.</summary>
 	/// <param name="unique_id">The user's unique id.</param>
-	/// <param name="username">The new username.</param>
-	/// <param name="display_name">The new display name.</param>
-	/// <param name="user_image">The new image (blob data).</param>
+	/// <param name="user">The new user details.</param>
 	/// <param name="error">Error information.</param>
 	/// <returns>Returns true if successful, else false.</returns>
 	/// <remarks>Saves changes to the local database.</remarks>
 	bool edit_user(const std::string& unique_id,
-		const std::string& username,
-		const std::string& display_name,
-		const std::string& user_image,
+		const user& user,
 		std::string& error);
 
 	//------------------------------------------------------------------------------------------------

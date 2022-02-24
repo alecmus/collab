@@ -360,15 +360,12 @@ bool main_form::on_initialize(std::string& error) {
 			// stop the timer
 			_timer_man.stop("avatar_set");
 
-			std::string _existing_username;
-			std::string _existing_display_name;
-			std::string _existing_user_image;
+			collab::user _existing_user;
 
-			if (!_collab.get_user(_collab.unique_id(),
-				_existing_username, _existing_display_name, _existing_user_image, error))
+			if (!_collab.get_user(_collab.unique_id(), _existing_user, error))
 				return;
 
-			set_avatar(_existing_user_image);
+			set_avatar(_existing_user.user_image);
 			});
 	}
 

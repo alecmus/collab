@@ -143,18 +143,18 @@ collab::collab() : _d(*new impl(*this)) {
 	liblec::leccore::pc_info::pc_details _pc_details;
 	if (_pc_info.pc(_pc_details, error)) {
 		if (!_pc_details.bios_serial_number.empty())
-			_unique_id = _pc_details.bios_serial_number;
+			_d._unique_id = _pc_details.bios_serial_number;
 	}
 
 	// mask with a hash
-	_unique_id = liblec::leccore::hash_string::sha256(_unique_id);
+	_d._unique_id = liblec::leccore::hash_string::sha256(_d._unique_id);
 }
 
 collab::~collab() {
 	delete& _d;
 }
 
-const std::string& collab::unique_id() { return _unique_id; }
+const std::string& collab::unique_id() { return _d._unique_id; }
 
 bool collab::initialize(const std::string& database_file, std::string& error) {
 	return _d.initialize(database_file, error);

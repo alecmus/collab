@@ -49,9 +49,7 @@ void main_form::user() {
 		std::string _resized_profile_image;
 		const bool _editing_mode = false;
 
-		std::string _existing_username;
-		std::string _existing_display_name;
-		std::string _existing_user_image;
+		collab::user _existing_user;
 
 		bool on_initialize(std::string& error) override {
 			// size and stuff
@@ -67,13 +65,12 @@ void main_form::user() {
 			_dim.set_size(lecui::size().width(300.f).height(340.f));
 
 			if (_editing_mode) {
-				if (!_main_form._collab.get_user(_main_form._collab.unique_id(),
-					_existing_username, _existing_display_name, _existing_user_image, error))
+				if (!_main_form._collab.get_user(_main_form._collab.unique_id(), _existing_user, error))
 					return false;
 
-				if (!_existing_user_image.empty()) {
+				if (!_existing_user.user_image.empty()) {
 					std::string fullpath = _main_form._folder + "\\rpi.jpg";
-					if (!leccore::file::write(fullpath, _existing_user_image, error))
+					if (!leccore::file::write(fullpath, _existing_user.user_image, error))
 						return false;
 
 					_resized_profile_image = fullpath;
@@ -175,7 +172,7 @@ void main_form::user() {
 			// add user name text field
 			auto& username = lecui::widgets::text_field::add(home, "username");
 			username
-				.text(_existing_username)
+				.text(_existing_user.username)
 				.prompt("e.g. 'johndoe'")
 				.allowed_characters(allowed_set)
 				.maximum_length(20)	// to-do: remove magic number
@@ -198,7 +195,7 @@ void main_form::user() {
 			// add session description text field
 			auto& display_name = lecui::widgets::text_field::add(home, "display_name");
 			display_name
-				.text(_existing_display_name)
+				.text(_existing_user.display_name)
 				.prompt("e.g. 'John Doe'")
 				.maximum_length(100)	// to-do: remove magic number
 				.rect(lecui::rect(username.rect())
@@ -279,10 +276,13 @@ void main_form::user() {
 
 				// read user_image data
 				std::string error;
-				std::string user_image_data;
+				collab::user user_data;
+				user_data.unique_id = _main_form._collab.unique_id();
+				user_data.username = username.text();
+				user_data.display_name = display_name.text();
 
 				if (!user_image.png_resource() && !user_image.file().empty()) {
-					if (!leccore::file::read(_resized_profile_image, user_image_data, error)) {
+					if (!leccore::file::read(_resized_profile_image, user_data.user_image, error)) {
 						message("Failed to read user image: " + error);
 						return;
 					}
@@ -290,22 +290,20 @@ void main_form::user() {
 
 				if (_editing_mode) {
 					// edit existing user
-					if (!_main_form._collab.edit_user(_main_form._collab.unique_id(),
-						username.text(), display_name.text(), user_image_data, error)) {
+					if (!_main_form._collab.edit_user(_main_form._collab.unique_id(), user_data, error)) {
 						message(error);
 						return;
 					}
 				}
 				else {
 					// save new user
-					if (!_main_form._collab.save_user(_main_form._collab.unique_id(),
-						username.text(), display_name.text(), user_image_data, error)) {
+					if (!_main_form._collab.save_user(user_data, error)) {
 						message(error);
 						return;
 					}
 				}
 
-				_main_form.set_avatar(user_image_data);
+				_main_form.set_avatar(user_data.user_image);
 
 				close();
 			}

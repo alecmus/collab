@@ -94,6 +94,8 @@ class collab::impl {
 	bool _stop_session_broadcast = false;
 
 public:
+	std::string _unique_id;
+
 	std::string _current_session_unique_id;
 
 	// concurrency control related to the session broadcast thread

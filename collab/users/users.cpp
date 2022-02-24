@@ -24,10 +24,7 @@
 
 #include "../impl.h"
 
-bool collab::save_user(const std::string& unique_id,
-	const std::string& username,
-	const std::string& display_name,
-	const std::string& user_image,
+bool collab::save_user(const collab::user& user,
 	std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
 
@@ -44,13 +41,13 @@ bool collab::save_user(const std::string& unique_id,
 
 	// create table if it doesn't exist
 	if (!con.execute("CREATE TABLE IF NOT EXISTS Users "
-		"(UniqueID TEXT, Username TEXT, DisplayName TEXT, UserImage BLOB, PRIMARY KEY(UniqueID));",
+		"(UniqueID TEXT NOT NULL, Username TEXT NOT NULL, DisplayName TEXT NOT NULL, UserImage BLOB, PRIMARY KEY(UniqueID));",
 		{}, error))
 		return false;
 
 	// insert data into table
 	if (!con.execute("INSERT INTO Users VALUES(?, ?, ?, ?);",
-		{ unique_id, username, display_name, liblec::leccore::database::blob{ user_image } },
+		{ user.unique_id, user.username, user.display_name, liblec::leccore::database::blob{ user.user_image } },
 		error))
 		return false;
 
@@ -83,13 +80,13 @@ bool collab::user_exists(const std::string& unique_id) {
 	return !results.data.empty();
 }
 
-bool collab::get_user(const std::string& unique_id, std::string& username, std::string& display_name,
-	std::string& user_image, std::string& error) {
+bool collab::get_user(const std::string& unique_id, collab::user& user, std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
 
-	username.clear();
-	display_name.clear();
-	user_image.clear();
+	user.unique_id.clear();
+	user.username.clear();
+	user.display_name.clear();
+	user.user_image.clear();
 
 	if (unique_id.empty()) {
 		error = "User unique id not supplied";
@@ -112,14 +109,17 @@ bool collab::get_user(const std::string& unique_id, std::string& username, std::
 		return false;
 
 	try {
+		if (results.data[0].at("UniqueID").has_value())
+			user.unique_id = liblec::leccore::database::get::text(results.data[0].at("UniqueID"));
+
 		if (results.data[0].at("Username").has_value())
-			username = liblec::leccore::database::get::text(results.data[0].at("Username"));
+			user.username = liblec::leccore::database::get::text(results.data[0].at("Username"));
 
 		if (results.data[0].at("DisplayName").has_value())
-			display_name = liblec::leccore::database::get::text(results.data[0].at("DisplayName"));
+			user.display_name = liblec::leccore::database::get::text(results.data[0].at("DisplayName"));
 
 		if (results.data[0].at("UserImage").has_value())
-			user_image = liblec::leccore::database::get::blob(results.data[0].at("UserImage")).data;
+			user.user_image = liblec::leccore::database::get::blob(results.data[0].at("UserImage")).data;
 
 		return true;
 	}
@@ -129,8 +129,7 @@ bool collab::get_user(const std::string& unique_id, std::string& username, std::
 	}
 }
 
-bool collab::edit_user(const std::string& unique_id, const std::string& username,
-	const std::string& display_name, const std::string& user_image, std::string& error) {
+bool collab::edit_user(const std::string& unique_id, const collab::user& user, std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
 
 	if (unique_id.empty()) {
@@ -151,7 +150,7 @@ bool collab::edit_user(const std::string& unique_id, const std::string& username
 
 	// insert data into table
 	if (!con.execute("UPDATE Users SET Username = ?, DisplayName = ?, UserImage = ? WHERE UniqueID = ?",
-		{ username, display_name, liblec::leccore::database::blob{ user_image }, unique_id },
+		{ user.username, user.display_name, liblec::leccore::database::blob{ user.user_image }, unique_id },
 		error))
 		return false;
 
