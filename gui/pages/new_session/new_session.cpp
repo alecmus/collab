@@ -238,10 +238,8 @@ void main_form::new_session() {
 					session.passphrase_hash = leccore::hash_string::sha256(session_password.text());
 					
 					std::string error;
-					if (_main_form._collab.create_session(session, error)) {
-						message("Session created successfully!");
+					if (_main_form._collab.create_session(session, error))
 						close();
-					}
 					else
 						message(error);
 				}
