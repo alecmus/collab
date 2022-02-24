@@ -31,6 +31,18 @@
     <Filter Include="collab\gui\main_form\pages\join_session">
       <UniqueIdentifier>{414fc153-b6de-4f81-9a40-480826b9f746}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\collab">
+      <UniqueIdentifier>{9805a174-0d62-405d-8bde-47ed24556381}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\collab\users">
+      <UniqueIdentifier>{9067a90d-1c34-4c9b-a875-275c4a99b729}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\collab\sessions">
+      <UniqueIdentifier>{6b967573-c226-4da8-b21e-fed40732a47b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\collab\messages">
+      <UniqueIdentifier>{6ceee6cf-6dd1-41d7-8567-cf1126c98ee7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
@@ -45,8 +57,11 @@
     <ClInclude Include="helper_functions.h">
       <Filter>collab</Filter>
     </ClInclude>
-    <ClInclude Include="collab.h">
-      <Filter>collab</Filter>
+    <ClInclude Include="collab\collab.h">
+      <Filter>collab\collab</Filter>
+    </ClInclude>
+    <ClInclude Include="collab\impl.h">
+      <Filter>collab\collab</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +103,6 @@
     <ClCompile Include="gui\side_pane.cpp">
       <Filter>collab\gui\main_form</Filter>
     </ClCompile>
-    <ClCompile Include="collab.cpp">
-      <Filter>collab</Filter>
-    </ClCompile>
     <ClCompile Include="gui\top_status_pane.cpp">
       <Filter>collab\gui\main_form</Filter>
     </ClCompile>
@@ -102,6 +114,18 @@
     </ClCompile>
     <ClCompile Include="gui\pages\join_session\join_session.cpp">
       <Filter>collab\gui\main_form\pages\join_session</Filter>
+    </ClCompile>
+    <ClCompile Include="collab\collab.cpp">
+      <Filter>collab\collab</Filter>
+    </ClCompile>
+    <ClCompile Include="collab\users\users.cpp">
+      <Filter>collab\collab\users</Filter>
+    </ClCompile>
+    <ClCompile Include="collab\sessions\sessions.cpp">
+      <Filter>collab\collab\sessions</Filter>
+    </ClCompile>
+    <ClCompile Include="collab\messages\messages.cpp">
+      <Filter>collab\collab\messages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

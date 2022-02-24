@@ -26,7 +26,7 @@
 
 #include "version_info.h"
 #include "resource.h"
-#include "collab.h"
+#include "collab/collab.h"
 
 // lecui
 #include <liblec/lecui/instance.h>

@@ -175,7 +175,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="collab.h" />
+    <ClInclude Include="collab\collab.h" />
+    <ClInclude Include="collab\impl.h" />
     <ClInclude Include="gui.h" />
     <ClInclude Include="helper_functions.h" />
     <ClInclude Include="resource.h" />
@@ -186,7 +187,10 @@
     <ResourceCompile Include="version_info.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="collab.cpp" />
+    <ClCompile Include="collab\collab.cpp" />
+    <ClCompile Include="collab\messages\messages.cpp" />
+    <ClCompile Include="collab\sessions\sessions.cpp" />
+    <ClCompile Include="collab\users\users.cpp" />
     <ClCompile Include="gui\main_form.cpp" />
     <ClCompile Include="gui\on_initialize.cpp" />
     <ClCompile Include="gui\on_layout.cpp" />
