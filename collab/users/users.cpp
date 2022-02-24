@@ -24,6 +24,172 @@
 
 #include "../impl.h"
 
+#include <set>
+
+// serialize template to make collab::user serializable
+template<class Archive>
+void serialize(Archive& ar, collab::user& cls, const unsigned int version) {
+	ar& cls.unique_id;
+	ar& cls.username;
+	ar& cls.display_name;
+	ar& cls.user_image;
+}
+
+bool serialize_user_structure(const collab::user& cls, std::string& serialized, std::string& error) {
+	error.clear();
+
+	std::stringstream ss;
+
+	try {
+		boost::archive::text_oarchive oa(ss);
+		oa& cls;
+	}
+	catch (const std::exception& e) {
+		error = e.what();
+		return false;
+	}
+
+	// encode to base64
+	serialized = liblec::leccore::base64::encode(ss.str());
+	return true;
+}
+
+bool deserialize_user_structure(const std::string& serialized, collab::user& cls, std::string& error) {
+	std::stringstream ss;
+
+	// decode from base64
+	ss << liblec::leccore::base64::decode(serialized);
+
+	try {
+		boost::archive::text_iarchive ia(ss);
+		ia& cls;
+		return true;
+	}
+	catch (const std::exception& e) {
+		error = e.what();
+		return false;
+	}
+}
+
+void collab::impl::user_broadcast_sender_func(impl* p_impl) {
+	// create a broadcast sender object
+	liblec::lecnet::udp::broadcast::sender sender(USER_BROADCAST_PORT);
+
+	// loop until _stop_session_broadcast is false
+	while (true) {
+		{
+			liblec::auto_mutex lock(p_impl->_session_broadcast_mutex);
+
+			// check flag
+			if (p_impl->_stop_session_broadcast)
+				break;
+		}
+
+		std::string error;
+		collab::user user;
+
+		// get user from local database
+		if (p_impl->_collab.user_exists(p_impl->_collab.unique_id()) && p_impl->_collab.get_user(p_impl->_collab.unique_id(), user, error)) {
+
+			// serialize the user object
+			std::string serialized_user;
+			if (serialize_user_structure(user, serialized_user, error)) {
+
+				// broadcast the serialized object
+				unsigned long actual_count = 0;
+				if (sender.send(serialized_user, 1, 0, actual_count, error)) {
+					// broadcast successful
+				}
+			}
+		}
+
+		// take a breath
+		std::this_thread::sleep_for(std::chrono::milliseconds{ user_broadcast_cycle });
+	}
+}
+
+void collab::impl::user_broadcast_receiver_func(impl* p_impl) {
+	// create broadcast receiver object
+	liblec::lecnet::udp::broadcast::receiver receiver(USER_BROADCAST_PORT, "0.0.0.0");
+
+	// for tracking users that have already been received so that a user is not attended to more than once per session
+	std::set<std::string> received_users;
+
+	// loop until _stop_session_broadcast is false
+	while (true) {
+		{
+			liblec::auto_mutex lock(p_impl->_session_broadcast_mutex);
+
+			// check flag
+			if (p_impl->_stop_session_broadcast)
+				break;
+		}
+
+		std::string current_session_unique_id;
+
+		{
+			liblec::auto_mutex lock(p_impl->_message_broadcast_mutex);
+			current_session_unique_id = p_impl->_current_session_unique_id;
+		}
+
+		if (!current_session_unique_id.empty()) {
+			std::string error;
+
+			// run the receiver
+			if (receiver.run(user_receiver_cycle, error)) {
+				// loop while running
+				while (receiver.running())
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+				// no longer running ... check if a datagram was received
+				std::string serialized_user;
+				if (receiver.get(serialized_user, error)) {
+					// datagram received ... deserialize
+
+					collab::user cls;
+					if (deserialize_user_structure(serialized_user, cls, error)) {
+						// deserialized successfully
+
+						// check if user has message in current session
+						if (!p_impl->_collab.user_has_messages_in_session(cls.unique_id, current_session_unique_id))
+							continue;	// ignore this data
+
+						if (p_impl->_collab.user_exists(cls.unique_id)) {
+							// edit user
+							if (p_impl->_collab.edit_user(cls.unique_id, cls, error)) {
+								// user edited successfully
+							}
+						}
+						else {
+							// save user to local database
+							if (p_impl->_collab.save_user(cls, error)) {
+								// user added successfully to the local database
+							}
+						}
+
+						// don't attend to more than once
+						if (received_users.count(cls.unique_id))
+							continue;	// ignore this data
+						else {
+							// add to received user list
+							received_users.insert(cls.unique_id);
+						}
+					}
+				}
+			}
+
+			receiver.stop();
+		}
+		else {
+			// clear received user list so it's refreshed per session
+			received_users.clear();
+
+			// take a breath
+			std::this_thread::sleep_for(std::chrono::milliseconds{ user_receiver_cycle });
+		}
+	}
+}
+
 bool collab::save_user(const collab::user& user,
 	std::string& error) {
 	liblec::auto_mutex lock(_d._database_mutex);
@@ -109,17 +275,62 @@ bool collab::get_user(const std::string& unique_id, collab::user& user, std::str
 		return false;
 
 	try {
-		if (results.data[0].at("UniqueID").has_value())
-			user.unique_id = liblec::leccore::database::get::text(results.data[0].at("UniqueID"));
+		for (const auto& row : results.data) {
+			if (row.at("UniqueID").has_value())
+				user.unique_id = liblec::leccore::database::get::text(row.at("UniqueID"));
 
-		if (results.data[0].at("Username").has_value())
-			user.username = liblec::leccore::database::get::text(results.data[0].at("Username"));
+			if (row.at("Username").has_value())
+				user.username = liblec::leccore::database::get::text(row.at("Username"));
 
-		if (results.data[0].at("DisplayName").has_value())
-			user.display_name = liblec::leccore::database::get::text(results.data[0].at("DisplayName"));
+			if (row.at("DisplayName").has_value())
+				user.display_name = liblec::leccore::database::get::text(row.at("DisplayName"));
 
-		if (results.data[0].at("UserImage").has_value())
-			user.user_image = liblec::leccore::database::get::blob(results.data[0].at("UserImage")).data;
+			if (row.at("UserImage").has_value())
+				user.user_image = liblec::leccore::database::get::blob(row.at("UserImage")).data;
+
+			break;	// only one row expected anyway
+		}
+
+		return true;
+	}
+	catch (const std::exception& e) {
+		error = e.what();
+		return false;
+	}
+}
+
+bool collab::get_user_display_name(const std::string& unique_id, std::string& display_name, std::string& error) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	display_name.clear();
+
+	if (unique_id.empty()) {
+		error = "User unique id not supplied";
+		return false;
+	}
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+	if (!con.execute_query("SELECT DisplayName FROM Users WHERE UniqueID = ?;", { unique_id }, results, error))
+		return false;
+
+	try {
+		for (const auto& row : results.data) {
+			if (row.at("DisplayName").has_value())
+				display_name = liblec::leccore::database::get::text(row.at("DisplayName"));
+
+			break;	// only one row expected anyway
+		}
 
 		return true;
 	}

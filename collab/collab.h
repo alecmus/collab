@@ -95,6 +95,16 @@ public:
 	bool get_user(const std::string& unique_id,
 		user& user, std::string& error);
 
+	/// <summary>Get a user's display name.</summary>
+	/// <param name="unique_id">The user's unique id.</param>
+	/// <param name="display_name">The user's display name.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Reads from the local database.</remarks>
+	bool get_user_display_name(const std::string& unique_id,
+		std::string& display_name,
+		std::string& error);
+
 	/// <summary>Edit an existing user.</summary>
 	/// <param name="unique_id">The user's unique id.</param>
 	/// <param name="user">The new user details.</param>
@@ -211,6 +221,13 @@ public:
 	bool get_latest_messages(const std::string& session_unique_id,
 		std::vector<message>& messages,
 		int number, std::string& error);
+
+	/// <summary>Check if a user has any messages in a given session.</summary>
+	/// <param name="user_unique_id">The user's unique id.</param>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <returns></returns>
+	bool user_has_messages_in_session(const std::string& user_unique_id,
+		const std::string& session_unique_id);
 
 private:
 	class impl;

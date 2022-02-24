@@ -100,25 +100,27 @@ void collab::impl::message_broadcast_sender_func(impl* p_impl) {
 			current_session_unique_id = p_impl->_current_session_unique_id;
 		}
 
-		std::string error;
-		std::vector<message> local_message_list;
+		if (!current_session_unique_id.empty()) {
+			std::string error;
+			std::vector<message> local_message_list;
 
-		// get message list from local database
-		if (p_impl->_collab.get_latest_messages(current_session_unique_id, local_message_list, message_broadcast_limit, error)) {
+			// get message list from local database
+			if (p_impl->_collab.get_latest_messages(current_session_unique_id, local_message_list, message_broadcast_limit, error)) {
 
-			// make a message broadcast object
-			std::string serialized_message_list;
-			message_broadcast_structure cls;
-			cls.source_node_unique_id = p_impl->_collab.unique_id();
-			cls.message_list = local_message_list;
+				// make a message broadcast object
+				std::string serialized_message_list;
+				message_broadcast_structure cls;
+				cls.source_node_unique_id = p_impl->_collab.unique_id();
+				cls.message_list = local_message_list;
 
-			// serialize the message broadcast object
-			if (serialize_message_broadcast_structure(cls, serialized_message_list, error)) {
+				// serialize the message broadcast object
+				if (serialize_message_broadcast_structure(cls, serialized_message_list, error)) {
 
-				// broadcast the serialized object
-				unsigned long actual_count = 0;
-				if (sender.send(serialized_message_list, 1, 0, actual_count, error)) {
-					// broadcast successful
+					// broadcast the serialized object
+					unsigned long actual_count = 0;
+					if (sender.send(serialized_message_list, 1, 0, actual_count, error)) {
+						// broadcast successful
+					}
 				}
 			}
 		}
@@ -149,57 +151,66 @@ void collab::impl::message_broadcast_receiver_func(impl* p_impl) {
 			current_session_unique_id = p_impl->_current_session_unique_id;
 		}
 
-		std::string error;
+		if (!current_session_unique_id.empty()) {
+			std::string error;
 
-		// run the receiver
-		if (receiver.run(message_receiver_cycle, error)) {
-			// loop while running
-			while (receiver.running())
-				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			// run the receiver
+			if (receiver.run(message_receiver_cycle, error)) {
+				// loop while running
+				while (receiver.running())
+					std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-			// no longer running ... check if a datagram was received
-			std::string serialized_message_list;
-			if (receiver.get(serialized_message_list, error)) {
-				// datagram received ... deserialize
+				// no longer running ... check if a datagram was received
+				std::string serialized_message_list;
+				if (receiver.get(serialized_message_list, error)) {
+					// datagram received ... deserialize
 
-				message_broadcast_structure cls;
-				if (deserialize_message_broadcast_structure(serialized_message_list, cls, error)) {
-					// deserialized successfully
+					message_broadcast_structure cls;
+					if (deserialize_message_broadcast_structure(serialized_message_list, cls, error)) {
+						// deserialized successfully
 
-					// check if data is coming from a different node
-					if (cls.source_node_unique_id == p_impl->_collab.unique_id())
-						continue;	// ignore this data
+						// check if data is coming from a different node
+						if (cls.source_node_unique_id == p_impl->_collab.unique_id())
+							continue;	// ignore this data
 
-					std::vector<message> local_message_list;
+						std::vector<message> local_message_list;
 
-					// get message list from local database
-					if (!p_impl->_collab.get_messages(current_session_unique_id, local_message_list, error)) {
-						// database may be empty or table may not exist, so ignore
-					}
-
-					// check if any message is missing in the local database
-					for (const auto& it : cls.message_list) {
-						bool found = false;
-
-						for (const auto& m_it : local_message_list) {
-							if (it.unique_id == m_it.unique_id) {
-								found = true;
-								break;
-							}
+						// get message list from local database
+						if (!p_impl->_collab.get_messages(current_session_unique_id, local_message_list, error)) {
+							// database may be empty or table may not exist, so ignore
 						}
 
-						if (!found) {
-							// add this message to the local database
-							if (p_impl->_collab.create_message(it, error)) {
-								// message added successfully to the local database
+						// check if any message is missing in the local database
+						for (const auto& it : cls.message_list) {
+							if (it.session_id != current_session_unique_id)
+								continue;	// ignore this data
+
+							bool found = false;
+
+							for (const auto& m_it : local_message_list) {
+								if (it.unique_id == m_it.unique_id) {
+									found = true;
+									break;
+								}
+							}
+
+							if (!found) {
+								// add this message to the local database
+								if (p_impl->_collab.create_message(it, error)) {
+									// message added successfully to the local database
+								}
 							}
 						}
 					}
 				}
 			}
-		}
 
-		receiver.stop();
+			receiver.stop();
+		}
+		else {
+			// take a breath
+			std::this_thread::sleep_for(std::chrono::milliseconds{ message_receiver_cycle });
+		}
 	}
 }
 
@@ -262,7 +273,8 @@ bool collab::get_messages(const std::string& session_unique_id,
 
 	if (!con.execute_query(
 		"SELECT UniqueID, Time, SessionID, SenderUniqueID, Message "
-		"FROM SessionMessages WHERE SessionID = ? ORDER BY Time ASC;",
+		"FROM SessionMessages "
+		"WHERE SessionID = ? ORDER BY Time ASC;",
 		{ session_unique_id }, results, error))
 		return false;
 
@@ -323,7 +335,8 @@ bool collab::get_latest_messages(const std::string& session_unique_id, std::vect
 	if (number > 0) {
 		if (!con.execute_query(
 			"SELECT UniqueID, Time, SessionID, SenderUniqueID, Message "
-			"FROM SessionMessages WHERE SessionID = ? "
+			"FROM SessionMessages "
+			"WHERE SessionID = ? "
 			"ORDER BY Time DESC "
 			"LIMIT ?;",
 			{ session_unique_id, number }, results, error))
@@ -332,7 +345,8 @@ bool collab::get_latest_messages(const std::string& session_unique_id, std::vect
 	else {
 		if (!con.execute_query(
 			"SELECT UniqueID, Time, SessionID, SenderUniqueID, Message "
-			"FROM SessionMessages WHERE SessionID = ? ORDER BY Time DESC;",
+			"FROM SessionMessages "
+			"WHERE SessionID = ? ORDER BY Time DESC;",
 			{ session_unique_id }, results, error))
 			return false;
 	}
@@ -365,4 +379,32 @@ bool collab::get_latest_messages(const std::string& session_unique_id, std::vect
 	}
 
 	return true;
+}
+
+bool collab::user_has_messages_in_session(const std::string& user_unique_id, const std::string& session_unique_id) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	if (user_unique_id.empty() || session_unique_id.empty())
+		return false;	// User or Session unique id not supplied
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value())
+		return false;	// No database connection
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+
+	std::string error;
+	if (!con.execute_query(
+		"SELECT Time "
+		"FROM SessionMessages "
+		"WHERE SenderUniqueID = ? AND SessionID = ?;",
+		{ user_unique_id, session_unique_id }, results, error))
+		return false;
+
+	return !results.data.empty();
 }

@@ -85,6 +85,30 @@ collab::impl::~impl() {
 		}
 	}
 
+	if (_user_broadcast_sender.valid()) {
+		// wait for the thread to exit
+		while (true) {
+			bool thread_running = _user_broadcast_sender.wait_for(std::chrono::seconds{ 0 }) != std::future_status::ready;
+
+			if (!thread_running)
+				break;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+		}
+	}
+
+	if (_user_broadcast_receiver.valid()) {
+		// wait for the thread to exit
+		while (true) {
+			bool thread_running = _user_broadcast_receiver.wait_for(std::chrono::seconds{ 0 }) != std::future_status::ready;
+
+			if (!thread_running)
+				break;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+		}
+	}
+
 	if (_p_con) {
 		delete _p_con;
 		_p_con = nullptr;
@@ -123,6 +147,8 @@ bool collab::impl::initialize(const std::string& database_file, std::string& err
 		_session_broadcast_receiver = std::async(std::launch::async, session_broadcast_receiver_func, this);
 		_message_broadcast_sender = std::async(std::launch::async, message_broadcast_sender_func, this);
 		_message_broadcast_receiver = std::async(std::launch::async, message_broadcast_receiver_func, this);
+		_user_broadcast_sender = std::async(std::launch::async, user_broadcast_sender_func, this);
+		_user_broadcast_receiver = std::async(std::launch::async, user_broadcast_receiver_func, this);
 	}
 	catch (const std::exception& e) {
 		error = e.what();

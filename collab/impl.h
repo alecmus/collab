@@ -53,7 +53,8 @@
 
 enum ports {
 	SESSION_BROADCAST_PORT = 30030,
-	MESSAGE_BROADCAST_PORT
+	MESSAGE_BROADCAST_PORT,
+	USER_BROADCAST_PORT,
 };
 
 constexpr int session_broadcast_cycle = 1200;	// in milliseconds
@@ -61,6 +62,9 @@ constexpr int session_receiver_cycle = 1500;	// in milliseconds
 
 constexpr int message_broadcast_cycle = 1200;	// in milliseconds
 constexpr int message_receiver_cycle = 1500;	// in milliseconds
+
+constexpr int user_broadcast_cycle = 1200;		// in milliseconds
+constexpr int user_receiver_cycle = 1200;		// in milliseconds
 
 constexpr int message_broadcast_limit = 10;		// only broadcast the latest 10 messages
 
@@ -84,6 +88,11 @@ bool serialize_message_broadcast_structure(const message_broadcast_structure& cl
 bool deserialize_message_broadcast_structure(const std::string& serialized,
 	message_broadcast_structure& cls, std::string& error);
 
+bool serialize_user_structure(const collab::user& cls,
+	std::string& serialized, std::string& error);
+bool deserialize_user_structure(const std::string& serialized,
+	collab::user& cls, std::string& error);
+
 class collab::impl {
 	liblec::leccore::database::connection* _p_con;
 	collab& _collab;
@@ -91,6 +100,8 @@ class collab::impl {
 	std::future<void> _session_broadcast_receiver;
 	std::future<void> _message_broadcast_sender;
 	std::future<void> _message_broadcast_receiver;
+	std::future<void> _user_broadcast_sender;
+	std::future<void> _user_broadcast_receiver;
 	bool _stop_session_broadcast = false;
 
 public:
@@ -119,4 +130,7 @@ public:
 
 	static void message_broadcast_sender_func(impl* p_impl);
 	static void message_broadcast_receiver_func(impl* p_impl);
+
+	static void user_broadcast_sender_func(impl* p_impl);
+	static void user_broadcast_receiver_func(impl* p_impl);
 };

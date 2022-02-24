@@ -500,6 +500,9 @@ void main_form::update_session_chat_messages() {
 
 			std::string previous_sender_unique_id;
 
+			// K = unique_id, T = display name
+			std::map<std::string, std::string> display_names;
+
 			for (const auto& msg : messages) {
 				const bool continuation = (previous_sender_unique_id == msg.sender_unique_id);
 				const bool own_message = msg.sender_unique_id == _collab.unique_id();
@@ -509,8 +512,38 @@ void main_form::update_session_chat_messages() {
 
 				std::string display_name;
 
-				for (size_t i = 0; i < 10; i++)
-					display_name += msg.sender_unique_id[i];
+				// try to get this user's display name
+				try {
+					if (display_names.count(msg.sender_unique_id) == 0) {
+						// fetch from local database
+						std::string _display_name;
+						if (_collab.get_user_display_name(msg.sender_unique_id, _display_name, error) && !_display_name.empty()) {
+							// capture
+							display_name = _display_name;
+
+							// cache
+							display_names[msg.sender_unique_id] = display_name;
+						}
+						else {
+							// use the first ten characters in the user's unique id
+							display_name.clear();
+
+							for (size_t i = 0; i < 10; i++)
+								display_name += msg.sender_unique_id[i];
+						}
+					}
+					else {
+						// use the cached display name
+						display_name = display_names.at(msg.sender_unique_id);
+					}
+				}
+				catch (const std::exception&) {
+					// use the first ten characters in the user's unique id
+					display_name.clear();
+
+					for (size_t i = 0; i < 10; i++)
+						display_name += msg.sender_unique_id[i];
+				}
 
 				std::string send_time(6, '\0');
 
