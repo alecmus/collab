@@ -50,6 +50,7 @@ const float main_form::_info_size = 20.f;
 const float main_form::_title_font_size = 12.f;
 const float main_form::_highlight_font_size = 14.f;
 const float main_form::_detail_font_size = 10.f;
+const float main_form::_ui_font_size = 9.f;
 const float main_form::_caption_font_size = 8.f;
 const std::string main_form::_sample_text = "<u><strong>Aq</strong></u>";
 const std::string main_form::_font = "Segoe UI";
@@ -515,8 +516,8 @@ void main_form::update_session_chat_messages() {
 
 				std::strftime(&send_time[0], send_time.size(), "%H:%M", std::localtime(&msg.time));
 
-				float text_height = _detail_height;
-				float font_size = _detail_font_size;
+				float text_height = _ui_font_height;
+				float font_size = _ui_font_size;
 
 				// measure text height
 				text_height = _dim.measure_label(msg.text, _font, font_size,

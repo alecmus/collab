@@ -49,6 +49,7 @@ void main_form::add_home_page() {
 	_title_height = _dim.measure_label(_sample_text, _font, _title_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
 	_highlight_height = _dim.measure_label(_sample_text, _font, _highlight_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
 	_detail_height = _dim.measure_label(_sample_text, _font, _detail_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
+	_ui_font_height = _dim.measure_label(_sample_text, _font, _ui_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
 	_caption_height = _dim.measure_label(_sample_text, _font, _caption_font_size, lecui::text_alignment::center, lecui::paragraph_alignment::top, page_rect).height();
 
 	auto& ref_rect = lecui::rect()

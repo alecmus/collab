@@ -70,12 +70,14 @@ class main_form : public lecui::form {
 	static const float _title_font_size;
 	static const float _highlight_font_size;
 	static const float _detail_font_size;
+	static const float _ui_font_size;
 	static const float _caption_font_size;
 
 	// computed ideal label heights, in pixels
 	float _title_height = 0.f;
 	float _highlight_height = 0.f;
 	float _detail_height = 0.f;
+	float _ui_font_height = 0.f;
 	float _caption_height = 0.f;
 
 	static const std::string _sample_text;
