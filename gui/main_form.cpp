@@ -22,8 +22,6 @@
 ** SOFTWARE.
 */
 
-#define _CRT_SECURE_NO_WARNINGS
-
 #include "../gui.h"
 
 // lecui
@@ -39,6 +37,7 @@
 
 // STL
 #include <filesystem>
+#include <sstream>
 
 // GDI+
 #include <Windows.h>
@@ -545,9 +544,12 @@ void main_form::update_session_chat_messages() {
 						display_name += msg.sender_unique_id[i];
 				}
 
-				std::string send_time(6, '\0');
+				std::tm time = { };
+				localtime_s(&time, &msg.time);
 
-				std::strftime(&send_time[0], send_time.size(), "%H:%M", std::localtime(&msg.time));
+				std::stringstream ss;
+				ss << std::put_time(&time, "%H:%M");
+				std::string send_time = ss.str();
 
 				float text_height = _ui_font_height;
 				float font_size = _ui_font_size;
