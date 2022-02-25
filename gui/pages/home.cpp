@@ -240,6 +240,7 @@ void main_form::add_home_page() {
 									std::string error;
 									if (_collab.create_message(msg, error)) {
 										try {
+											_message_sent_just_now = msg.unique_id;
 											auto& message = get_text_field("home/collaboration_pane/chat_pane/message");
 											message.text().clear();
 											update();

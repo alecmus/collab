@@ -39,10 +39,6 @@
 #include <filesystem>
 #include <sstream>
 
-// GDI+
-#include <Windows.h>
-#include <GdiPlus.h>
-
 const float main_form::_margin = 10.f;
 const float main_form::_icon_size = 32.f;
 const float main_form::_info_size = 20.f;
@@ -502,7 +498,12 @@ void main_form::update_session_chat_messages() {
 			// K = unique_id, T = display name
 			std::map<std::string, std::string> display_names;
 
+			bool latest_message_arrived = false;
+
 			for (const auto& msg : messages) {
+				if (msg.unique_id == _message_sent_just_now)
+					latest_message_arrived = true;
+
 				const bool continuation = (previous_sender_unique_id == msg.sender_unique_id);
 				const bool own_message = msg.sender_unique_id == _collab.unique_id();
 
@@ -613,6 +614,16 @@ void main_form::update_session_chat_messages() {
 				}
 
 				previous_sender_unique_id = msg.sender_unique_id;
+			}
+
+			if (latest_message_arrived) {
+				// clear
+				_message_sent_just_now.clear();
+
+				// scroll to the bottom
+				messages_pane.scroll_vertically(-std::numeric_limits<float>::max());
+
+				update();
 			}
 		}
 		catch (const std::exception&) {}

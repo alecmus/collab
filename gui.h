@@ -134,6 +134,7 @@ class main_form : public lecui::form {
 	std::string _avatar_file;
 	collab _collab;	// collaboration object
 	std::string _current_session_unique_id;
+	std::string _message_sent_just_now;
 
 	bool on_initialize(std::string& error) override;
 	bool on_layout(std::string& error) override;
