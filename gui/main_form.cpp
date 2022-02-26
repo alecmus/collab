@@ -28,6 +28,7 @@
 #include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/widgets/rectangle.h>
 #include <liblec/lecui/widgets/table_view.h>
+#include <liblec/lecui/widgets/icon.h>
 #include <liblec/lecui/containers/pane.h>
 
 // leccore
@@ -53,6 +54,55 @@ const std::string main_form::_font = "Segoe UI";
 const lecui::color main_form::_caption_color{ lecui::color().red(100).green(100).blue(100) };
 const lecui::color main_form::_online = lecui::color().red(0).green(150).blue(0).alpha(180);
 const lecui::color main_form::_busy = lecui::color().red(255).green(0).blue(0).alpha(180);
+
+int map_extension_to_resource(const std::string& extension) {
+	if (extension == ".pdf")
+		return png_pdf;
+		
+	if (extension == ".png")
+		return png_png;
+	
+	if (extension == ".jpg" || extension == ".jpeg")
+		return png_jpg;
+	
+	if (extension == ".bmp")
+		return png_bmp;
+	
+	if (extension == ".gif")
+		return png_gif;
+
+	if (extension == ".psd")
+		return png_psd;
+	
+	if (extension == ".doc" || extension == ".docx")
+		return png_doc;
+	
+	if (extension == ".xls" || extension == ".xlsx")
+		return png_xls;
+	
+	if (extension == ".ppt" || extension == ".pptx")
+		return png_ppt;
+		
+	if (extension == ".txt")
+		return png_txt;
+	
+	if (extension == ".iso")
+		return png_iso;
+	
+	if (extension == ".mp3" || extension == ".m4a" || extension == ".ogg" || extension == ".aac" || extension == ".wav" || extension == ".wma")
+		return png_audio;
+	
+	if (extension == ".mp4" || extension == ".avi" || extension == ".3gp" || extension == ".wmv" || extension == ".mkv" || extension == ".webm")
+		return png_video;
+	
+	if (extension == ".zip" || extension == ".rar" || extension == ".tar" || extension == ".gz" || extension == ".7z")
+		return png_archive;
+	
+	if (extension == ".exe" || extension == ".dll" || extension == ".cmd" || extension == ".bat")
+		return png_executable;
+	
+	return png_file;
+}
 
 void main_form::on_close() {
 	if (_installed)
@@ -688,6 +738,135 @@ void main_form::update_session_chat_messages() {
 	// resume the timer (1200ms looping ...)
 	_timer_man.add("update_session_chat_messages", 1200, [&]() {
 		update_session_chat_messages();
+		});
+}
+
+void main_form::update_session_chat_files() {
+	if (_current_session_unique_id.empty())
+		return;	// exit immediately, user isn't currently part of any session
+
+	// stop the timer
+	_timer_man.stop("update_session_chat_files");
+
+	std::vector<collab::file> files;
+
+	std::string error;
+
+	if (_collab.get_files(_current_session_unique_id, files, error)) {
+		try {
+			auto& content_pane = get_pane("home/collaboration_pane/files_pane/content");
+
+			const auto ref_rect = lecui::rect(content_pane.size());
+
+			float bottom_margin = 0.f;
+
+			// K = unique_id, T = display name
+			std::map<std::string, std::string> display_names;
+
+			for (const auto& file : files) {
+				std::tm time = { };
+				localtime_s(&time, &file.time);
+
+				std::stringstream ss;
+				ss << std::put_time(&time, "%d %B %Y, %H:%M");
+				std::string send_date = ss.str();
+
+				std::string display_name;
+
+				// try to get this user's display name
+				try {
+					if (display_names.count(file.sender_unique_id) == 0) {
+						// fetch from local database
+						std::string _display_name;
+						if (_collab.get_user_display_name(file.sender_unique_id, _display_name, error) && !_display_name.empty()) {
+							// capture
+							display_name = _display_name;
+
+							// cache
+							display_names[file.sender_unique_id] = display_name;
+						}
+						else {
+							// use the first ten characters in the user's unique id
+							display_name.clear();
+
+							for (size_t i = 0; i < 10; i++)
+								display_name += file.sender_unique_id[i];
+						}
+					}
+					else {
+						// use the cached display name
+						display_name = display_names.at(file.sender_unique_id);
+					}
+				}
+				catch (const std::exception&) {
+					// use the first ten characters in the user's unique id
+					display_name.clear();
+
+					for (size_t i = 0; i < 10; i++)
+						display_name += file.sender_unique_id[i];
+				}
+
+				auto& file_pane = lecui::containers::pane::add(content_pane, file.hash);
+				file_pane
+					.rect(lecui::rect(ref_rect)
+						.top(bottom_margin)
+						.height(105.f))
+					.color_fill(_setting_darktheme ?
+						lecui::color().red(35).green(45).blue(60) :
+						lecui::color().red(255).green(255).blue(255));
+
+				// update bottom margin
+				bottom_margin = file_pane.rect().bottom() + _margin;
+
+				auto& file_image = lecui::widgets::icon::add(file_pane, file.hash + "_file_image");
+				file_image
+					.rect(lecui::rect()
+						.width(40.f)
+						.height(40.f))
+					.png_resource(map_extension_to_resource(file.extension))
+					.padding(0.f);
+
+				auto& file_name = lecui::widgets::label::add(file_pane, file.hash + "_file_name");
+				file_name
+					.text("<strong>" + file.name + "</strong><span style = 'font-size: 8.0pt;'>" + file.extension + "</span>")
+					.rect(file_name.rect()
+						.left(file_image.rect().right() + _margin)
+						.right(file_pane.size().get_width()));
+
+				auto& additional = lecui::widgets::label::add(file_pane, file.hash + "_additional");
+				additional
+					.text("<strong>" + leccore::format_size(file.size, 2) + "</strong>, shared by <em>" + display_name + "</em>")
+					.font_size(_caption_font_size)
+					.color_text(_caption_color)
+					.rect(lecui::rect(file_name.rect())
+						.height(_caption_height)
+						.snap_to(file_name.rect(), snap_type::bottom, 0.f));
+
+				auto& shared_by = lecui::widgets::label::add(file_pane, file.hash + "_shared_by");
+				shared_by
+					.text("Shared on " + send_date)
+					.font_size(_caption_font_size)
+					.color_text(_caption_color)
+					.rect(lecui::rect(file_name.rect())
+						.height(_caption_height)
+						.snap_to(additional.rect(), snap_type::bottom, 0.f));
+
+				auto& file_description = lecui::widgets::label::add(file_pane, file.hash + "_file_description");
+				file_description
+					.text(file.description)
+					.font_size(_caption_font_size)
+					.color_text(_caption_color)
+					.rect(lecui::rect(file_name.rect())
+						.height(_caption_height * 2.5f)
+						.snap_to(shared_by.rect(), snap_type::bottom, _margin / 2.f));
+			}
+		}
+		catch (const std::exception&) {}
+	}
+
+	// resume the timer (1200ms looping ...)
+	_timer_man.add("update_session_chat_files", 1200, [&]() {
+		update_session_chat_files();
 		});
 }
 

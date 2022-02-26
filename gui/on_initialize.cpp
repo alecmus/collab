@@ -326,15 +326,17 @@ bool main_form::on_initialize(std::string& error) {
 			// default to the current directory in portable mode
 			_folder = get_current_folder() + "\\Collab";
 
+		_files_folder = _folder + "\\files";
+
 		// create the folder
-		if (!leccore::file::create_directory(_folder, error)) {
+		if (!leccore::file::create_directory(_files_folder, error)) {
 			message("Error creating Collab directory: " + error);
 			return false;
 		}
 
 		// lock the folder to prevent its deletion as long as the app is running by
 		// making a .lock file in it
-		const std::string lock_file_full_path = _folder + "\\.lock";
+		const std::string lock_file_full_path = _files_folder + "\\.lock";
 
 		_lock_file = new leccore::file::exclusive_lock(lock_file_full_path);
 
@@ -374,6 +376,9 @@ bool main_form::on_initialize(std::string& error) {
 
 	// schedule timer for session chat messages list (1500ms kick start ... the method will do the timer looping)
 	_timer_man.add("update_session_chat_messages", 1500, [&]() { update_session_chat_messages(); });
+
+	// schedule timer for session file list (1500ms kick start ... the method will do the timer looping)
+	_timer_man.add("update_session_chat_files", 1500, [&]() { update_session_chat_files(); });
 
 	// size and stuff
 	_ctrls

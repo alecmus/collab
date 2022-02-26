@@ -52,6 +52,17 @@ public:
 		std::string user_image;
 	};
 
+	struct file {
+		std::string hash;
+		long long time;
+		std::string session_id;
+		std::string sender_unique_id;
+		std::string name;
+		std::string extension;
+		std::string description;
+		long long size;
+	};
+
 	collab ();
 	~collab ();
 
@@ -225,8 +236,34 @@ public:
 	/// <summary>Check if a user has any messages in a given session.</summary>
 	/// <param name="user_unique_id">The user's unique id.</param>
 	/// <param name="session_unique_id">The session's unique id.</param>
-	/// <returns></returns>
+	/// <returns>Returns true if the user has at least one message in the session, else false.</returns>
 	bool user_has_messages_in_session(const std::string& user_unique_id,
+		const std::string& session_unique_id);
+
+	//------------------------------------------------------------------------------------------------
+	// files
+
+	/// <summary>Create a file.</summary>
+	/// <param name="file">The file, as defined in <see cref='collab::file'></see>.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	bool create_file(const file& file, std::string& error);
+
+	/// <summary>Get session files.</summary>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <param name="files">The list of files.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Files are ordered chronologically, starting with the latest.</remarks>
+	bool get_files(const std::string& session_unique_id,
+		std::vector<file>& files,
+		std::string& error);
+
+	/// <summary>Check if a user has any files in a given session.</summary>
+	/// <param name="user_unique_id">The user's unique id.</param>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <returns>Returns true if the user has at least one file in the session, else false.</returns>
+	bool user_has_files_in_session(const std::string& user_unique_id,
 		const std::string& session_unique_id);
 
 private:

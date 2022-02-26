@@ -188,6 +188,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="collab\collab.cpp" />
+    <ClCompile Include="collab\files\files.cpp" />
     <ClCompile Include="collab\messages\messages.cpp" />
     <ClCompile Include="collab\sessions\sessions.cpp" />
     <ClCompile Include="collab\users\users.cpp" />

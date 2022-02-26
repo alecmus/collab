@@ -118,7 +118,7 @@ class main_form : public lecui::form {
 	leccore::download_update _download_update;
 	std::string _update_directory;
 	bool _setting_autostart = false;
-	std::string _folder;
+	std::string _folder, _files_folder;
 
 	const bool _cleanup_mode;
 	const bool _update_mode;
@@ -169,6 +169,7 @@ class main_form : public lecui::form {
 	void set_avatar(const std::string& image_data);
 	void update_session_list();
 	void update_session_chat_messages();
+	void update_session_chat_files();
 
 public:
 	main_form(const std::string& caption, bool restarted);

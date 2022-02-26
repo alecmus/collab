@@ -43,6 +43,9 @@
     <Filter Include="collab\collab\messages">
       <UniqueIdentifier>{6ceee6cf-6dd1-41d7-8567-cf1126c98ee7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\collab\files">
+      <UniqueIdentifier>{fc19746f-fe87-4815-af89-8499cd763ce2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
@@ -126,6 +129,9 @@
     </ClCompile>
     <ClCompile Include="collab\messages\messages.cpp">
       <Filter>collab\collab\messages</Filter>
+    </ClCompile>
+    <ClCompile Include="collab\files\files.cpp">
+      <Filter>collab\collab\files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
