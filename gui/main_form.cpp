@@ -26,6 +26,7 @@
 
 // lecui
 #include <liblec/lecui/widgets/label.h>
+#include <liblec/lecui/widgets/rectangle.h>
 #include <liblec/lecui/widgets/table_view.h>
 #include <liblec/lecui/containers/pane.h>
 
@@ -500,14 +501,43 @@ void main_form::update_session_chat_messages() {
 
 			bool latest_message_arrived = false;
 
+			struct day_struct {
+				int day = 0;
+				int month = 0;
+				int year = 0;
+
+				bool operator==(const day_struct& param) {
+					return (day == param.day) && (month == param.month) && (year == param.year);
+				}
+
+				bool operator!=(const day_struct& param) {
+					return !operator==(param);
+				}
+			} previous_day;
+
 			for (const auto& msg : messages) {
 				if (msg.unique_id == _message_sent_just_now)
 					latest_message_arrived = true;
 
+				std::tm time = { };
+				localtime_s(&time, &msg.time);
+
+				std::stringstream ss;
+				ss << std::put_time(&time, "%H:%M");
+				std::string send_time = ss.str();
+
+				day_struct this_day;
+				this_day.day = time.tm_mday;
+				this_day.month = time.tm_mon;
+				this_day.year = time.tm_year;
+
+				const bool day_change = this_day != previous_day;
+				previous_day = this_day;
+
 				const bool continuation = (previous_sender_unique_id == msg.sender_unique_id);
 				const bool own_message = msg.sender_unique_id == _collab.unique_id();
 
-				if (continuation)
+				if (continuation && !day_change)
 					bottom_margin -= _margin;
 
 				std::string display_name;
@@ -545,13 +575,6 @@ void main_form::update_session_chat_messages() {
 						display_name += msg.sender_unique_id[i];
 				}
 
-				std::tm time = { };
-				localtime_s(&time, &msg.time);
-
-				std::stringstream ss;
-				ss << std::put_time(&time, "%H:%M");
-				std::string send_time = ss.str();
-
 				float text_height = _ui_font_height;
 				float font_size = _ui_font_size;
 
@@ -565,6 +588,39 @@ void main_form::update_session_chat_messages() {
 				float pane_height = (own_message || continuation) ?
 					text_height + (2 * content_margin) :
 					_caption_height + text_height + (2 * content_margin);
+
+				if (day_change) {
+					std::stringstream ss;
+					ss << std::put_time(&time, "%B %d, %Y");
+					std::string day_string = ss.str();
+
+					// text size
+					auto text_width = _dim.measure_label(day_string, _font, _caption_font_size,
+						lecui::text_alignment::center, lecui::paragraph_alignment::top, ref_rect).width();
+
+					auto& day_label_background = lecui::widgets::rectangle::add(messages_pane, day_string + "_rect");
+					day_label_background
+						.rect(lecui::rect(messages_pane.size())
+							.top(bottom_margin + _margin / 2.f)
+							.height(_caption_height + _margin / 2.f)
+							.width(text_width + 2.f* _margin))
+						.corner_radius_x(day_label_background.rect().height() / 2.f)
+						.corner_radius_y(day_label_background.corner_radius_x())
+						.color_fill(lecui::defaults::color(_setting_darktheme ? lecui::themes::dark : lecui::themes::light, lecui::item::text_field));
+
+					auto& day_label = lecui::widgets::label::add(messages_pane, day_string);
+					day_label
+						.rect(lecui::rect(messages_pane.size())
+							.top(bottom_margin + _margin / 2.f)
+							.height(_caption_height))
+						.alignment(lecui::text_alignment::center)
+						.text(day_string)
+						.font_size(_caption_font_size);
+
+					day_label_background.rect().place(day_label.rect(), 50.f, 50.f);
+
+					bottom_margin = day_label.rect().bottom() + _margin + _margin / 2.f;
+				}
 
 				// add message pane
 				auto& pane = lecui::containers::pane::add(messages_pane, msg.unique_id, content_margin);
