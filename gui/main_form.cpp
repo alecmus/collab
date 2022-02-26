@@ -538,7 +538,7 @@ void main_form::update_session_chat_messages() {
 				const bool own_message = msg.sender_unique_id == _collab.unique_id();
 
 				if (continuation && !day_change)
-					bottom_margin -= _margin;
+					bottom_margin -= (.85f * _margin);
 
 				std::string display_name;
 
