@@ -27,6 +27,9 @@
 #include <strsafe.h>	// for StringCchPrintfA
 
 #include <mutex>
+#include <sstream>
+#include <algorithm>
+#include <stdio.h>
 
 /// <summary>
 /// Get current module's full path, whether it's a .exe or a .dll.
@@ -158,4 +161,114 @@ void liblec::log(const std::string& string) {
 	printf(_string.c_str());
 	OutputDebugStringA(_string.c_str());
 #endif
+}
+
+template<typename T>
+bool sort_and_compare(std::vector<T>& v1, std::vector<T>& v2) {
+	std::sort(v1.begin(), v1.end());
+	std::sort(v2.begin(), v2.end());
+	return v1 == v2;
+}
+
+struct ip {
+	int i;
+	int j;
+	int k;
+	int l;
+};
+
+ip convert_ip(std::string s_ip) {
+	ip m_ip;
+	sscanf_s(s_ip.c_str(), "%d.%d.%d.%d", &m_ip.i, &m_ip.j, &m_ip.k, &m_ip.l);
+	return m_ip;
+}
+
+std::string convert_ip(ip m_ip) {
+	std::stringstream s;
+	s << m_ip.i << "." << m_ip.j << "." << m_ip.k << "." << m_ip.l;
+	return s.str();
+}
+
+std::string select_ip(std::vector<std::string> server_ips, std::vector<std::string> client_ips) {
+	std::string s_ip;
+
+	try {
+		// erase all occurences of "127.0.0.1" from the IP lists
+		server_ips.erase(std::remove(server_ips.begin(), server_ips.end(), "127.0.0.1"), server_ips.end());
+		client_ips.erase(std::remove(client_ips.begin(), client_ips.end(), "127.0.0.1"), client_ips.end());
+
+		do {
+			if (sort_and_compare(server_ips, client_ips)) {
+				s_ip = "127.0.0.1";
+				break;
+			}
+
+			std::vector<ip> v_server, v_client;
+
+			// convert server IPs
+			for (auto it : server_ips)
+				v_server.push_back(convert_ip(it));
+
+			// convert client IPs
+			for (auto it : client_ips)
+				v_client.push_back(convert_ip(it));
+
+			struct similarity_count {
+				ip server_ip;
+				int count;
+			};
+
+			std::vector<similarity_count> v_structs;
+
+			// loop through the client IPs and find which one is most similar to the server IPs
+			for (auto it : v_client) {
+				for (auto m_it : v_server) {
+					int count = 0;
+
+					if (it.i == m_it.i) {
+						count++;
+
+						if (it.j == m_it.j) {
+							count++;
+
+							if (it.k == m_it.k) {
+								count++;
+
+								if (it.l == m_it.l)
+									count++;
+							}
+						}
+					}
+
+					similarity_count m;
+					m.count = count;
+					m.server_ip = m_it;
+
+					v_structs.push_back(m);
+				}
+			}
+
+			// loop through and select one with greatest count
+			if (v_structs.empty()) {
+				// this shouldn't happen
+				s_ip.clear();
+				break;
+			}
+
+			s_ip = convert_ip(v_structs[0].server_ip);
+			int highest_count = v_structs[0].count;
+
+			for (auto it : v_structs) {
+				if (it.count > highest_count) {
+					s_ip = convert_ip(it.server_ip);
+					highest_count = it.count;
+				}
+			}
+		} while (false);
+	}
+	catch (const std::exception&) {
+		// this shouldn't happen
+	}
+
+	return s_ip;
 }

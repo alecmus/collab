@@ -109,15 +109,41 @@ collab::impl::~impl() {
 		}
 	}
 
+	if (_file_broadcast_sender.valid()) {
+		// wait for the thread to exit
+		while (true) {
+			bool thread_running = _file_broadcast_sender.wait_for(std::chrono::seconds{ 0 }) != std::future_status::ready;
+
+			if (!thread_running)
+				break;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+		}
+	}
+
+	if (_file_broadcast_receiver.valid()) {
+		// wait for the thread to exit
+		while (true) {
+			bool thread_running = _file_broadcast_receiver.wait_for(std::chrono::seconds{ 0 }) != std::future_status::ready;
+
+			if (!thread_running)
+				break;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+		}
+	}
+
 	if (_p_con) {
 		delete _p_con;
 		_p_con = nullptr;
 	}
 }
 
-bool collab::impl::initialize(const std::string& database_file, std::string& error) {
+bool collab::impl::initialize(const std::string& database_file, const std::string& files_folder, std::string& error) {
 	if (_p_con)
 		return true;
+
+	_files_folder = files_folder;
 
 	// make database connection object
 	_p_con = new liblec::leccore::database::connection("sqlcipher", database_file, "");
@@ -149,6 +175,8 @@ bool collab::impl::initialize(const std::string& database_file, std::string& err
 		_message_broadcast_receiver = std::async(std::launch::async, message_broadcast_receiver_func, this);
 		_user_broadcast_sender = std::async(std::launch::async, user_broadcast_sender_func, this);
 		_user_broadcast_receiver = std::async(std::launch::async, user_broadcast_receiver_func, this);
+		_file_broadcast_sender = std::async(std::launch::async, file_broadcast_sender_func, this);
+		_file_broadcast_receiver = std::async(std::launch::async, file_broadcast_receiver_func, this);
 	}
 	catch (const std::exception& e) {
 		error = e.what();
@@ -156,6 +184,10 @@ bool collab::impl::initialize(const std::string& database_file, std::string& err
 	}
 
 	return true;
+}
+
+const std::string& collab::impl::files_folder() {
+	return _files_folder;
 }
 
 std::optional<std::reference_wrapper<liblec::leccore::database::connection>> collab::impl::get_connection() {
@@ -182,6 +214,10 @@ collab::~collab() {
 
 const std::string& collab::unique_id() { return _d._unique_id; }
 
-bool collab::initialize(const std::string& database_file, std::string& error) {
-	return _d.initialize(database_file, error);
+bool collab::initialize(const std::string& database_file, const std::string& files_folder, std::string& error) {
+	return _d.initialize(database_file, files_folder, error);
+}
+
+const std::string& collab::files_folder() {
+	return _d.files_folder();
 }

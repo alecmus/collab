@@ -58,6 +58,13 @@ enum ports {
 	FILE_BROADCAST_PORT,
 };
 
+enum tcp_ports {
+	FILE_TRANSFER_PORT = 55554,
+};
+
+constexpr int file_transfer_magic_number = 173;
+constexpr int file_chunk_size = 1024 * 1024;	// the size of each file chunk used in file transfer
+
 constexpr int session_broadcast_cycle = 1200;	// in milliseconds
 constexpr int session_receiver_cycle = 1500;	// in milliseconds
 
@@ -99,6 +106,7 @@ bool deserialize_user_structure(const std::string& serialized,
 
 struct file_broadcast_structure {
 	std::string source_node_unique_id;
+	std::vector<std::string> ips;
 	std::vector<collab::file> file_list;
 };
 
@@ -119,6 +127,7 @@ class collab::impl {
 	std::future<void> _file_broadcast_sender;
 	std::future<void> _file_broadcast_receiver;
 	bool _stop_session_broadcast = false;
+	std::string _files_folder;
 
 public:
 	std::string _unique_id;
@@ -137,7 +146,8 @@ public:
 	impl(collab& collab);
 	~impl();
 
-	bool initialize(const std::string& database_file, std::string& error);
+	bool initialize(const std::string& database_file, const std::string& files_folder, std::string& error);
+	const std::string& files_folder();
 
 	std::optional<std::reference_wrapper<liblec::leccore::database::connection>> get_connection();
 

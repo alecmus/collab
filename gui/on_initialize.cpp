@@ -353,7 +353,7 @@ bool main_form::on_initialize(std::string& error) {
 	}
 
 	// initialize collab
-	if (!_collab.initialize(_database_file, error))
+	if (!_collab.initialize(_database_file, _files_folder, error))
 		return false;
 
 	if (_collab.user_exists(_collab.unique_id())) {

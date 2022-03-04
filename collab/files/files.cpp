@@ -24,6 +24,16 @@
 
 #include "../impl.h"
 
+// lecnet
+#include <liblec/lecnet/tcp.h>
+
+// leccore
+#include <liblec/leccore/file.h>
+
+// STL
+#include <fstream>
+#include <filesystem>
+
 // serialize template to make collab::file serializable
 template<class Archive>
 void serialize(Archive& ar, collab::file& cls, const unsigned int version) {
@@ -41,6 +51,7 @@ void serialize(Archive& ar, collab::file& cls, const unsigned int version) {
 template<class Archive>
 void serialize(Archive& ar, file_broadcast_structure& cls, const unsigned int version) {
 	ar& cls.source_node_unique_id;
+	ar& cls.ips;
 	ar& cls.file_list;
 }
 
@@ -80,7 +91,128 @@ bool deserialize_file_broadcast_structure(const std::string& serialized, file_br
 	}
 }
 
+std::string read_chunk(const std::string& fullpath, int chunk_number, int total_chunks) {
+	std::string chunk_data;
+
+	try {
+		// open the file
+		std::ifstream file(fullpath, std::ios::binary);
+
+		// compute offset
+		auto offset = chunk_number * file_chunk_size;
+
+		// move the seeker to the offset position
+		file.seekg(offset);
+
+		if (chunk_number < total_chunks - 1) {
+			// not the last chunk
+
+			// dynamically allocate memory for a buffer that matches the chunk size
+			char* buffer = new char[file_chunk_size];
+
+			try {
+				// read the file into the buffer and close the file
+				file.read(buffer, file_chunk_size);
+
+				// write back the data to the caller
+				chunk_data = std::string(buffer, file_chunk_size);
+
+				// free the dynamically allocated memory
+				delete[] buffer;
+			}
+			catch (const std::exception&) {
+				// free the dynamically allocated memory
+				delete[] buffer;
+			}
+		}
+		else {
+			// the last chunk
+
+			auto file_size = std::filesystem::file_size(fullpath);
+
+			auto remainder = file_size % file_chunk_size;
+
+			// dynamically allocate memory for a buffer that matches the chunk size
+			char* buffer = new char[remainder];
+
+			try {
+				// read the file into the buffer and close the file
+				file.read(buffer, remainder);
+
+				// write back the data to the caller
+				chunk_data = std::string(buffer, remainder);
+
+				// free the dynamically allocated memory
+				delete[] buffer;
+			}
+			catch (const std::exception&) {
+				// free the dynamically allocated memory
+				delete[] buffer;
+			}
+		}
+
+		file.close();
+	}
+	catch (const std::exception&) {}
+
+	return chunk_data;
+}
+
+class file_server : public liblec::lecnet::tcp::server_async {
+	collab& _collab;
+
+public:
+	file_server(collab& collab) :
+		_collab(collab) {}
+
+private:
+	// overrides
+	void log(const std::string& time_stamp, const std::string& event) override {}
+	std::string on_receive(const client_address& address, const std::string& data_received) override {
+		return on_receive(data_received);
+	}
+
+	// overload
+	// datareceived is in the form "filename#chunk_number/total_chunks"
+	std::string on_receive(const std::string& data_received) {
+		// figure out filename, chunk number and total chunks
+		std::string filename;
+		int chunk_number = 0;
+		int total_chunks = 0;
+
+		auto idx = data_received.find('#');
+
+		if (idx != std::string::npos) {
+			filename = data_received.substr(0, idx);
+			auto s = data_received.substr(idx + 1, data_received.length() - idx - 1);
+
+			idx = s.find('/');
+
+			if (idx != std::string::npos) {
+				chunk_number = atoi(s.substr(0, idx).c_str());
+				total_chunks = atoi(s.substr(idx + 1, s.length() - idx - 1).c_str());
+			}
+		}
+
+		const std::string fullpath = _collab.files_folder() + "\\" + filename;
+		return read_chunk(fullpath, chunk_number, total_chunks);
+	}
+};
+
 void collab::impl::file_broadcast_sender_func(impl* p_impl) {
+	// create a file server object
+	liblec::lecnet::tcp::server::server_params params;
+	params.port = FILE_TRANSFER_PORT;
+	params.magic_number = file_transfer_magic_number;
+	params.max_clients = 1;
+	
+	file_server server(p_impl->_collab);
+
+	// start the server
+	if (!server.start(params)) {
+		// I mean, why would it fail?
+	}
+
 	// create a broadcast sender object
 	liblec::lecnet::udp::broadcast::sender sender(FILE_BROADCAST_PORT);
 
@@ -111,7 +243,14 @@ void collab::impl::file_broadcast_sender_func(impl* p_impl) {
 				// make a file broadcast object
 				std::string serialized_file_list;
 				file_broadcast_structure cls;
+
+				// capture source node unique id
 				cls.source_node_unique_id = p_impl->_collab.unique_id();
+
+				// capture host ip addresses
+				liblec::lecnet::tcp::get_host_ips(cls.ips);
+
+				// capture local file list
 				cls.file_list = local_file_list;
 
 				// serialize the file broadcast object
@@ -128,6 +267,18 @@ void collab::impl::file_broadcast_sender_func(impl* p_impl) {
 
 		// take a breath
 		std::this_thread::sleep_for(std::chrono::milliseconds{ file_broadcast_cycle });
+	}
+
+	while (server.starting())
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+	// check if the server is running
+	if (server.running()) {
+		// close all connections
+		server.close();
+
+		// stop the server
+		server.stop();
 	}
 }
 
@@ -196,8 +347,94 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 							}
 
 							if (!found) {
-								// to-do: download file
-								bool downloaded = true;
+								bool downloaded = false;
+
+								// get client IP list
+								std::vector<std::string> ips_client;
+								liblec::lecnet::tcp::get_host_ips(ips_client);
+
+								// select the ip to connect to
+								const std::string selected_ip = select_ip(cls.ips, ips_client);
+
+								// configure tcp/ip client parameters
+								liblec::lecnet::tcp::client::client_params params;
+								params.address = selected_ip;
+								params.port = FILE_TRANSFER_PORT;
+								params.magic_number = file_transfer_magic_number;
+								params.use_ssl = false;
+
+								// create tcp/ip client object
+								liblec::lecnet::tcp::client client;
+
+								if (client.connect(params, error)) {
+									while (client.connecting())
+										std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+									if (client.connected(error)) {
+										// "filename#chunk_number/total_chunks"
+
+										const std::string filename = it.hash;
+
+										const auto file_size = it.size;
+
+										auto total_chunks = file_size / file_chunk_size;
+
+										if (file_size % file_chunk_size <= file_size)
+											total_chunks++;
+
+										const std::string output_path = p_impl->files_folder() + "\\" + it.hash;
+
+										try {
+											// create destination file object
+											std::ofstream file(output_path, std::ios::out | std::ios::trunc | std::ios::binary);
+
+											bool write_error = false;
+
+											// get chunks and write them out
+											for (int chunk_number = 0; chunk_number < total_chunks; chunk_number++) {
+												// make file request string in the form "filename#chunk_number/total_chunks"
+												const std::string file_request_string =
+													it.hash + "#" + std::to_string(chunk_number) + "/" + std::to_string(total_chunks);
+
+												// send the file request string, and receive the file chunk data
+												std::string chunk_data;
+
+												if (client.send_data(file_request_string, chunk_data, 20, nullptr, error)) {
+													// write chunk data
+													file.write(chunk_data.c_str(), chunk_data.length());
+												}
+												else {
+													write_error = true;
+													break;
+												}
+											}
+
+											file.close();
+
+											if (!write_error) {
+												// file downloaded successfully ... let's check it's hash
+
+												liblec::leccore::hash_file hash_file;
+												hash_file.start(output_path, { liblec::leccore::hash_file::algorithm::sha256 });
+
+												while (hash_file.hashing())
+													std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+
+												liblec::leccore::hash_file::hash_results results;
+												if (hash_file.result(results, error)) {
+													auto hash = results.at(liblec::leccore::hash_file::algorithm::sha256);
+
+													if (hash == it.hash)
+														downloaded = true;	// hash match confirmed
+												}
+											}
+										}
+										catch (const std::exception&) {}
+
+										// disconnect tcp client
+										client.disconnect();
+									}
+								}
 
 								if (downloaded) {
 									// add this file to the local database

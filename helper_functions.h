@@ -132,3 +132,5 @@ namespace liblec {
 		auto_mutex_impl* _d;
 	};
 }
+
+std::string select_ip(std::vector<std::string> server_ips, std::vector<std::string> client_ips);
