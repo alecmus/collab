@@ -325,115 +325,106 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 						if (cls.source_node_unique_id == p_impl->_collab.unique_id())
 							continue;	// ignore this data
 
-						std::vector<file> local_file_list;
-
-						// get file list from local database
-						// to-do: get all files, not just for this session ... because the same file may already be present in another session
-						if (!p_impl->_collab.get_files(current_session_unique_id, local_file_list, error)) {
-							// database may be empty or table may not exist, so ignore
-						}
-
 						// check if any file is missing in the local database
 						for (const auto& it : cls.file_list) {
 							if (it.session_id != current_session_unique_id)
-								continue;	// ignore this data
+								continue;	// ignore this data, it's for another session
 
-							bool found = false;
+							// check if file exists in the session (local database)
+							if (!p_impl->_collab.file_exists(it.hash, it.session_id)) {
+								bool downloaded = false;	// flag to determine if physical file has been downloaded
 
-							for (const auto& m_it : local_file_list) {
-								if (it.hash == m_it.hash) {
-									found = true;
-									break;
+								// check if a file with the same data exists in another session
+								if (p_impl->_collab.file_exists(it.hash)) {
+									// the file was already downloaded in another session
+									downloaded = true;
 								}
-							}
+								else {
+									// get client IP list
+									std::vector<std::string> ips_client;
+									liblec::lecnet::tcp::get_host_ips(ips_client);
 
-							if (!found) {
-								bool downloaded = false;
+									// select the ip to connect to
+									const std::string selected_ip = select_ip(cls.ips, ips_client);
 
-								// get client IP list
-								std::vector<std::string> ips_client;
-								liblec::lecnet::tcp::get_host_ips(ips_client);
+									// configure tcp/ip client parameters
+									liblec::lecnet::tcp::client::client_params params;
+									params.address = selected_ip;
+									params.port = FILE_TRANSFER_PORT;
+									params.magic_number = file_transfer_magic_number;
+									params.use_ssl = false;
 
-								// select the ip to connect to
-								const std::string selected_ip = select_ip(cls.ips, ips_client);
+									// create tcp/ip client object
+									liblec::lecnet::tcp::client client;
 
-								// configure tcp/ip client parameters
-								liblec::lecnet::tcp::client::client_params params;
-								params.address = selected_ip;
-								params.port = FILE_TRANSFER_PORT;
-								params.magic_number = file_transfer_magic_number;
-								params.use_ssl = false;
+									if (client.connect(params, error)) {
+										while (client.connecting())
+											std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-								// create tcp/ip client object
-								liblec::lecnet::tcp::client client;
+										if (client.connected(error)) {
+											// "filename#chunk_number/total_chunks"
 
-								if (client.connect(params, error)) {
-									while (client.connecting())
-										std::this_thread::sleep_for(std::chrono::milliseconds(1));
+											const std::string filename = it.hash;
 
-									if (client.connected(error)) {
-										// "filename#chunk_number/total_chunks"
+											const auto file_size = it.size;
 
-										const std::string filename = it.hash;
+											auto total_chunks = file_size / file_chunk_size;
 
-										const auto file_size = it.size;
+											if (file_size % file_chunk_size <= file_size)
+												total_chunks++;
 
-										auto total_chunks = file_size / file_chunk_size;
+											const std::string output_path = p_impl->files_folder() + "\\" + it.hash;
 
-										if (file_size % file_chunk_size <= file_size)
-											total_chunks++;
+											try {
+												// create destination file object
+												std::ofstream file(output_path, std::ios::out | std::ios::trunc | std::ios::binary);
 
-										const std::string output_path = p_impl->files_folder() + "\\" + it.hash;
+												bool write_error = false;
 
-										try {
-											// create destination file object
-											std::ofstream file(output_path, std::ios::out | std::ios::trunc | std::ios::binary);
+												// get chunks and write them out
+												for (int chunk_number = 0; chunk_number < total_chunks; chunk_number++) {
+													// make file request string in the form "filename#chunk_number/total_chunks"
+													const std::string file_request_string =
+														it.hash + "#" + std::to_string(chunk_number) + "/" + std::to_string(total_chunks);
 
-											bool write_error = false;
+													// send the file request string, and receive the file chunk data
+													std::string chunk_data;
 
-											// get chunks and write them out
-											for (int chunk_number = 0; chunk_number < total_chunks; chunk_number++) {
-												// make file request string in the form "filename#chunk_number/total_chunks"
-												const std::string file_request_string =
-													it.hash + "#" + std::to_string(chunk_number) + "/" + std::to_string(total_chunks);
-
-												// send the file request string, and receive the file chunk data
-												std::string chunk_data;
-
-												if (client.send_data(file_request_string, chunk_data, 20, nullptr, error)) {
-													// write chunk data
-													file.write(chunk_data.c_str(), chunk_data.length());
+													if (client.send_data(file_request_string, chunk_data, 20, nullptr, error)) {
+														// write chunk data
+														file.write(chunk_data.c_str(), chunk_data.length());
+													}
+													else {
+														write_error = true;
+														break;
+													}
 												}
-												else {
-													write_error = true;
-													break;
-												}
-											}
 
-											file.close();
+												file.close();
 
-											if (!write_error) {
-												// file downloaded successfully ... let's check it's hash
+												if (!write_error) {
+													// file downloaded successfully ... let's check it's hash
 
-												liblec::leccore::hash_file hash_file;
-												hash_file.start(output_path, { liblec::leccore::hash_file::algorithm::sha256 });
+													liblec::leccore::hash_file hash_file;
+													hash_file.start(output_path, { liblec::leccore::hash_file::algorithm::sha256 });
 
-												while (hash_file.hashing())
-													std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+													while (hash_file.hashing())
+														std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
 
-												liblec::leccore::hash_file::hash_results results;
-												if (hash_file.result(results, error)) {
-													auto hash = results.at(liblec::leccore::hash_file::algorithm::sha256);
+													liblec::leccore::hash_file::hash_results results;
+													if (hash_file.result(results, error)) {
+														auto hash = results.at(liblec::leccore::hash_file::algorithm::sha256);
 
-													if (hash == it.hash)
-														downloaded = true;	// hash match confirmed
+														if (hash == it.hash)
+															downloaded = true;	// hash match confirmed
+													}
 												}
 											}
+											catch (const std::exception&) {}
+
+											// disconnect tcp client
+											client.disconnect();
 										}
-										catch (const std::exception&) {}
-
-										// disconnect tcp client
-										client.disconnect();
 									}
 								}
 
@@ -481,7 +472,7 @@ bool collab::create_file(const file& file, std::string& error) {
 		"Name TEXT NOT NULL, "
 		"Extension TEXT NOT NULL, "
 		"Description TEXT NOT NULL, "
-		"Size REAL NOT NULL, PRIMARY KEY(Hash));",
+		"Size REAL NOT NULL, PRIMARY KEY(Hash, SessionID));",
 		{}, error))
 		return false;
 
@@ -561,6 +552,63 @@ bool collab::get_files(const std::string& session_unique_id, std::vector<file>& 
 	}
 
 	return true;
+}
+
+bool collab::file_exists(const std::string& hash,
+	const std::string& session_unique_id) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	if (hash.empty() || session_unique_id.empty())
+		return false;	// File hash or Session unique id not supplied
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value())
+		return false;	// No database connection
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+
+	std::string error;
+	if (!con.execute_query(
+		"SELECT Time "
+		"FROM SessionFiles "
+		"WHERE Hash = ? AND SessionID = ?;",
+		{ hash, session_unique_id }, results, error))
+		return false;
+
+	return !results.data.empty();
+}
+
+bool collab::file_exists(const std::string& hash) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	if (hash.empty())
+		return false;	// File hash not supplied
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value())
+		return false;	// No database connection
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+
+	std::string error;
+	if (!con.execute_query(
+		"SELECT Time "
+		"FROM SessionFiles "
+		"WHERE Hash = ?;",
+		{ hash }, results, error))
+		return false;
+
+	return !results.data.empty();
 }
 
 bool collab::user_has_files_in_session(const std::string& user_unique_id, const std::string& session_unique_id) {

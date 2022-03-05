@@ -306,6 +306,18 @@ public:
 		std::vector<file>& files,
 		std::string& error);
 
+	/// <summary>Check if a file exists in a given session.</summary>
+	/// <param name="hash">The hash of the file.</param>
+	/// <param name="session_unique_id">The session's unique ID.</param>
+	/// <returns>Returns true if the file exists, else false.</returns>
+	bool file_exists(const std::string& hash,
+		const std::string& session_unique_id);
+
+	/// <summary>Check if a file exists.</summary>
+	/// <param name="hash">The hash of the file.</param>
+	/// <returns>Returns true if the file exists, else false.</returns>
+	bool file_exists(const std::string& hash);
+
 	/// <summary>Check if a user has any files in a given session.</summary>
 	/// <param name="user_unique_id">The user's unique id.</param>
 	/// <param name="session_unique_id">The session's unique id.</param>

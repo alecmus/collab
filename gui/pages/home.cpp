@@ -506,10 +506,13 @@ void main_form::add_home_page() {
 
 													file.hash = results.at(leccore::hash_file::algorithm::sha256);
 
-													// save the file to the collab folder
-													if (!leccore::file::rename(_full_path, _main_form._files_folder + "\\" + file.hash, error)) {
-														message("Error copying file: " + error);
-														return;
+													// check if file already exists in another session
+													if (!_main_form._collab.file_exists(file.hash, error)) {
+														// save the file to the collab folder
+														if (!leccore::file::rename(_full_path, _main_form._files_folder + "\\" + file.hash, error)) {
+															message("Error copying file: " + error);
+															return;
+														}
 													}
 
 													// save the file to the database
