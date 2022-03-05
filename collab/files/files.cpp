@@ -328,6 +328,7 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 						std::vector<file> local_file_list;
 
 						// get file list from local database
+						// to-do: get all files, not just for this session ... because the same file may already be present in another session
 						if (!p_impl->_collab.get_files(current_session_unique_id, local_file_list, error)) {
 							// database may be empty or table may not exist, so ignore
 						}

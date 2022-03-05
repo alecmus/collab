@@ -309,7 +309,7 @@ void main_form::add_home_page() {
 										.right(files_pane.size().get_width() - _margin))
 									.png_resource(png_files)
 									.text("Session Files")
-									.description("Collaborate via sharing digital content");
+									.description("Collaborate via digital content");
 
 								// add content pane
 								auto& content_pane = lecui::containers::pane::add(files_pane, "content");
@@ -326,48 +326,6 @@ void main_form::add_home_page() {
 									.border(0.f);
 								content_pane
 									.color_fill().alpha(0);
-
-								if (false) {
-									const auto ref_rect = lecui::rect(content_pane.size());
-
-									// add dummy file
-									auto& file_pane = lecui::containers::pane::add(content_pane);
-									file_pane
-										.rect(lecui::rect(ref_rect).height(100.f));
-
-									auto& file_image = lecui::widgets::icon::add(file_pane);
-									file_image
-										.rect(lecui::rect()
-											.width(40.f)
-											.height(40.f))
-										.png_resource(png_png)
-										.padding(0.f);
-
-									auto& file_name = lecui::widgets::label::add(file_pane);
-									file_name
-										.text("Shared Specification Document.pdf")
-										.rect(file_name.rect()
-											.left(file_image.rect().right() + _margin)
-											.right(file_pane.size().get_width()));
-
-									auto& additional = lecui::widgets::label::add(file_pane);
-									additional
-										.text("<strong>45.6KB</strong>, shared by <em>Alec Musasa</em> on 25 February 2022")
-										.font_size(_caption_font_size)
-										.color_text(_caption_color)
-										.rect(lecui::rect(file_name.rect())
-											.height(_caption_height)
-											.snap_to(file_name.rect(), snap_type::bottom, 0.f));
-
-									auto& file_description = lecui::widgets::label::add(file_pane);
-									file_description
-										.text("This is the description of the file. There should be a reasonable limit to the file description length")
-										.font_size(_caption_font_size)
-										.color_text(_caption_color)
-										.rect(lecui::rect(file_name.rect())
-											.height(_caption_height * 2.5f)
-											.snap_to(additional.rect(), snap_type::bottom, _margin / 2.f));
-								}
 
 								auto do_add_file = [this]() {
 									try {

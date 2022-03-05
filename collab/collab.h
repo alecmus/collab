@@ -30,36 +30,78 @@
 /// <summary>Collaboration class.</summary>
 class collab {
 public:
+	/// <summary>Session structure.</summary>
 	struct session {
+		/// <summary>The session's unique ID, preferrably a uuid.</summary>
 		std::string unique_id;
+
+		/// <summary>The session's name.</summary>
 		std::string name;
+
+		/// <summary>The session's description.</summary>
 		std::string description;
+
+		/// <summary>The hash of the session's passphrase.</summary>
 		std::string passphrase_hash;
 	};
 
+	/// <summary>Message structure.</summary>
 	struct message {
+		/// <summary>The message's unique ID, preferrably a uuid.</summary>
 		std::string unique_id;
+
+		/// <summary>The time the message was posted (time_t value).</summary>
 		long long time;
+
+		/// <summary>The unique ID of the session in which the message was posted.</summary>
 		std::string session_id;
+
+		/// <summary>The unique ID of the user that posted the message.</summary>
 		std::string sender_unique_id;
+
+		/// <summary>The message text (basic HTML supported).</summary>
 		std::string text;
 	};
 
+	/// <summary>User structure.</summary>
 	struct user {
+		/// <summary>The user's unique ID, preferrably a uuid or sha256 of something that uniquely identifies the user's computer.</summary>
 		std::string unique_id;
+
+		/// <summary>The user's username, preferrably unique but doesn't have to be.</summary>
 		std::string username;
+
+		/// <summary>The user's display name, preferrably the forename and surname seperated by a space.</summary>
 		std::string display_name;
+
+		/// <summary>A blob of the user's image, preferrably a compressed format such as .jpg, with limited dimensions.</summary>
 		std::string user_image;
 	};
 
+	/// <summary>File structure.</summary>
 	struct file {
+		/// <summary>The file's hash, preferrably a secure modern hash such as sha256.</summary>
 		std::string hash;
+
+		/// <summary>The time the file was posted (time_t value).</summary>
 		long long time;
+
+		/// <summary>The unique ID of the session to which the file was posted.</summary>
 		std::string session_id;
+
+		/// <summary>The unique ID of the user that posted the file.</summary>
 		std::string sender_unique_id;
+
+		/// <summary>The name of the file, excluding the file extension, e.g. 'SRS Document'</summary>
 		std::string name;
+
+		/// <summary>The extension of the file, including the dot, e.g. '.pdf'.</summary>
 		std::string extension;
+
+		/// <summary>A brief description of the file.</summary>
 		std::string description;
+
+		/// <summary>The size of the file, in bytes.</summary>
 		long long size;
 	};
 
@@ -274,4 +316,8 @@ public:
 private:
 	class impl;
 	impl& _d;
+
+	// Copying an object of this class is not allowed
+	collab(const collab&) = delete;
+	collab& operator=(const collab&) = delete;
 };

@@ -169,12 +169,19 @@ bool collab::impl::initialize(const std::string& database_file, const std::strin
 
 	// start threads
 	try {
+		// session threads
 		_session_broadcast_sender = std::async(std::launch::async, session_broadcast_sender_func, this);
 		_session_broadcast_receiver = std::async(std::launch::async, session_broadcast_receiver_func, this);
+
+		// message threads
 		_message_broadcast_sender = std::async(std::launch::async, message_broadcast_sender_func, this);
 		_message_broadcast_receiver = std::async(std::launch::async, message_broadcast_receiver_func, this);
+
+		// user threads
 		_user_broadcast_sender = std::async(std::launch::async, user_broadcast_sender_func, this);
 		_user_broadcast_receiver = std::async(std::launch::async, user_broadcast_receiver_func, this);
+
+		// file threads
 		_file_broadcast_sender = std::async(std::launch::async, file_broadcast_sender_func, this);
 		_file_broadcast_receiver = std::async(std::launch::async, file_broadcast_receiver_func, this);
 	}

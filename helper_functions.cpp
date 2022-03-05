@@ -171,10 +171,10 @@ bool sort_and_compare(std::vector<T>& v1, std::vector<T>& v2) {
 }
 
 struct ip {
-	int i;
-	int j;
-	int k;
-	int l;
+	int i = 0;
+	int j = 0;
+	int k = 0;
+	int l = 0;
 };
 
 ip convert_ip(std::string s_ip) {
@@ -206,11 +206,11 @@ std::string select_ip(std::vector<std::string> server_ips, std::vector<std::stri
 			std::vector<ip> v_server, v_client;
 
 			// convert server IPs
-			for (auto it : server_ips)
+			for (const auto& it : server_ips)
 				v_server.push_back(convert_ip(it));
 
 			// convert client IPs
-			for (auto it : client_ips)
+			for (const auto& it : client_ips)
 				v_client.push_back(convert_ip(it));
 
 			struct similarity_count {
@@ -221,8 +221,8 @@ std::string select_ip(std::vector<std::string> server_ips, std::vector<std::stri
 			std::vector<similarity_count> v_structs;
 
 			// loop through the client IPs and find which one is most similar to the server IPs
-			for (auto it : v_client) {
-				for (auto m_it : v_server) {
+			for (const auto& it : v_client) {
+				for (const auto& m_it : v_server) {
 					int count = 0;
 
 					if (it.i == m_it.i) {
@@ -258,7 +258,7 @@ std::string select_ip(std::vector<std::string> server_ips, std::vector<std::stri
 			s_ip = convert_ip(v_structs[0].server_ip);
 			int highest_count = v_structs[0].count;
 
-			for (auto it : v_structs) {
+			for (const auto& it : v_structs) {
 				if (it.count > highest_count) {
 					s_ip = convert_ip(it.server_ip);
 					highest_count = it.count;
