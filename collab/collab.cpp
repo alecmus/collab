@@ -139,11 +139,13 @@ collab::impl::~impl() {
 	}
 }
 
-bool collab::impl::initialize(const std::string& database_file, const std::string& files_folder, std::string& error) {
+bool collab::impl::initialize(const std::string& database_file, const std::string& files_folder,
+	std::function<void(const std::string&)> log, std::string& error) {
 	if (_p_con)
 		return true;
 
 	_files_folder = files_folder;
+	_log = log;
 
 	// make database connection object
 	_p_con = new liblec::leccore::database::connection("sqlcipher", database_file, "");
@@ -221,8 +223,9 @@ collab::~collab() {
 
 const std::string& collab::unique_id() { return _d._unique_id; }
 
-bool collab::initialize(const std::string& database_file, const std::string& files_folder, std::string& error) {
-	return _d.initialize(database_file, files_folder, error);
+bool collab::initialize(const std::string& database_file, const std::string& files_folder,
+	std::function<void(const std::string&)> log, std::string& error) {
+	return _d.initialize(database_file, files_folder, log, error);
 }
 
 const std::string& collab::files_folder() {

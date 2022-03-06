@@ -27,6 +27,15 @@
 #include <string>
 #include <vector>
 
+static inline std::string shorten_unique_id(const std::string& unique_id) {
+	std::string short_id;
+
+	for (size_t i = 0; i < unique_id.length() && i < 8; i++)
+		short_id += unique_id[i];
+	
+	return short_id;
+}
+
 template <typename T>
 static inline T smallest(T a, T b) {
 	return (((a) < (b)) ? (a) : (b));

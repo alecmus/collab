@@ -150,29 +150,40 @@ void collab::impl::user_broadcast_receiver_func(impl* p_impl) {
 					if (deserialize_user_structure(serialized_user, cls, error)) {
 						// deserialized successfully
 
-						// check if user has message in current session
-						if (!p_impl->_collab.user_has_messages_in_session(cls.unique_id, current_session_unique_id))
-							continue;	// ignore this data
-
-						if (p_impl->_collab.user_exists(cls.unique_id)) {
-							// edit user
-							if (p_impl->_collab.edit_user(cls.unique_id, cls, error)) {
-								// user edited successfully
-							}
+						if (cls.unique_id == p_impl->_collab.unique_id() ||		// check if data is coming from a different node
+							received_users.count(cls.unique_id)) {				// don't attend to same user more than once per session
+							// ignore this data
 						}
 						else {
-							// save user to local database
-							if (p_impl->_collab.save_user(cls, error)) {
-								// user added successfully to the local database
+							// check if user has message in current session
+							if (!p_impl->_collab.user_has_messages_in_session(cls.unique_id, current_session_unique_id)) {
+								// ignore this data
 							}
-						}
+							else {
+								// add to received user list
+								received_users.insert(cls.unique_id);
 
-						// don't attend to more than once
-						if (received_users.count(cls.unique_id))
-							continue;	// ignore this data
-						else {
-							// add to received user list
-							received_users.insert(cls.unique_id);
+								p_impl->_log("New user found (UDP): " + cls.display_name + " '" + cls.username + "' (unique id: " + shorten_unique_id(cls.unique_id) + ")");
+
+								if (p_impl->_collab.user_exists(cls.unique_id)) {
+									// edit user
+									if (p_impl->_collab.edit_user(cls.unique_id, cls, error)) {
+										// user edited successfully
+										p_impl->_log("Editing user: '" + shorten_unique_id(cls.unique_id) + "' successful");
+									}
+									else
+										p_impl->_log("Error editing user: '" + shorten_unique_id(cls.unique_id) + "': " + error);
+								}
+								else {
+									// save user to local database
+									if (p_impl->_collab.save_user(cls, error)) {
+										// user added successfully to the local database
+										p_impl->_log("Saving user: '" + shorten_unique_id(cls.unique_id) + "' successful");
+									}
+									else
+										p_impl->_log("Error saving user: '" + shorten_unique_id(cls.unique_id) + "': " + error);
+								}
+							}
 						}
 					}
 				}

@@ -174,11 +174,18 @@ void collab::impl::session_broadcast_receiver_func(impl* p_impl) {
 						}
 
 						if (!found) {
+							p_impl->_log("Session received (UDP): '" + it.name + "' (source node: " + shorten_unique_id(cls.source_node_unique_id) + ")");
+
 							// add this session to the local database
 							if (p_impl->_collab.create_session(it, error)) {
 								// session added successfully to the local database, add it to the temporary session list
-								if (p_impl->_collab.create_temporary_session_entry(it.unique_id, error)) {}
+								if (p_impl->_collab.create_temporary_session_entry(it.unique_id, error))
+									p_impl->_log("Temporary session entry successful for '" + it.name + "'");
+								else
+									p_impl->_log("Creating temporary session entry for '" + it.name + "' failed: " + error);
 							}
+							else
+								p_impl->_log("Creating session '" + it.name + "' failed: " + error);
 						}
 					}
 				}

@@ -133,6 +133,9 @@
     <ClCompile Include="collab\files\files.cpp">
       <Filter>collab\collab\files</Filter>
     </ClCompile>
+    <ClCompile Include="gui\pages\log.cpp">
+      <Filter>collab\gui\main_form\pages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\ico\icon.ico">
@@ -193,6 +196,9 @@
       <Filter>collab\resources\png</Filter>
     </Image>
     <Image Include="resources\png\chat.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\log.png">
       <Filter>collab\resources\png</Filter>
     </Image>
   </ItemGroup>

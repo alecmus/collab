@@ -45,6 +45,7 @@ bool main_form::on_layout(std::string& error) {
 	add_home_page();
 	add_settings_page();
 	add_help_page();
+	add_log_page();
 
 	_page_man.show("home");
 	return true;

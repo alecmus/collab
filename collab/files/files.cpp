@@ -332,11 +332,14 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 
 							// check if file exists in the session (local database)
 							if (!p_impl->_collab.file_exists(it.hash, it.session_id)) {
+								p_impl->_log("New file found (UDP): '" + it.name + it.extension + "' (source node: " + shorten_unique_id(cls.source_node_unique_id) + ")");
+
 								bool downloaded = false;	// flag to determine if physical file has been downloaded
 
 								// check if a file with the same data exists in another session
 								if (p_impl->_collab.file_exists(it.hash)) {
 									// the file was already downloaded in another session
+									p_impl->_log("File '" + it.name + it.extension + "' already downloaded as " + shorten_unique_id(it.hash) + "' in another session");
 									downloaded = true;
 								}
 								else {
@@ -375,11 +378,16 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 
 											const std::string output_path = p_impl->files_folder() + "\\" + it.hash;
 
+											p_impl->_log("Connected via TCP to " + selected_ip + " to download '" + it.name + it.extension + "' (" + liblec::leccore::format_size(file_size) + ")");
+
 											try {
 												// create destination file object
 												std::ofstream file(output_path, std::ios::out | std::ios::trunc | std::ios::binary);
 
 												bool write_error = false;
+
+												long long total_downloaded = 0;
+												float previous_percentage = 0.f;
 
 												// get chunks and write them out
 												for (int chunk_number = 0; chunk_number < total_chunks; chunk_number++) {
@@ -393,8 +401,19 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 													if (client.send_data(file_request_string, chunk_data, 20, nullptr, error)) {
 														// write chunk data
 														file.write(chunk_data.c_str(), chunk_data.length());
+
+														total_downloaded += chunk_data.length();
+
+														float percentage = 100.f * (file_size ? (static_cast<float>(total_downloaded) / static_cast<float>(file_size)) : 100.f);
+														percentage = smallest(percentage, 100.f);
+
+														if (percentage - previous_percentage >= 20.f || percentage == 100.f) {
+															previous_percentage = percentage;
+															p_impl->_log("File '" + it.name + it.extension + "' download: " + liblec::leccore::round_off::to_string(percentage, 0) + "%");
+														}
 													}
 													else {
+														p_impl->_log("Error downloading '" + it.name + it.extension + "': " + error);
 														write_error = true;
 														break;
 													}
@@ -408,6 +427,8 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 													liblec::leccore::hash_file hash_file;
 													hash_file.start(output_path, { liblec::leccore::hash_file::algorithm::sha256 });
 
+													p_impl->_log("Hashing downloaded file '" + it.name + it.extension + "'");
+
 													while (hash_file.hashing())
 														std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
 
@@ -415,24 +436,38 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 													if (hash_file.result(results, error)) {
 														auto hash = results.at(liblec::leccore::hash_file::algorithm::sha256);
 
-														if (hash == it.hash)
+														if (hash == it.hash) {
+															p_impl->_log("Hash match for file '" + it.name + it.extension + "'");
 															downloaded = true;	// hash match confirmed
+														}
+														else
+															p_impl->_log("Hash mis-match for file '" + it.name + it.extension + "': obtained " + shorten_unique_id(hash) + " instead of " + shorten_unique_id(it.hash));
 													}
 												}
 											}
-											catch (const std::exception&) {}
+											catch (const std::exception& e) {
+												error = e.what();
+												p_impl->_log("Error downloading '" + it.name + it.extension + "': " + error);
+											}
 
 											// disconnect tcp client
 											client.disconnect();
 										}
+										else
+											p_impl->_log("TCP connection for downloading '" + it.name + it.extension + "' from " + selected_ip + " failed: " + error);
 									}
+									else
+										p_impl->_log("TCP connection for downloading '" + it.name + it.extension + "' from " + selected_ip + " failed: " + error);
 								}
 
 								if (downloaded) {
 									// add this file to the local database
 									if (p_impl->_collab.create_file(it, error)) {
 										// file added successfully to the local database
+										p_impl->_log("File '" + it.name + it.extension + "' entry saved successfully");
 									}
+									else
+										p_impl->_log("Entry failed for '" + it.name + it.extension + "': " + error);
 								}
 							}
 						}

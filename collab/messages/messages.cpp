@@ -195,10 +195,15 @@ void collab::impl::message_broadcast_receiver_func(impl* p_impl) {
 							}
 
 							if (!found) {
+								p_impl->_log("Message received (UDP): " + shorten_unique_id(it.unique_id) + " (source node: " + shorten_unique_id(cls.source_node_unique_id) + ")");
+
 								// add this message to the local database
 								if (p_impl->_collab.create_message(it, error)) {
 									// message added successfully to the local database
+									p_impl->_log("Message '" + shorten_unique_id(it.unique_id) + "' saved successfully");
 								}
+								else
+									p_impl->_log("Creating message '" + shorten_unique_id(it.unique_id) + "' failed: " + error);
 							}
 						}
 					}

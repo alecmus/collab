@@ -26,6 +26,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 /// <summary>Collaboration class.</summary>
 class collab {
@@ -115,13 +116,14 @@ public:
 	/// <summary>Initialize the collaboration class.</summary>
 	/// <param name="database_file">The full path to the database file.</param>
 	/// <param name="files_folder">The full path to the files folder.</param>
+	/// <param name="log">The function to call for logging.</param>
 	/// <param name="error">Error information.</param>
 	/// <returns>Returns true if successful, else false.</returns>
 	/// <remarks>This method creates the database connection. Calling any methods that need a
 	/// database connection before calling it will only result in those methods returning
 	/// a 'No database connection' error.</remarks>
 	bool initialize(const std::string& database_file, const std::string& files_folder,
-		std::string& error);
+		std::function<void(const std::string&)> log, std::string& error);
 
 	/// <summary>Get the full path to the files folder.</summary>
 	/// <returns>Returns the full path to the files folder.</returns>

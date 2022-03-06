@@ -60,7 +60,7 @@ void main_form::add_side_pane() {
 			.width(side_pane_rect.width())
 			.height(side_pane_rect.width())
 			.place(side_pane_rect, 50.f, 100.f)
-			.move(side_pane_rect.get_left(), side_pane_rect.get_bottom() - 3.f * (icon_size + _icon_gap) + _icon_gap))
+			.move(side_pane_rect.get_left(), side_pane_rect.get_bottom() - 4.f * (icon_size + _icon_gap) + _icon_gap))
 		.on_resize(lecui::resize_params()
 			.y_rate(100.f))
 		.png_resource(png_updates)
@@ -74,6 +74,23 @@ void main_form::add_side_pane() {
 		}
 
 		updates();
+	};
+
+	// add log icon
+	auto& log_icon = lecui::widgets::icon::add(side_pane);
+	log_icon
+		.tooltip("Log")
+		.rect(lecui::rect()
+			.width(side_pane_rect.width())
+			.height(side_pane_rect.width())
+			.place(side_pane_rect, 50.f, 100.f)
+			.move(side_pane_rect.get_left(), side_pane_rect.get_bottom() - 3.f * (icon_size + _icon_gap) + _icon_gap))
+		.on_resize(lecui::resize_params()
+			.y_rate(100.f))
+		.png_resource(png_log)
+		.events().action = [this]() {
+		add_back_button();
+		_page_man.show("log");
 	};
 
 	// add settings icon

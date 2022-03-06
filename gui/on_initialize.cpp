@@ -353,7 +353,10 @@ bool main_form::on_initialize(std::string& error) {
 	}
 
 	// initialize collab
-	if (!_collab.initialize(_database_file, _files_folder, error))
+	if (!_collab.initialize(_database_file, _files_folder,
+		[&](const std::string& event) {
+			log(event);
+		}, error))
 		return false;
 
 	if (_collab.user_exists(_collab.unique_id())) {
@@ -379,6 +382,9 @@ bool main_form::on_initialize(std::string& error) {
 
 	// schedule timer for session file list (1500ms kick start ... the method will do the timer looping)
 	_timer_man.add("update_session_chat_files", 1500, [&]() { update_session_chat_files(); });
+
+	// schedule timer for logging (100ms kick start ... the method will do the timer looping)
+	_timer_man.add("update_log", 100, [&]() { update_log(); });
 
 	// size and stuff
 	_ctrls

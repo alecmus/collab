@@ -22,44 +22,44 @@
 ** SOFTWARE.
 */
 
-#pragma once
+#include "../../gui.h"
+#include <liblec/lecui/widgets/label.h>
+#include <liblec/lecui/widgets/table_view.h>
 
-#define ico_resource		100
-#define icon_png_32			101
-#define icon_png_64			102
-#define icon_png_256		103
-#define icon_png_512		104
-#define splash_image_128	105
-#define splash_image_256	106
+#include <liblec/leccore/system.h>
 
-#define png_error			110
-#define png_settings		111
-#define png_back_light		112
-#define png_back_dark		113
-#define png_help			114
-#define png_updates			115
-#define png_user			116
-#define png_new_session		117
-#define png_join_session	118
-#define png_delete			119
-#define png_send			120
-#define png_chat			121
-#define png_files			122
-#define png_tasks			123
-#define png_pdf				124
-#define png_png				125
-#define png_jpg				126
-#define png_bmp				127
-#define png_gif				128
-#define png_psd				129
-#define png_doc				130
-#define png_xls				131
-#define png_ppt				132
-#define png_txt				133
-#define png_iso				134
-#define png_audio			135
-#define png_video			136
-#define png_archive			137
-#define png_executable		138
-#define png_file			139
-#define png_log				140
+void main_form::add_log_page() {
+	auto& log = _page_man.add("log");
+
+	const auto right = log.size().get_width();
+	const auto bottom = log.size().get_height();
+
+	// add page title
+	auto& title = lecui::widgets::label::add(log);
+	title
+		.text("<strong>LOG</strong>")
+		.rect(lecui::rect()
+			.left(_margin)
+			.right(right - _margin)
+			.top(_margin)
+			.height(25.f))
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f));
+
+	auto& log_table = lecui::widgets::table_view::add(log, "log_table");
+	log_table
+		.user_sort(false)
+		.fixed_number_column(true)
+		.rect(lecui::rect()
+			.left(_margin)
+			.right(right - _margin)
+			.top(title.rect().bottom())
+			.bottom(bottom - _margin))
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f)
+			.height_rate(100.f))
+		.columns({
+				{ "Time", 140 },
+				{ "Event", 900 }
+			});
+}

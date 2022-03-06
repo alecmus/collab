@@ -64,4 +64,4 @@ png_video			PNG		"resources/png/video.png"		// Roman Kacerek
 png_archive			PNG		"resources/png/archive.png"		// Roman Kacerek
 png_executable		PNG		"resources/png/executable.png"	// Vectorslab
 png_file			PNG		"resources/png/file.png"		// berkahicon
-
+png_log				PNG		"resources/png/log.png"			// Freepik

@@ -870,6 +870,61 @@ void main_form::update_session_chat_files() {
 		});
 }
 
+void main_form::log(const std::string& event) {
+	liblec::auto_mutex lock(_log_mutex);
+
+	liblec::log(event);
+
+	// get the current time
+	const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	std::tm time = { };
+	localtime_s(&time, &now);
+
+	// format time string
+	std::stringstream ss;
+	ss << std::put_time(&time, "%B %d, %H:%M:%S");
+
+	// add to log queue
+	_log_queue.push_back({ ss.str(), event });
+}
+
+void main_form::update_log() {
+	// stop the timer
+	_timer_man.stop("update_log");
+
+	try {
+		auto& log_table = get_table_view("log/log_table");
+
+		bool do_update = !_log_queue.empty();
+
+		{
+			liblec::auto_mutex lock(_log_mutex);
+
+			// retrieve log events in the queue and insert them into the log table
+			for (const auto& info : _log_queue) {
+				liblec::lecui::table_row row;
+				row.insert(std::make_pair("Time", info.time));
+				row.insert(std::make_pair("Event", info.event));
+
+				log_table
+					.data().push_back(row);
+			}
+
+			// clear the log queue
+			_log_queue.clear();
+		}
+		
+		if (do_update)
+			update();
+	}
+	catch (const std::exception&) {}
+
+	// resume the timer (1000ms looping ...)
+	_timer_man.add("update_log", 1000, [&]() {
+		update_log();
+		});
+}
+
 main_form::main_form(const std::string& caption, bool restarted) :
 	_cleanup_mode(restarted ? false : leccore::commandline_arguments::contains("/cleanup")),
 	_update_mode(restarted ? false : leccore::commandline_arguments::contains("/update")),

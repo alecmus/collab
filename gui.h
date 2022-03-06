@@ -27,6 +27,7 @@
 #include "version_info.h"
 #include "resource.h"
 #include "collab/collab.h"
+#include "helper_functions.h"
 
 // lecui
 #include <liblec/lecui/instance.h>
@@ -45,6 +46,9 @@
 
 // lecnet
 #include <liblec/lecnet.h>
+
+// STL
+#include <functional>
 
 using namespace liblec;
 using snap_type = lecui::rect::snap_type;
@@ -136,6 +140,16 @@ class main_form : public lecui::form {
 	std::string _current_session_unique_id;
 	std::string _message_sent_just_now;
 
+	// concurrency control related to the log
+	liblec::mutex _log_mutex;
+
+	struct event_info {
+		std::string time;
+		std::string event;
+	};
+
+	std::vector<event_info> _log_queue;
+
 	bool on_initialize(std::string& error) override;
 	bool on_layout(std::string& error) override;
 	void on_start() override;
@@ -147,6 +161,7 @@ class main_form : public lecui::form {
 	void add_home_page();
 	void add_help_page();
 	void add_settings_page();
+	void add_log_page();
 
 	void updates();
 	void on_update_check();
@@ -170,6 +185,9 @@ class main_form : public lecui::form {
 	void update_session_list();
 	void update_session_chat_messages();
 	void update_session_chat_files();
+
+	void log(const std::string& event);
+	void update_log();
 
 public:
 	main_form(const std::string& caption, bool restarted);
