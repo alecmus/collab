@@ -122,7 +122,7 @@ class main_form : public lecui::form {
 	leccore::download_update _download_update;
 	std::string _update_directory;
 	bool _setting_autostart = false;
-	std::string _folder, _files_folder;
+	std::string _folder, _files_folder, _files_staging_folder;
 
 	const bool _cleanup_mode;
 	const bool _update_mode;
@@ -149,6 +149,7 @@ class main_form : public lecui::form {
 	};
 
 	std::vector<event_info> _log_queue;
+	std::map<std::string, collab::file> _session_files;
 
 	bool on_initialize(std::string& error) override;
 	bool on_layout(std::string& error) override;

@@ -753,6 +753,9 @@ void main_form::update_session_chat_files() {
 	std::string error;
 
 	if (_collab.get_files(_current_session_unique_id, files, error)) {
+		for (const auto& it : files)
+			_session_files[it.hash] = it;
+
 		try {
 			auto& content_pane = get_pane("home/collaboration_pane/files_pane/content");
 
@@ -763,7 +766,9 @@ void main_form::update_session_chat_files() {
 			// K = unique_id, T = display name
 			std::map<std::string, std::string> display_names;
 
-			for (const auto& file : files) {
+			for (const auto& it : files) {
+				auto& file = _session_files.at(it.hash);
+
 				std::tm time = { };
 				localtime_s(&time, &file.time);
 
@@ -817,6 +822,34 @@ void main_form::update_session_chat_files() {
 
 				// update bottom margin
 				bottom_margin = file_pane.rect().bottom() + _margin;
+
+				// add rectangle for hit testing
+				auto& hit_testing = lecui::widgets::rectangle::add(file_pane, file.hash + "_hit_testing");
+				hit_testing
+					.rect(lecui::rect(file_pane.size()))
+					.corner_radius_x(5.f)
+					.corner_radius_y(5.f)
+					.color_fill(lecui::color().alpha(0))
+					.color_border(lecui::color().alpha(0))
+					.color_hot(lecui::defaults::color(_setting_darktheme ?
+						lecui::themes::dark : lecui::themes::light, lecui::item::icon_hot).alpha(20));
+				hit_testing
+					.events().action = [&]() {
+					std::string error;
+
+					const auto destination_file = _files_staging_folder + "\\" + file.name + file.extension;
+
+					// remove destination file if it already exists
+					if (!leccore::file::remove(destination_file, error)) {}
+
+					// extract the file
+					if (!leccore::file::copy(_files_folder + "\\" + file.hash, destination_file, error))
+						message("Error extracting file: " + error);
+					else {
+						if (!leccore::shell::open(destination_file, error))
+							message("Error opening file: " + error);
+					}
+				};
 
 				auto& file_image = lecui::widgets::icon::add(file_pane, file.hash + "_file_image");
 				file_image

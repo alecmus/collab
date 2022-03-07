@@ -327,16 +327,17 @@ bool main_form::on_initialize(std::string& error) {
 			_folder = get_current_folder() + "\\Collab";
 
 		_files_folder = _folder + "\\files";
+		_files_staging_folder = _files_folder + "\\staging";
 
 		// create the folder
-		if (!leccore::file::create_directory(_files_folder, error)) {
+		if (!leccore::file::create_directory(_files_staging_folder, error)) {
 			message("Error creating Collab directory: " + error);
 			return false;
 		}
 
 		// lock the folder to prevent its deletion as long as the app is running by
 		// making a .lock file in it
-		const std::string lock_file_full_path = _files_folder + "\\.lock";
+		const std::string lock_file_full_path = _files_staging_folder + "\\.lock";
 
 		_lock_file = new leccore::file::exclusive_lock(lock_file_full_path);
 
