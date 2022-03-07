@@ -44,6 +44,17 @@ public:
 
 		/// <summary>The hash of the session's passphrase.</summary>
 		std::string passphrase_hash;
+
+		bool operator==(const session& param) const {
+			return
+				unique_id == param.unique_id &&
+				name == param.name &&
+				description == param.description;
+		}
+
+		bool operator!=(const session& param) const {
+			return !operator==(param);
+		}
 	};
 
 	/// <summary>Message structure.</summary>

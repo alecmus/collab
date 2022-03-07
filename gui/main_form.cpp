@@ -497,27 +497,33 @@ void main_form::update_session_list() {
 
 	std::string error;
 	if (_collab.get_sessions(sessions, error)) {
-		try {
-			auto& session_list = get_table_view("home/join_session_pane/session_list");
+		// check if anything has changed
+		if (sessions != _previous_sessions) {
+			_previous_sessions = sessions;
+			log("Sessions changed");
 
-			// clear session list
-			session_list
-				.data().clear();
+			try {
+				auto& session_list = get_table_view("home/join_session_pane/session_list");
 
-			// populate session list with latest data
-			for (auto& session : sessions) {
-				liblec::lecui::table_row row;
-				row.insert(std::make_pair("UniqueID", session.unique_id));
-				row.insert(std::make_pair("Name", session.name));
-				row.insert(std::make_pair("Description", session.description));
+				// clear session list
+				session_list
+					.data().clear();
 
-				session_list.data().push_back(row);
+				// populate session list with latest data
+				for (auto& session : sessions) {
+					liblec::lecui::table_row row;
+					row.insert(std::make_pair("UniqueID", session.unique_id));
+					row.insert(std::make_pair("Name", session.name));
+					row.insert(std::make_pair("Description", session.description));
+
+					session_list.data().push_back(row);
+				}
+
+				// update
+				update();
 			}
-
-			// update
-			update();
+			catch (const std::exception&) {}
 		}
-		catch (const std::exception&) {}
 	}
 
 	// resume the timer (5000ms looping ... room to breathe)
@@ -540,8 +546,7 @@ void main_form::update_session_chat_messages() {
 		// check if anything has changed
 		if (messages != _previous_messages) {
 			_previous_messages = messages;
-
-			log("Messages changed");
+			log("Session " + shorten_unique_id(_current_session_unique_id) + ": messages changed");
 
 			try {
 				auto& messages_pane = get_pane("home/collaboration_pane/chat_pane/messages");
@@ -763,8 +768,7 @@ void main_form::update_session_chat_files() {
 		// check if anything has changed
 		if (files != _previous_files) {
 			_previous_files = files;
-
-			log("Session files changed");
+			log("Session " + shorten_unique_id(_current_session_unique_id) + ": files changed");
 
 			for (const auto& it : files)
 				_session_files[it.hash] = it;
@@ -940,11 +944,11 @@ void main_form::update_log() {
 	_timer_man.stop("update_log");
 
 	try {
-		auto& log_table = get_table_view("log/log_table");
-
 		bool do_update = !_log_queue.empty();
 
-		{
+		if (do_update) {
+			auto& log_table = get_table_view("log/log_table");
+
 			liblec::auto_mutex lock(_log_mutex);
 
 			// retrieve log events in the queue and insert them into the log table
@@ -959,10 +963,9 @@ void main_form::update_log() {
 
 			// clear the log queue
 			_log_queue.clear();
-		}
-		
-		if (do_update)
+
 			update();
+		}
 	}
 	catch (const std::exception&) {}
 
