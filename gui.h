@@ -123,6 +123,8 @@ class main_form : public lecui::form {
 	std::string _update_directory;
 	bool _setting_autostart = false;
 	std::string _folder, _files_folder, _files_staging_folder;
+	std::vector<collab::message> _previous_messages;
+	std::vector<collab::file> _previous_files;
 
 	const bool _cleanup_mode;
 	const bool _update_mode;

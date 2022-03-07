@@ -62,6 +62,19 @@ public:
 
 		/// <summary>The message text (basic HTML supported).</summary>
 		std::string text;
+
+		bool operator==(const message& param) const {
+			return
+				unique_id == param.unique_id &&
+				time == param.time &&
+				session_id == param.session_id &&
+				sender_unique_id == param.sender_unique_id &&
+				text == param.text;
+		}
+
+		bool operator!=(const message& param) const {
+			return !operator==(param);
+		}
 	};
 
 	/// <summary>User structure.</summary>
@@ -104,6 +117,22 @@ public:
 
 		/// <summary>The size of the file, in bytes.</summary>
 		long long size;
+
+		bool operator==(const file& param) const {
+			return
+				hash == param.hash &&
+				time == param.time &&
+				session_id == param.session_id &&
+				sender_unique_id == param.sender_unique_id &&
+				name == param.name &&
+				extension == param.extension &&
+				description == param.description &&
+				size == param.size;
+		}
+
+		bool operator!=(const file& param) const {
+			return !operator==(param);
+		}
 	};
 
 	collab ();

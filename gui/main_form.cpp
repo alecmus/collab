@@ -537,202 +537,209 @@ void main_form::update_session_chat_messages() {
 
 	std::string error;
 	if (_collab.get_messages(_current_session_unique_id, messages, error)) {
-		try {
-			auto& messages_pane = get_pane("home/collaboration_pane/chat_pane/messages");
+		// check if anything has changed
+		if (messages != _previous_messages) {
+			_previous_messages = messages;
 
-			const auto ref_rect = lecui::rect(messages_pane.size());
+			log("Messages changed");
 
-			float bottom_margin = 0.f;
+			try {
+				auto& messages_pane = get_pane("home/collaboration_pane/chat_pane/messages");
 
-			std::string previous_sender_unique_id;
+				const auto ref_rect = lecui::rect(messages_pane.size());
 
-			// K = unique_id, T = display name
-			std::map<std::string, std::string> display_names;
+				float bottom_margin = 0.f;
 
-			bool latest_message_arrived = false;
+				std::string previous_sender_unique_id;
 
-			struct day_struct {
-				int day = 0;
-				int month = 0;
-				int year = 0;
+				// K = unique_id, T = display name
+				std::map<std::string, std::string> display_names;
 
-				bool operator==(const day_struct& param) {
-					return (day == param.day) && (month == param.month) && (year == param.year);
-				}
+				bool latest_message_arrived = false;
 
-				bool operator!=(const day_struct& param) {
-					return !operator==(param);
-				}
-			} previous_day;
+				struct day_struct {
+					int day = 0;
+					int month = 0;
+					int year = 0;
 
-			for (const auto& msg : messages) {
-				if (msg.unique_id == _message_sent_just_now)
-					latest_message_arrived = true;
+					bool operator==(const day_struct& param) {
+						return (day == param.day) && (month == param.month) && (year == param.year);
+					}
 
-				std::tm time = { };
-				localtime_s(&time, &msg.time);
+					bool operator!=(const day_struct& param) {
+						return !operator==(param);
+					}
+				} previous_day;
 
-				std::stringstream ss;
-				ss << std::put_time(&time, "%H:%M");
-				std::string send_time = ss.str();
+				for (const auto& msg : messages) {
+					if (msg.unique_id == _message_sent_just_now)
+						latest_message_arrived = true;
 
-				day_struct this_day;
-				this_day.day = time.tm_mday;
-				this_day.month = time.tm_mon;
-				this_day.year = time.tm_year;
+					std::tm time = { };
+					localtime_s(&time, &msg.time);
 
-				const bool day_change = this_day != previous_day;
-				previous_day = this_day;
+					std::stringstream ss;
+					ss << std::put_time(&time, "%H:%M");
+					std::string send_time = ss.str();
 
-				const bool continuation = (previous_sender_unique_id == msg.sender_unique_id);
-				const bool own_message = msg.sender_unique_id == _collab.unique_id();
+					day_struct this_day;
+					this_day.day = time.tm_mday;
+					this_day.month = time.tm_mon;
+					this_day.year = time.tm_year;
 
-				if (continuation && !day_change)
-					bottom_margin -= (.85f * _margin);
+					const bool day_change = this_day != previous_day;
+					previous_day = this_day;
 
-				std::string display_name;
+					const bool continuation = (previous_sender_unique_id == msg.sender_unique_id);
+					const bool own_message = msg.sender_unique_id == _collab.unique_id();
 
-				// try to get this user's display name
-				try {
-					if (display_names.count(msg.sender_unique_id) == 0) {
-						// fetch from local database
-						std::string _display_name;
-						if (_collab.get_user_display_name(msg.sender_unique_id, _display_name, error) && !_display_name.empty()) {
-							// capture
-							display_name = _display_name;
+					if (continuation && !day_change)
+						bottom_margin -= (.85f * _margin);
 
-							// cache
-							display_names[msg.sender_unique_id] = display_name;
+					std::string display_name;
+
+					// try to get this user's display name
+					try {
+						if (display_names.count(msg.sender_unique_id) == 0) {
+							// fetch from local database
+							std::string _display_name;
+							if (_collab.get_user_display_name(msg.sender_unique_id, _display_name, error) && !_display_name.empty()) {
+								// capture
+								display_name = _display_name;
+
+								// cache
+								display_names[msg.sender_unique_id] = display_name;
+							}
+							else {
+								// use the first ten characters in the user's unique id
+								display_name.clear();
+
+								for (size_t i = 0; i < 10; i++)
+									display_name += msg.sender_unique_id[i];
+							}
 						}
 						else {
-							// use the first ten characters in the user's unique id
-							display_name.clear();
-
-							for (size_t i = 0; i < 10; i++)
-								display_name += msg.sender_unique_id[i];
+							// use the cached display name
+							display_name = display_names.at(msg.sender_unique_id);
 						}
 					}
-					else {
-						// use the cached display name
-						display_name = display_names.at(msg.sender_unique_id);
+					catch (const std::exception&) {
+						// use the first ten characters in the user's unique id
+						display_name.clear();
+
+						for (size_t i = 0; i < 10; i++)
+							display_name += msg.sender_unique_id[i];
 					}
-				}
-				catch (const std::exception&) {
-					// use the first ten characters in the user's unique id
-					display_name.clear();
 
-					for (size_t i = 0; i < 10; i++)
-						display_name += msg.sender_unique_id[i];
-				}
+					float text_height = _ui_font_height;
+					float font_size = _ui_font_size;
 
-				float text_height = _ui_font_height;
-				float font_size = _ui_font_size;
+					// measure text height
+					text_height = _dim.measure_label(msg.text, _font, font_size,
+						lecui::text_alignment::left, lecui::paragraph_alignment::top, ref_rect).height();
 
-				// measure text height
-				text_height = _dim.measure_label(msg.text, _font, font_size,
-					lecui::text_alignment::left, lecui::paragraph_alignment::top, ref_rect).height();
+					text_height += .1f;	// failsafe
 
-				text_height += .1f;	// failsafe
+					const float content_margin = 10.f;
+					float pane_height = (own_message || continuation) ?
+						text_height + (2 * content_margin) :
+						_caption_height + text_height + (2 * content_margin);
 
-				const float content_margin = 10.f;
-				float pane_height = (own_message || continuation) ?
-					text_height + (2 * content_margin) :
-					_caption_height + text_height + (2 * content_margin);
+					if (day_change) {
+						std::stringstream ss;
+						ss << std::put_time(&time, "%B %d, %Y");
+						std::string day_string = ss.str();
 
-				if (day_change) {
-					std::stringstream ss;
-					ss << std::put_time(&time, "%B %d, %Y");
-					std::string day_string = ss.str();
+						// text size
+						auto text_width = _dim.measure_label(day_string, _font, _caption_font_size,
+							lecui::text_alignment::center, lecui::paragraph_alignment::top, ref_rect).width();
 
-					// text size
-					auto text_width = _dim.measure_label(day_string, _font, _caption_font_size,
-						lecui::text_alignment::center, lecui::paragraph_alignment::top, ref_rect).width();
+						auto& day_label_background = lecui::widgets::rectangle::add(messages_pane, day_string + "_rect");
+						day_label_background
+							.rect(lecui::rect(messages_pane.size())
+								.top(bottom_margin + _margin / 2.f)
+								.height(_caption_height + _margin / 2.f)
+								.width(text_width + 2.f * _margin))
+							.corner_radius_x(day_label_background.rect().height() / 2.f)
+							.corner_radius_y(day_label_background.corner_radius_x())
+							.color_fill(lecui::defaults::color(_setting_darktheme ? lecui::themes::dark : lecui::themes::light, lecui::item::text_field));
 
-					auto& day_label_background = lecui::widgets::rectangle::add(messages_pane, day_string + "_rect");
-					day_label_background
+						auto& day_label = lecui::widgets::label::add(messages_pane, day_string);
+						day_label
+							.rect(lecui::rect(messages_pane.size())
+								.top(bottom_margin + _margin / 2.f)
+								.height(_caption_height))
+							.alignment(lecui::text_alignment::center)
+							.text(day_string)
+							.font_size(_caption_font_size);
+
+						day_label_background.rect().place(day_label.rect(), 50.f, 50.f);
+
+						bottom_margin = day_label.rect().bottom() + _margin + _margin / 2.f;
+					}
+
+					// add message pane
+					auto& pane = lecui::containers::pane::add(messages_pane, msg.unique_id, content_margin);
+					pane
 						.rect(lecui::rect(messages_pane.size())
-							.top(bottom_margin + _margin / 2.f)
-							.height(_caption_height + _margin / 2.f)
-							.width(text_width + 2.f* _margin))
-						.corner_radius_x(day_label_background.rect().height() / 2.f)
-						.corner_radius_y(day_label_background.corner_radius_x())
-						.color_fill(lecui::defaults::color(_setting_darktheme ? lecui::themes::dark : lecui::themes::light, lecui::item::text_field));
+							.top(bottom_margin)
+							.height(pane_height))
+						.color_fill(_setting_darktheme ?
+							(own_message ?
+								lecui::color().red(30).green(60).blue(100) :
+								lecui::color().red(35).green(45).blue(60)) :
+							(own_message ?
+								lecui::color().red(245).green(255).blue(245) :
+								lecui::color().red(255).green(255).blue(255)));
+					pane
+						.badge()
+						.text(send_time)
+						.color(lecui::color().alpha(0))
+						.color_border(lecui::color().alpha(0))
+						.color_text(_caption_color);
 
-					auto& day_label = lecui::widgets::label::add(messages_pane, day_string);
-					day_label
-						.rect(lecui::rect(messages_pane.size())
-							.top(bottom_margin + _margin / 2.f)
-							.height(_caption_height))
-						.alignment(lecui::text_alignment::center)
-						.text(day_string)
-						.font_size(_caption_font_size);
+					// update bottom margin
+					bottom_margin = pane.rect().bottom() + _margin;
 
-					day_label_background.rect().place(day_label.rect(), 50.f, 50.f);
+					if (!(own_message || continuation)) {
+						// add message label
+						auto& label = lecui::widgets::label::add(pane, msg.unique_id + "_label");
+						label
+							.text("<strong>" + display_name + "</strong>")
+							.rect(lecui::rect(pane.size()).height(_caption_height))
+							.font_size(_caption_font_size);
 
-					bottom_margin = day_label.rect().bottom() + _margin + _margin / 2.f;
+						// add message text
+						auto& text = lecui::widgets::label::add(pane, msg.unique_id + "_text");
+						text
+							.text(msg.text)
+							.rect(lecui::rect(label.rect()).height(text_height).snap_to(label.rect(), snap_type::bottom, 0.f))
+							.font_size(font_size);
+					}
+					else {
+						// add message text
+						auto& text = lecui::widgets::label::add(pane, msg.unique_id + "_text");
+						text
+							.text(msg.text)
+							.rect(lecui::rect(pane.size()).height(text_height))
+							.font_size(font_size);
+					}
+
+					previous_sender_unique_id = msg.sender_unique_id;
 				}
 
-				// add message pane
-				auto& pane = lecui::containers::pane::add(messages_pane, msg.unique_id, content_margin);
-				pane
-					.rect(lecui::rect(messages_pane.size())
-						.top(bottom_margin)
-						.height(pane_height))
-					.color_fill(_setting_darktheme ?
-						(own_message ?
-							lecui::color().red(30).green(60).blue(100) :
-							lecui::color().red(35).green(45).blue(60)) :
-						(own_message ?
-							lecui::color().red(245).green(255).blue(245) :
-							lecui::color().red(255).green(255).blue(255)));
-				pane
-					.badge()
-					.text(send_time)
-					.color(lecui::color().alpha(0))
-					.color_border(lecui::color().alpha(0))
-					.color_text(_caption_color);
+				if (latest_message_arrived) {
+					// clear
+					_message_sent_just_now.clear();
 
-				// update bottom margin
-				bottom_margin = pane.rect().bottom() + _margin;
+					// scroll to the bottom
+					messages_pane.scroll_vertically(-std::numeric_limits<float>::max());
 
-				if (!(own_message || continuation)) {
-					// add message label
-					auto& label = lecui::widgets::label::add(pane, msg.unique_id + "_label");
-					label
-						.text("<strong>" + display_name + "</strong>")
-						.rect(lecui::rect(pane.size()).height(_caption_height))
-						.font_size(_caption_font_size);
-
-					// add message text
-					auto& text = lecui::widgets::label::add(pane, msg.unique_id + "_text");
-					text
-						.text(msg.text)
-						.rect(lecui::rect(label.rect()).height(text_height).snap_to(label.rect(), snap_type::bottom, 0.f))
-						.font_size(font_size);
+					update();
 				}
-				else {
-					// add message text
-					auto& text = lecui::widgets::label::add(pane, msg.unique_id + "_text");
-					text
-						.text(msg.text)
-						.rect(lecui::rect(pane.size()).height(text_height))
-						.font_size(font_size);
-				}
-
-				previous_sender_unique_id = msg.sender_unique_id;
 			}
-
-			if (latest_message_arrived) {
-				// clear
-				_message_sent_just_now.clear();
-
-				// scroll to the bottom
-				messages_pane.scroll_vertically(-std::numeric_limits<float>::max());
-
-				update();
-			}
+			catch (const std::exception&) {}
 		}
-		catch (const std::exception&) {}
 	}
 
 	// resume the timer (1200ms looping ...)
@@ -749,152 +756,159 @@ void main_form::update_session_chat_files() {
 	_timer_man.stop("update_session_chat_files");
 
 	std::vector<collab::file> files;
-
 	std::string error;
 
 	if (_collab.get_files(_current_session_unique_id, files, error)) {
-		for (const auto& it : files)
-			_session_files[it.hash] = it;
 
-		try {
-			auto& content_pane = get_pane("home/collaboration_pane/files_pane/content");
+		// check if anything has changed
+		if (files != _previous_files) {
+			_previous_files = files;
 
-			const auto ref_rect = lecui::rect(content_pane.size());
+			log("Session files changed");
 
-			float bottom_margin = 0.f;
+			for (const auto& it : files)
+				_session_files[it.hash] = it;
 
-			// K = unique_id, T = display name
-			std::map<std::string, std::string> display_names;
+			try {
+				auto& content_pane = get_pane("home/collaboration_pane/files_pane/content");
 
-			for (const auto& it : files) {
-				auto& file = _session_files.at(it.hash);
+				const auto ref_rect = lecui::rect(content_pane.size());
 
-				std::tm time = { };
-				localtime_s(&time, &file.time);
+				float bottom_margin = 0.f;
 
-				std::stringstream ss;
-				ss << std::put_time(&time, "%d %B %Y, %H:%M");
-				std::string send_date = ss.str();
+				// K = unique_id, T = display name
+				std::map<std::string, std::string> display_names;
 
-				std::string display_name;
+				for (const auto& it : files) {
+					auto& file = _session_files.at(it.hash);
 
-				// try to get this user's display name
-				try {
-					if (display_names.count(file.sender_unique_id) == 0) {
-						// fetch from local database
-						std::string _display_name;
-						if (_collab.get_user_display_name(file.sender_unique_id, _display_name, error) && !_display_name.empty()) {
-							// capture
-							display_name = _display_name;
+					std::tm time = { };
+					localtime_s(&time, &file.time);
 
-							// cache
-							display_names[file.sender_unique_id] = display_name;
+					std::stringstream ss;
+					ss << std::put_time(&time, "%d %B %Y, %H:%M");
+					std::string send_date = ss.str();
+
+					std::string display_name;
+
+					// try to get this user's display name
+					try {
+						if (display_names.count(file.sender_unique_id) == 0) {
+							// fetch from local database
+							std::string _display_name;
+							if (_collab.get_user_display_name(file.sender_unique_id, _display_name, error) && !_display_name.empty()) {
+								// capture
+								display_name = _display_name;
+
+								// cache
+								display_names[file.sender_unique_id] = display_name;
+							}
+							else {
+								// use the first ten characters in the user's unique id
+								display_name.clear();
+
+								for (size_t i = 0; i < 10; i++)
+									display_name += file.sender_unique_id[i];
+							}
 						}
 						else {
-							// use the first ten characters in the user's unique id
-							display_name.clear();
-
-							for (size_t i = 0; i < 10; i++)
-								display_name += file.sender_unique_id[i];
+							// use the cached display name
+							display_name = display_names.at(file.sender_unique_id);
 						}
 					}
-					else {
-						// use the cached display name
-						display_name = display_names.at(file.sender_unique_id);
+					catch (const std::exception&) {
+						// use the first ten characters in the user's unique id
+						display_name.clear();
+
+						for (size_t i = 0; i < 10; i++)
+							display_name += file.sender_unique_id[i];
 					}
+
+					auto& file_pane = lecui::containers::pane::add(content_pane, file.hash);
+					file_pane
+						.rect(lecui::rect(ref_rect)
+							.top(bottom_margin)
+							.height(105.f))
+						.color_fill(_setting_darktheme ?
+							lecui::color().red(35).green(45).blue(60) :
+							lecui::color().red(255).green(255).blue(255));
+
+					// update bottom margin
+					bottom_margin = file_pane.rect().bottom() + _margin;
+
+					// add rectangle for hit testing
+					auto& hit_testing = lecui::widgets::rectangle::add(file_pane, file.hash + "_hit_testing");
+					hit_testing
+						.rect(lecui::rect(file_pane.size()))
+						.corner_radius_x(5.f)
+						.corner_radius_y(5.f)
+						.color_fill(lecui::color().alpha(0))
+						.color_border(lecui::color().alpha(0))
+						.color_hot(lecui::defaults::color(_setting_darktheme ?
+							lecui::themes::dark : lecui::themes::light, lecui::item::icon_hot).alpha(20));
+					hit_testing
+						.events().action = [&]() {
+						std::string error;
+
+						const auto destination_file = _files_staging_folder + "\\" + file.name + file.extension;
+
+						// remove destination file if it already exists
+						if (!leccore::file::remove(destination_file, error)) {}
+
+						// extract the file
+						if (!leccore::file::copy(_files_folder + "\\" + file.hash, destination_file, error))
+							message("Error extracting file: " + error);
+						else {
+							if (!leccore::shell::open(destination_file, error))
+								message("Error opening file: " + error);
+						}
+					};
+
+					auto& file_image = lecui::widgets::icon::add(file_pane, file.hash + "_file_image");
+					file_image
+						.rect(lecui::rect()
+							.width(40.f)
+							.height(40.f))
+						.png_resource(map_extension_to_resource(file.extension))
+						.padding(0.f);
+
+					auto& file_name = lecui::widgets::label::add(file_pane, file.hash + "_file_name");
+					file_name
+						.text("<strong>" + file.name + "</strong><span style = 'font-size: 8.0pt;'>" + file.extension + "</span>")
+						.rect(file_name.rect()
+							.left(file_image.rect().right() + _margin)
+							.right(file_pane.size().get_width()));
+
+					auto& additional = lecui::widgets::label::add(file_pane, file.hash + "_additional");
+					additional
+						.text("<strong>" + leccore::format_size(file.size, 2) + "</strong>, shared by <em>" + display_name + "</em>")
+						.font_size(_caption_font_size)
+						.color_text(_caption_color)
+						.rect(lecui::rect(file_name.rect())
+							.height(_caption_height)
+							.snap_to(file_name.rect(), snap_type::bottom, 0.f));
+
+					auto& shared_by = lecui::widgets::label::add(file_pane, file.hash + "_shared_by");
+					shared_by
+						.text("Shared on " + send_date)
+						.font_size(_caption_font_size)
+						.color_text(_caption_color)
+						.rect(lecui::rect(file_name.rect())
+							.height(_caption_height)
+							.snap_to(additional.rect(), snap_type::bottom, 0.f));
+
+					auto& file_description = lecui::widgets::label::add(file_pane, file.hash + "_file_description");
+					file_description
+						.text(file.description)
+						.font_size(_caption_font_size)
+						.color_text(_caption_color)
+						.rect(lecui::rect(file_name.rect())
+							.height(_caption_height * 2.5f)
+							.snap_to(shared_by.rect(), snap_type::bottom, _margin / 2.f));
 				}
-				catch (const std::exception&) {
-					// use the first ten characters in the user's unique id
-					display_name.clear();
-
-					for (size_t i = 0; i < 10; i++)
-						display_name += file.sender_unique_id[i];
-				}
-
-				auto& file_pane = lecui::containers::pane::add(content_pane, file.hash);
-				file_pane
-					.rect(lecui::rect(ref_rect)
-						.top(bottom_margin)
-						.height(105.f))
-					.color_fill(_setting_darktheme ?
-						lecui::color().red(35).green(45).blue(60) :
-						lecui::color().red(255).green(255).blue(255));
-
-				// update bottom margin
-				bottom_margin = file_pane.rect().bottom() + _margin;
-
-				// add rectangle for hit testing
-				auto& hit_testing = lecui::widgets::rectangle::add(file_pane, file.hash + "_hit_testing");
-				hit_testing
-					.rect(lecui::rect(file_pane.size()))
-					.corner_radius_x(5.f)
-					.corner_radius_y(5.f)
-					.color_fill(lecui::color().alpha(0))
-					.color_border(lecui::color().alpha(0))
-					.color_hot(lecui::defaults::color(_setting_darktheme ?
-						lecui::themes::dark : lecui::themes::light, lecui::item::icon_hot).alpha(20));
-				hit_testing
-					.events().action = [&]() {
-					std::string error;
-
-					const auto destination_file = _files_staging_folder + "\\" + file.name + file.extension;
-
-					// remove destination file if it already exists
-					if (!leccore::file::remove(destination_file, error)) {}
-
-					// extract the file
-					if (!leccore::file::copy(_files_folder + "\\" + file.hash, destination_file, error))
-						message("Error extracting file: " + error);
-					else {
-						if (!leccore::shell::open(destination_file, error))
-							message("Error opening file: " + error);
-					}
-				};
-
-				auto& file_image = lecui::widgets::icon::add(file_pane, file.hash + "_file_image");
-				file_image
-					.rect(lecui::rect()
-						.width(40.f)
-						.height(40.f))
-					.png_resource(map_extension_to_resource(file.extension))
-					.padding(0.f);
-
-				auto& file_name = lecui::widgets::label::add(file_pane, file.hash + "_file_name");
-				file_name
-					.text("<strong>" + file.name + "</strong><span style = 'font-size: 8.0pt;'>" + file.extension + "</span>")
-					.rect(file_name.rect()
-						.left(file_image.rect().right() + _margin)
-						.right(file_pane.size().get_width()));
-
-				auto& additional = lecui::widgets::label::add(file_pane, file.hash + "_additional");
-				additional
-					.text("<strong>" + leccore::format_size(file.size, 2) + "</strong>, shared by <em>" + display_name + "</em>")
-					.font_size(_caption_font_size)
-					.color_text(_caption_color)
-					.rect(lecui::rect(file_name.rect())
-						.height(_caption_height)
-						.snap_to(file_name.rect(), snap_type::bottom, 0.f));
-
-				auto& shared_by = lecui::widgets::label::add(file_pane, file.hash + "_shared_by");
-				shared_by
-					.text("Shared on " + send_date)
-					.font_size(_caption_font_size)
-					.color_text(_caption_color)
-					.rect(lecui::rect(file_name.rect())
-						.height(_caption_height)
-						.snap_to(additional.rect(), snap_type::bottom, 0.f));
-
-				auto& file_description = lecui::widgets::label::add(file_pane, file.hash + "_file_description");
-				file_description
-					.text(file.description)
-					.font_size(_caption_font_size)
-					.color_text(_caption_color)
-					.rect(lecui::rect(file_name.rect())
-						.height(_caption_height * 2.5f)
-						.snap_to(shared_by.rect(), snap_type::bottom, _margin / 2.f));
 			}
+			catch (const std::exception&) {}
 		}
-		catch (const std::exception&) {}
 	}
 
 	// resume the timer (1200ms looping ...)
