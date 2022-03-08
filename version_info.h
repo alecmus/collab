@@ -25,7 +25,7 @@
 #pragma once
 
 #define appname			"Collab"
-#define appdescription	"LAN based Collaboration using Distributed Computing"
+#define appdescription	"Collab"
 #define appcomments		"Powered by liblec"
 #define appcopyright	"(c) 2021 Alec Musasa"
 #define appcompany		"Alec Musasa"
