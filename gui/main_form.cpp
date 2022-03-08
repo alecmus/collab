@@ -30,6 +30,8 @@
 #include <liblec/lecui/widgets/table_view.h>
 #include <liblec/lecui/widgets/icon.h>
 #include <liblec/lecui/containers/pane.h>
+#include <liblec/lecui/menus/context_menu.h>
+#include <liblec/lecui/utilities/filesystem.h>
 
 // leccore
 #include <liblec/leccore/system.h>
@@ -869,6 +871,53 @@ void main_form::update_session_chat_files() {
 						else {
 							if (!leccore::shell::open(destination_file, error))
 								message("Error opening file: " + error);
+						}
+					};
+					
+					hit_testing
+						.events().right_click = [&]() {
+						std::string error;
+
+						lecui::context_menu::specs menu_specs;
+						menu_specs.items.push_back({ "Open", png_open_file });
+						menu_specs.items.push_back({ "Save As ...", png_save_as });
+
+						auto selected = lecui::context_menu::context_menu()(*this, menu_specs);
+
+						if (selected == "Open") {
+							const auto destination_file = _files_staging_folder + "\\" + file.name + file.extension;
+
+							// remove destination file if it already exists
+							if (!leccore::file::remove(destination_file, error)) {}
+
+							// extract the file
+							if (!leccore::file::copy(_files_folder + "\\" + file.hash, destination_file, error))
+								message("Error extracting file: " + error);
+							else {
+								if (!leccore::shell::open(destination_file, error))
+									message("Error opening file: " + error);
+							}
+						}
+
+						if (selected == "Save As ...") {
+							// prompt user for folder to save
+							lecui::filesystem fs(*this);
+							const auto folder = fs.select_folder("Select Folder");
+
+							if (!folder.empty()) {
+								const auto destination_file = folder + "\\" + file.name + file.extension;
+
+								// remove destination file if it already exists
+								if (!leccore::file::remove(destination_file, error)) {}
+
+								// extract the file
+								if (!leccore::file::copy(_files_folder + "\\" + file.hash, destination_file, error))
+									message("Error extracting file: " + error);
+								else {
+									if (!leccore::shell::open(folder, error))
+										message("Error opening folder: " + error);
+								}
+							}
 						}
 					};
 
