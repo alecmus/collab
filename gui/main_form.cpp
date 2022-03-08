@@ -640,19 +640,17 @@ void main_form::update_session_chat_messages() {
 							display_name += msg.sender_unique_id[i];
 					}
 
-					float text_height = _ui_font_height;
 					float font_size = _ui_font_size;
 
 					// measure text height
-					text_height = _dim.measure_label(msg.text, _font, font_size,
+					const float text_height = _dim.measure_label(msg.text, _font, font_size,
 						lecui::text_alignment::left, lecui::paragraph_alignment::top, ref_rect).height();
 
-					text_height += .1f;	// failsafe
-
 					const float content_margin = 10.f;
-					float pane_height = (own_message || continuation) ?
+					const float pane_height = (own_message || continuation) ?
 						text_height + (2 * content_margin) :
-						_caption_height + text_height + (2 * content_margin);
+						_caption_height + text_height + (2 * content_margin) +
+						1.f;	// failsafe
 
 					if (day_change) {
 						std::stringstream ss;
@@ -834,11 +832,27 @@ void main_form::update_session_chat_files() {
 							display_name += file.sender_unique_id[i];
 					}
 
-					auto& file_pane = lecui::containers::pane::add(content_pane, file.hash);
+					const float content_margin = 10.f;
+
+					const float description_height = _dim.measure_label(file.description, _font, _caption_font_size,
+						lecui::text_alignment::left, lecui::paragraph_alignment::top,
+						lecui::rect(ref_rect).width(ref_rect.width() - (2.f * content_margin))).height();
+
+					const float file_pane_height =
+						content_margin +		// top margin
+						20.f +					// filename
+						_caption_height +		// additional
+						_caption_height +		// shared on
+						(_margin / 2.f) +		// margin between shared on and description
+						description_height +	// description height
+						content_margin +		// bottom margin
+						1.f;					// failsafe
+
+					auto& file_pane = lecui::containers::pane::add(content_pane, file.hash, content_margin);
 					file_pane
 						.rect(lecui::rect(ref_rect)
 							.top(bottom_margin)
-							.height(105.f))
+							.height(file_pane_height))
 						.color_fill(_setting_darktheme ?
 							lecui::color().red(35).green(45).blue(60) :
 							lecui::color().red(255).green(255).blue(255));
@@ -945,8 +959,8 @@ void main_form::update_session_chat_files() {
 							.height(_caption_height)
 							.snap_to(file_name.rect(), snap_type::bottom, 0.f));
 
-					auto& shared_by = lecui::widgets::label::add(file_pane, file.hash + "_shared_by");
-					shared_by
+					auto& shared_on = lecui::widgets::label::add(file_pane, file.hash + "_shared_on");
+					shared_on
 						.text("Shared on " + send_date)
 						.font_size(_caption_font_size)
 						.color_text(_caption_color)
@@ -961,7 +975,7 @@ void main_form::update_session_chat_files() {
 						.color_text(_caption_color)
 						.rect(lecui::rect(file_name.rect())
 							.height(_caption_height * 2.5f)
-							.snap_to(shared_by.rect(), snap_type::bottom, _margin / 2.f));
+							.snap_to(shared_on.rect(), snap_type::bottom, _margin / 2.f));
 				}
 			}
 			catch (const std::exception&) {}
