@@ -914,7 +914,7 @@ void main_form::update_session_chat_files() {
 								if (!leccore::file::copy(_files_folder + "\\" + file.hash, destination_file, error))
 									message("Error extracting file: " + error);
 								else {
-									if (!leccore::shell::open(folder, error))
+									if (!leccore::shell::view(destination_file, error))
 										message("Error opening folder: " + error);
 								}
 							}
