@@ -155,7 +155,7 @@ void main_form::user() {
 			username_caption
 				.text("Username")
 				.font_size(_caption_font_size)
-				.color_text(_caption_color)
+				.color_text(_main_form._caption_color)
 				.rect(lecui::rect()
 					.left(_margin)
 					.width(ref_rect.width())
@@ -188,7 +188,7 @@ void main_form::user() {
 			display_name_caption
 				.text("Display Name")
 				.font_size(_caption_font_size)
-				.color_text(_caption_color)
+				.color_text(_main_form._caption_color)
 				.rect(lecui::rect(username_caption.rect())
 					.snap_to(username.rect(), snap_type::bottom, _margin));
 

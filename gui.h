@@ -86,9 +86,9 @@ class main_form : public lecui::form {
 
 	static const std::string _sample_text;
 	static const std::string _font;
-	static const lecui::color _caption_color;
 	static const lecui::color _online;
 	static const lecui::color _busy;
+	lecui::color _caption_color;
 
 	lecui::controls _ctrls{ *this };
 	lecui::page_manager _page_man{ *this };

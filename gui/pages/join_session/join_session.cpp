@@ -88,7 +88,7 @@ bool main_form::join_session(const collab::session& session) {
 			session_description
 				.text(_session.description)
 				.font_size(_caption_font_size)
-				.color_text(_caption_color)
+				.color_text(_main_form._caption_color)
 				.rect(lecui::rect(session_name.rect())
 					.height(_main_form._caption_height * 2.5f)
 					.snap_to(session_name.rect(), snap_type::bottom, 0.f));
@@ -111,7 +111,7 @@ bool main_form::join_session(const collab::session& session) {
 				session_password_caption
 					.text("Password")
 					.font_size(_caption_font_size)
-					.color_text(_caption_color)
+					.color_text(_main_form._caption_color)
 					.rect(lecui::rect()
 						.width(ref_rect.width())
 						.height(_main_form._caption_height)

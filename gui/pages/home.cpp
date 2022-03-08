@@ -372,7 +372,7 @@ void main_form::add_home_page() {
 												file_name_caption
 													.text("File Name")
 													.font_size(_caption_font_size)
-													.color_text(_caption_color)
+													.color_text(_main_form._caption_color)
 													.rect(lecui::rect()
 														.left(_margin)
 														.width(ref_rect.width())
@@ -395,7 +395,7 @@ void main_form::add_home_page() {
 												file_description_caption
 													.text("File Description")
 													.font_size(_caption_font_size)
-													.color_text(_caption_color)
+													.color_text(_main_form._caption_color)
 													.rect(lecui::rect(file_name_caption.rect())
 														.snap_to(file_name.rect(), snap_type::bottom, _margin));
 
@@ -420,7 +420,7 @@ void main_form::add_home_page() {
 												file_size
 													.text("Size: " + file_size_string)
 													.font_size(_caption_font_size)
-													.color_text(_caption_color)
+													.color_text(_main_form._caption_color)
 													.rect(lecui::rect(file_name_caption.rect())
 														.snap_to(file_description.rect(), snap_type::bottom, _margin));
 

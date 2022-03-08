@@ -76,7 +76,7 @@ void main_form::new_session() {
 			session_name_caption
 				.text("Session Name")
 				.font_size(_caption_font_size)
-				.color_text(_caption_color)
+				.color_text(_main_form._caption_color)
 				.rect(lecui::rect()
 					.left(_margin)
 					.width(ref_rect.width())
@@ -97,7 +97,7 @@ void main_form::new_session() {
 			session_description_caption
 				.text("Session Description")
 				.font_size(_caption_font_size)
-				.color_text(_caption_color)
+				.color_text(_main_form._caption_color)
 				.rect(lecui::rect(session_name_caption.rect())
 					.snap_to(session_name.rect(), snap_type::bottom, _margin));
 
@@ -128,7 +128,7 @@ void main_form::new_session() {
 				session_password_caption
 					.text("Password")
 					.font_size(_caption_font_size)
-					.color_text(_caption_color)
+					.color_text(_main_form._caption_color)
 					.rect(lecui::rect()
 						.width(ref_rect.width())
 						.height(_main_form._caption_height)
@@ -166,7 +166,7 @@ void main_form::new_session() {
 				confirm_session_password_caption
 					.text("Confirm password")
 					.font_size(_caption_font_size)
-					.color_text(_caption_color)
+					.color_text(_main_form._caption_color)
 					.rect(lecui::rect(session_password_caption.rect()).snap_to(session_password.rect(), snap_type::bottom, _margin));
 
 				// add confirm password field
@@ -184,7 +184,7 @@ void main_form::new_session() {
 					.text("Password quality")
 					.alignment(lecui::text_alignment::center)
 					.font_size(_caption_font_size)
-					.color_text(_caption_color)
+					.color_text(_main_form._caption_color)
 					.rect(lecui::rect(confirm_session_password_caption.rect()).snap_to(confirm_session_password.rect(), snap_type::bottom, _margin));
 
 				// add password strength bar
