@@ -63,3 +63,5 @@
 #define png_executable		138
 #define png_file			139
 #define png_log				140
+#define png_open_file		141
+#define png_save_as			142

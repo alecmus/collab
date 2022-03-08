@@ -43,7 +43,7 @@ png_updates			PNG		"resources/png/updates.png"		// dmitri13
 png_user			PNG		"resources/png/user.png"		// Freepik
 png_new_session		PNG		"resources/png/add.png"			// Good Ware
 png_join_session	PNG		"resources/png/team.png"		// Freepik
-png_delete			PNG		"resources/png/delete.png"		// GoodWare
+png_delete			PNG		"resources/png/delete.png"		// Good Ware
 png_send			PNG		"resources/png/send.png"		// Freepik, modified
 png_chat			PNG		"resources/png/chat.png"		// Freepik
 png_files			PNG		"resources/png/files.png"		// Freepik
@@ -59,9 +59,11 @@ png_xls				PNG		"resources/png/xls.png"			// Dimitry Miroliubov
 png_ppt				PNG		"resources/png/ppt.png"			// Dimitry Miroliubov
 png_txt				PNG		"resources/png/txt.png"			// Dimitry Miroliubov
 png_iso				PNG		"resources/png/iso.png"			// Dimitry Miroliubov
-png_audio			PNG		"resources/png/audio.png"		// Roman Kacerek
-png_video			PNG		"resources/png/video.png"		// Roman Kacerek
+png_audio			PNG		"resources/png/audio.png"		// Good Ware
+png_video			PNG		"resources/png/video.png"		// Good Ware
 png_archive			PNG		"resources/png/archive.png"		// Roman Kacerek
 png_executable		PNG		"resources/png/executable.png"	// Vectorslab
 png_file			PNG		"resources/png/file.png"		// berkahicon
 png_log				PNG		"resources/png/log.png"			// Freepik
+png_open_file		PNG		"resources/png/open_file.png"	// Good Ware
+png_save_as			PNG		"resources/png/save_as.png"		// Good Ware

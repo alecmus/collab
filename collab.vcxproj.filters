@@ -201,5 +201,65 @@
     <Image Include="resources\png\log.png">
       <Filter>collab\resources\png</Filter>
     </Image>
+    <Image Include="resources\png\audio.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\archive.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\bmp.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\doc.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\file.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\executable.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\files.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\gif.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\jpg.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\open_file.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\pdf.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\png.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\ppt.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\psd.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\save_as.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\iso.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\tasks.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\txt.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\video.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\xls.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
   </ItemGroup>
 </Project>
