@@ -533,8 +533,10 @@ void main_form::update_session_list() {
 }
 
 void main_form::update_session_chat_messages() {
-	if (_current_session_unique_id.empty())
+	if (_current_session_unique_id.empty()) {
+		_previous_messages.clear();
 		return;	// exit immediately, user isn't currently part of any session
+	}
 
 	// stop the timer
 	_timer_man.stop("update_session_chat_messages");
@@ -754,8 +756,10 @@ void main_form::update_session_chat_messages() {
 }
 
 void main_form::update_session_chat_files() {
-	if (_current_session_unique_id.empty())
+	if (_current_session_unique_id.empty()) {
+		_previous_files.clear();
 		return;	// exit immediately, user isn't currently part of any session
+	}
 
 	// stop the timer
 	_timer_man.stop("update_session_chat_files");

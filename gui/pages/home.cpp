@@ -161,6 +161,8 @@ void main_form::add_home_page() {
 
 					// to-do: implement session joining for first item in selection
 					if (join_session(session)) {
+						log("JOINED SESSION: " + shorten_unique_id(session.unique_id));
+
 						// capture current session unique id
 						_current_session_unique_id = session.unique_id;
 						_collab.set_current_session_unique_id(_current_session_unique_id);
@@ -618,6 +620,8 @@ void main_form::add_home_page() {
 				.height(_title_height + _caption_height))
 			.png_resource(_setting_darktheme ? png_back_dark : png_back_light)
 			.events().action = [this]() {
+			log("LEFT SESSION: " + shorten_unique_id(_current_session_unique_id));
+
 			// clear current session unique id
 			_current_session_unique_id.clear();
 			_collab.set_current_session_unique_id(_current_session_unique_id);
