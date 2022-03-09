@@ -893,7 +893,7 @@ void main_form::update_session_chat_files() {
 
 						lecui::context_menu::specs menu_specs;
 						menu_specs.items.push_back({ "Open", png_open_file });
-						menu_specs.items.push_back({ "Save As ...", png_save_as });
+						menu_specs.items.push_back({ "Save To ...", png_save_as });
 
 						auto selected = lecui::context_menu::context_menu()(*this, menu_specs);
 
@@ -912,7 +912,7 @@ void main_form::update_session_chat_files() {
 							}
 						}
 
-						if (selected == "Save As ...") {
+						if (selected == "Save To ...") {
 							// prompt user for folder to save
 							lecui::filesystem fs(*this);
 							const auto folder = fs.select_folder("Select Folder");
