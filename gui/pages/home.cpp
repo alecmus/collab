@@ -296,7 +296,7 @@ void main_form::add_home_page() {
 							files_pane
 								.rect(lecui::rect()
 									.left(chat_pane.rect().right() + _margin)
-									.width(350.f)
+									.width(300.f)
 									.top(session_description.rect().bottom() + _margin)
 									.bottom(ref_rect.bottom() - 20.f))
 								.on_resize(lecui::resize_params().height_rate(100.f));

@@ -632,24 +632,23 @@ void main_form::update_session_chat_messages() {
 						}
 					}
 					catch (const std::exception&) {
-						// use the first ten characters in the user's unique id
-						display_name.clear();
-
-						for (size_t i = 0; i < 10; i++)
-							display_name += msg.sender_unique_id[i];
+						// use shortened version of user's unique id
+						display_name = shorten_unique_id(msg.sender_unique_id);
 					}
 
 					float font_size = _ui_font_size;
 
+					const float content_margin = 10.f;
+
 					// measure text height
 					const float text_height = _dim.measure_label(msg.text, _font, font_size,
-						lecui::text_alignment::left, lecui::paragraph_alignment::top, ref_rect).height();
+						lecui::text_alignment::left, lecui::paragraph_alignment::top,
+						lecui::rect(ref_rect).width(ref_rect.width() - (2.f * content_margin))).height() +
+						1.f;	// failsafe
 
-					const float content_margin = 10.f;
 					const float pane_height = (own_message || continuation) ?
 						text_height + (2 * content_margin) :
-						_caption_height + text_height + (2 * content_margin) +
-						1.f;	// failsafe
+						_caption_height + text_height + (2 * content_margin);
 
 					if (day_change) {
 						std::stringstream ss;
@@ -831,21 +830,28 @@ void main_form::update_session_chat_files() {
 							display_name += file.sender_unique_id[i];
 					}
 
+					const std::string file_name_text = "<strong>" + file.name + "</strong><span style = 'font-size: 8.0pt;'>" + file.extension + "</span>";
+
 					const float content_margin = 10.f;
 
 					const float description_height = _dim.measure_label(file.description, _font, _caption_font_size,
 						lecui::text_alignment::left, lecui::paragraph_alignment::top,
-						lecui::rect(ref_rect).width(ref_rect.width() - (2.f * content_margin))).height();
+						lecui::rect(ref_rect).width(ref_rect.width() - (2.f * content_margin))).height() +
+						1.f;					// failsafe;
+
+					const float file_name_height = _dim.measure_label(file_name_text, _font, _ui_font_size,
+						lecui::text_alignment::left, lecui::paragraph_alignment::top,
+						lecui::rect(ref_rect).width(ref_rect.width() - (2.f * content_margin) - 40.f - _margin)).height() +
+						1.f;					// failsafe;
 
 					const float file_pane_height =
 						content_margin +		// top margin
-						20.f +					// filename
+						file_name_height +		// filename
 						_caption_height +		// additional
 						_caption_height +		// shared on
 						(_margin / 2.f) +		// margin between shared on and description
-						description_height +	// description height
-						content_margin +		// bottom margin
-						1.f;					// failsafe
+						description_height +	// description
+						content_margin;			// bottom margin
 
 					auto& file_pane = lecui::containers::pane::add(content_pane, file.hash, content_margin);
 					file_pane
@@ -944,10 +950,12 @@ void main_form::update_session_chat_files() {
 
 					auto& file_name = lecui::widgets::label::add(file_pane, file.hash + "_file_name");
 					file_name
-						.text("<strong>" + file.name + "</strong><span style = 'font-size: 8.0pt;'>" + file.extension + "</span>")
+						.text(file_name_text)
+						.font_size(_ui_font_size)
 						.rect(file_name.rect()
 							.left(file_image.rect().right() + _margin)
-							.right(file_pane.size().get_width()));
+							.right(file_pane.size().get_width())
+							.height(file_name_height));
 
 					auto& additional = lecui::widgets::label::add(file_pane, file.hash + "_additional");
 					additional
@@ -971,10 +979,11 @@ void main_form::update_session_chat_files() {
 					file_description
 						.text(file.description)
 						.font_size(_caption_font_size)
-						.color_text(_caption_color)
-						.rect(lecui::rect(file_name.rect())
-							.height(_caption_height * 2.5f)
-							.snap_to(shared_on.rect(), snap_type::bottom, _margin / 2.f));
+						.rect(lecui::rect()
+							.height(description_height)
+							.snap_to(shared_on.rect(), snap_type::bottom, _margin / 2.f)
+							.left(file_image.rect().left())
+							.right(shared_on.rect().right()));
 				}
 			}
 			catch (const std::exception&) {}
