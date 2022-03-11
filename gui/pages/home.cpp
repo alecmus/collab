@@ -311,7 +311,7 @@ void main_form::add_home_page() {
 										.right(files_pane.size().get_width() - _margin))
 									.png_resource(png_files)
 									.text("Session Files")
-									.description("Collaborate via digital content");
+									.description("Collaborate via digital content sharing and reviewing");
 
 								// add content pane
 								auto& content_pane = lecui::containers::pane::add(files_pane, "content");

@@ -831,7 +831,7 @@ void main_form::update_session_chat_files() {
 					const float content_margin = 10.f;
 
 					const float description_height = _dim.measure_label(file.description, _font, _caption_font_size,
-						lecui::text_alignment::left, lecui::paragraph_alignment::top,
+						lecui::text_alignment::justified, lecui::paragraph_alignment::top,
 						lecui::rect(ref_rect).width(ref_rect.width() - (2.f * content_margin))).height() +
 						1.f;					// failsafe;
 
@@ -1193,6 +1193,7 @@ void main_form::update_session_chat_files() {
 								input
 									.font(_font)
 									.font_size(_review_font_size)
+									.alignment(lecui::text_alignment::justified)
 									.rect(lecui::rect()
 										.left(_margin)
 										.width(ref_rect.width())
@@ -1305,6 +1306,7 @@ void main_form::update_session_chat_files() {
 					file_description
 						.text(file.description)
 						.font_size(_caption_font_size)
+						.alignment(lecui::text_alignment::justified)
 						.rect(lecui::rect()
 							.height(description_height)
 							.snap_to(shared_on.rect(), snap_type::bottom, _margin / 2.f)
@@ -1460,6 +1462,7 @@ void main_form::update_file_reviews() {
 						.text(review.text)
 						.font(_font)
 						.font_size(_review_font_size)
+						.alignment(lecui::text_alignment::justified)
 						.rect(lecui::rect(ref_rect)
 							.top(reviewed_on.rect().bottom() + _margin / 2.f)
 
