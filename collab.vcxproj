@@ -190,6 +190,7 @@
     <ClCompile Include="collab\collab.cpp" />
     <ClCompile Include="collab\files\files.cpp" />
     <ClCompile Include="collab\messages\messages.cpp" />
+    <ClCompile Include="collab\reviews\reviews.cpp" />
     <ClCompile Include="collab\sessions\sessions.cpp" />
     <ClCompile Include="collab\users\users.cpp" />
     <ClCompile Include="gui\main_form.cpp" />
@@ -238,6 +239,7 @@
     <Image Include="resources\png\png.png" />
     <Image Include="resources\png\ppt.png" />
     <Image Include="resources\png\psd.png" />
+    <Image Include="resources\png\review.png" />
     <Image Include="resources\png\save_as.png" />
     <Image Include="resources\png\send.png" />
     <Image Include="resources\png\settings.png" />

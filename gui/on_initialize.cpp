@@ -387,6 +387,9 @@ bool main_form::on_initialize(std::string& error) {
 	// schedule timer for session file list (1500ms kick start ... the method will do the timer looping)
 	_timer_man.add("update_session_chat_files", 1500, [&]() { update_session_chat_files(); });
 
+	// schedule timer for file review list (1500ms kick start ... the method will do the timer looping)
+	_timer_man.add("update_file_reviews", 3000, [&]() { update_file_reviews(); });
+
 	// schedule timer for logging (100ms kick start ... the method will do the timer looping)
 	_timer_man.add("update_log", 100, [&]() { update_log(); });
 

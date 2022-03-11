@@ -46,6 +46,9 @@
     <Filter Include="collab\collab\files">
       <UniqueIdentifier>{fc19746f-fe87-4815-af89-8499cd763ce2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="collab\collab\reviews">
+      <UniqueIdentifier>{762c32e4-0b6b-478c-b516-1c00e486cf2b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version_info.h">
@@ -135,6 +138,9 @@
     </ClCompile>
     <ClCompile Include="gui\pages\log.cpp">
       <Filter>collab\gui\main_form\pages</Filter>
+    </ClCompile>
+    <ClCompile Include="collab\reviews\reviews.cpp">
+      <Filter>collab\collab\reviews</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +265,9 @@
       <Filter>collab\resources\png</Filter>
     </Image>
     <Image Include="resources\png\xls.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\review.png">
       <Filter>collab\resources\png</Filter>
     </Image>
   </ItemGroup>

@@ -245,7 +245,7 @@ bool collab::session_exists(const std::string& unique_id) {
 	auto& con = con_opt.value().get();
 
 	liblec::leccore::database::table results;
-	if (!con.execute_query("SELECT * FROM Sessions WHERE UniqueID = ?;", { unique_id }, results, error))
+	if (!con.execute_query("SELECT UniqueID FROM Sessions WHERE UniqueID = ?;", { unique_id }, results, error))
 		return false;
 
 	return !results.data.empty();

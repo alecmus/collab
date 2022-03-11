@@ -76,6 +76,7 @@ class main_form : public lecui::form {
 	static const float _detail_font_size;
 	static const float _ui_font_size;
 	static const float _caption_font_size;
+	static const float _review_font_size;
 
 	// computed ideal label heights, in pixels
 	float _title_height = 0.f;
@@ -126,6 +127,7 @@ class main_form : public lecui::form {
 	std::vector<collab::session> _previous_sessions;
 	std::vector<collab::message> _previous_messages;
 	std::vector<collab::file> _previous_files;
+	std::vector<collab::review> _previous_reviews;
 
 	const bool _cleanup_mode;
 	const bool _update_mode;
@@ -142,6 +144,7 @@ class main_form : public lecui::form {
 	collab _collab;	// collaboration object
 	std::string _current_session_unique_id;
 	std::string _message_sent_just_now;
+	std::string _current_session_file_hash;
 
 	// concurrency control related to the log
 	liblec::mutex _log_mutex;
@@ -189,6 +192,7 @@ class main_form : public lecui::form {
 	void update_session_list();
 	void update_session_chat_messages();
 	void update_session_chat_files();
+	void update_file_reviews();
 
 	void log(const std::string& event);
 	void update_log();

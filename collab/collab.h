@@ -146,6 +146,41 @@ public:
 		}
 	};
 
+	/// <summary>Review structure.</summary>
+	struct review {
+		/// <summary>The review's unique ID, preferrably a uuid.</summary>
+		std::string unique_id;
+
+		/// <summary>The time the review was posted (time_t value).</summary>
+		long long time;
+
+		/// <summary>The unique ID of the session in which the review was posted.</summary>
+		std::string session_id;
+
+		/// <summary>The hash of the file to which the review belongs.</summary>
+		std::string file_hash;
+
+		/// <summary>The unique ID of the user that posted the review.</summary>
+		std::string sender_unique_id;
+
+		/// <summary>The review text (basic HTML supported).</summary>
+		std::string text;
+
+		bool operator==(const review& param) const {
+			return
+				unique_id == param.unique_id &&
+				time == param.time &&
+				session_id == param.session_id &&
+				file_hash == param.file_hash &&
+				sender_unique_id == param.sender_unique_id &&
+				text == param.text;
+		}
+
+		bool operator!=(const review& param) const {
+			return !operator==(param);
+		}
+	};
+
 	collab ();
 	~collab ();
 
@@ -366,6 +401,53 @@ public:
 	/// <returns>Returns true if the user has at least one file in the session, else false.</returns>
 	bool user_has_files_in_session(const std::string& user_unique_id,
 		const std::string& session_unique_id);
+
+	//------------------------------------------------------------------------------------------------
+	// reviews
+
+	/// <summary>Create a review.</summary>
+	/// <param name="review">The review as defined in <see cref="collab::review"></see>.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	bool create_review(const review& review,
+		std::string& error);
+
+	/// <summary>Get session file reviews.</summary>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <param name="reviews">The list of reviews.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Reviews are ordered chronologically, starting with the latest.</remarks>
+	bool get_reviews(const std::string& session_unique_id,
+		std::vector<review>& reviews,
+		std::string& error);
+
+	/// <summary>Get session file reviews for a specific file.</summary>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <param name="file_hash">The hash of the file.</param>
+	/// <param name="reviews">The list of reviews.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Reviews are ordered chronologically, starting with the latest.</remarks>
+	bool get_reviews(const std::string& session_unique_id,
+		const std::string& file_hash,
+		std::vector<review>& reviews,
+		std::string& error);
+
+	/// <summary>Get file review.</summary>
+	/// <param name="unique_id">The review's unique id.</param>
+	/// <param name="review">The review.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	bool get_review(const std::string& unique_id,
+		review& review,
+		std::string& error);
+
+	/// <summary>Check if a file review exists.</summary>
+	/// <param name="unique_id">The review's unique id.</param>
+	/// <returns>Returns true if the review exists, else false.</returns>
+	/// <remarks>Checks the local database.</remarks>
+	bool review_exists(const std::string& unique_id);
 
 private:
 	class impl;

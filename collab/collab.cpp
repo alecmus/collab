@@ -133,6 +133,30 @@ collab::impl::~impl() {
 		}
 	}
 
+	if (_review_broadcast_sender.valid()) {
+		// wait for the thread to exit
+		while (true) {
+			bool thread_running = _review_broadcast_sender.wait_for(std::chrono::seconds{ 0 }) != std::future_status::ready;
+
+			if (!thread_running)
+				break;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+		}
+	}
+
+	if (_review_broadcast_receiver.valid()) {
+		// wait for the thread to exit
+		while (true) {
+			bool thread_running = _review_broadcast_receiver.wait_for(std::chrono::seconds{ 0 }) != std::future_status::ready;
+
+			if (!thread_running)
+				break;
+
+			std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
+		}
+	}
+
 	if (_p_con) {
 		delete _p_con;
 		_p_con = nullptr;
@@ -186,6 +210,10 @@ bool collab::impl::initialize(const std::string& database_file, const std::strin
 		// file threads
 		_file_broadcast_sender = std::async(std::launch::async, file_broadcast_sender_func, this);
 		_file_broadcast_receiver = std::async(std::launch::async, file_broadcast_receiver_func, this);
+
+		// review threads
+		_review_broadcast_sender = std::async(std::launch::async, review_broadcast_sender_func, this);
+		_review_broadcast_receiver = std::async(std::launch::async, review_broadcast_receiver_func, this);
 	}
 	catch (const std::exception& e) {
 		error = e.what();

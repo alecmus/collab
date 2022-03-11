@@ -56,14 +56,18 @@ enum ports {
 	MESSAGE_BROADCAST_PORT,
 	USER_BROADCAST_PORT,
 	FILE_BROADCAST_PORT,
+	REVIEW_BROADCAST_PORT,
 };
 
 enum tcp_ports {
 	FILE_TRANSFER_PORT = 55554,
+	REVIEW_TRANSFER_PORT,
 };
 
 constexpr int file_transfer_magic_number = 173;
 constexpr int file_chunk_size = 1024 * 1024;	// the size of each file chunk used in file transfer
+
+constexpr int review_transfer_magic_number = 181;
 
 constexpr int session_broadcast_cycle = 1200;	// in milliseconds
 constexpr int session_receiver_cycle = 1500;	// in milliseconds
@@ -76,6 +80,9 @@ constexpr int user_receiver_cycle = 1500;		// in milliseconds
 
 constexpr int file_broadcast_cycle = 1200;		// in milliseconds
 constexpr int file_receiver_cycle = 1500;		// in milliseconds
+
+constexpr int review_broadcast_cycle = 1200;	// in milliseconds
+constexpr int review_receiver_cycle = 1500;	// in milliseconds
 
 constexpr int message_broadcast_limit = 10;		// only broadcast the latest 10 messages
 
@@ -115,6 +122,27 @@ bool serialize_file_broadcast_structure(const file_broadcast_structure& cls,
 bool deserialize_file_broadcast_structure(const std::string& serialized,
 	file_broadcast_structure& cls, std::string& error);
 
+// same as collab::review except it doesn't contain the review text
+// this is important for performance, and also to prevent the review_broadcast_structure from reaching the datagram size limit
+struct review_header_structure {
+	std::string unique_id;
+	long long time;
+	std::string session_id;
+	std::string file_hash;
+	std::string sender_unique_id;
+};
+
+struct review_broadcast_structure {
+	std::string source_node_unique_id;
+	std::vector<std::string> ips;
+	std::vector<review_header_structure> review_list;
+};
+
+bool serialize_review_broadcast_structure(const review_broadcast_structure& cls,
+	std::string& serialized, std::string& error);
+bool deserialize_review_broadcast_structure(const std::string& serialized,
+	review_broadcast_structure& cls, std::string& error);
+
 class collab::impl {
 	liblec::leccore::database::connection* _p_con;
 	collab& _collab;
@@ -126,6 +154,8 @@ class collab::impl {
 	std::future<void> _user_broadcast_receiver;
 	std::future<void> _file_broadcast_sender;
 	std::future<void> _file_broadcast_receiver;
+	std::future<void> _review_broadcast_sender;
+	std::future<void> _review_broadcast_receiver;
 	bool _stop_session_broadcast = false;
 	std::string _files_folder;
 	std::function<void(const std::string& event)> _log;
@@ -164,4 +194,7 @@ public:
 
 	static void file_broadcast_sender_func(impl* p_impl);
 	static void file_broadcast_receiver_func(impl* p_impl);
+
+	static void review_broadcast_sender_func(impl* p_impl);
+	static void review_broadcast_receiver_func(impl* p_impl);
 };

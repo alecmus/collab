@@ -195,7 +195,7 @@ void main_form::add_home_page() {
 							auto& chat_pane = lecui::containers::pane::add(collaboration_pane, "chat_pane", 0.f);
 							chat_pane
 								.rect(lecui::rect()
-									.width(400.f)
+									.width(350.f)
 									.top(session_description.rect().bottom() + _margin)
 									.bottom(ref_rect.bottom() - 20.f))
 								.on_resize(lecui::resize_params().height_rate(100.f));
@@ -296,10 +296,10 @@ void main_form::add_home_page() {
 							files_pane
 								.rect(lecui::rect()
 									.left(chat_pane.rect().right() + _margin)
-									.width(300.f)
+									.right(ref_rect.right())
 									.top(session_description.rect().bottom() + _margin)
 									.bottom(ref_rect.bottom() - 20.f))
-								.on_resize(lecui::resize_params().height_rate(100.f));
+								.on_resize(lecui::resize_params().height_rate(100.f).width_rate(100.f).min_width(files_pane.rect().width()));
 
 							{
 								// add files title
@@ -317,10 +317,10 @@ void main_form::add_home_page() {
 								auto& content_pane = lecui::containers::pane::add(files_pane, "content");
 								content_pane
 									.rect(lecui::rect(files_pane.size())
+										.width(300.f)
 										.top(title.rect().bottom() + _margin / 3.f)
 										.bottom(files_pane.size().get_height() - 30.f - _margin / 2.f))
 									.on_resize(lecui::resize_params()
-										.width_rate(100.f)
 										.height_rate(100.f));
 
 								// make pane invisible
@@ -557,23 +557,21 @@ void main_form::add_home_page() {
 											if (!fm.create(error))
 												message(error);
 
-											break;	// expecting a file file anyway
+											break;	// expecting a single file anyway
 										}
 									}
 									catch (const std::exception&) {}
 								};
 
-								// add file description text field
+								// add button
 								auto& add_file = lecui::widgets::button::add(files_pane, "add_file");
 								add_file
 									.text("Add file")
 									.rect(lecui::rect(add_file.rect())
-										.left(title.rect().left())
-										.width(title.rect().width() / 2.f)
-										.height(add_file.rect().height())
+										.width(content_pane.rect().width() - 2.f * 10.f)
+										.height(25.f)
 										.snap_to(content_pane.rect(), snap_type::bottom, 0.f))
 									.on_resize(lecui::resize_params()
-										.x_rate(50.f)
 										.y_rate(100.f))
 									.events().action = [do_add_file]() {
 									do_add_file();
