@@ -22,7 +22,7 @@
 ** SOFTWARE.
 */
 
-#include "../../../gui.h"
+#include "../../../../gui.h"
 
 // lecui
 #include <liblec/lecui/containers/pane.h>

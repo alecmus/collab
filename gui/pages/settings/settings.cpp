@@ -22,7 +22,7 @@
 ** SOFTWARE.
 */
 
-#include "../../gui.h"
+#include "../../../gui.h"
 #include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/widgets/toggle.h>
 #include <liblec/lecui/widgets/line.h>

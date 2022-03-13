@@ -38,6 +38,7 @@
 #include <liblec/lecui/utilities/tray_icon.h>
 #include <liblec/lecui/widgets/widget.h>
 #include <liblec/lecui/containers/page.h>
+#include <liblec/lecui/containers/pane.h>
 
 // leccore
 #include <liblec/leccore/settings.h>
@@ -187,12 +188,15 @@ class main_form : public lecui::form {
 	void new_session();
 	void user();
 	bool join_session(const collab::session& session);
+	lecui::containers::pane& add_chat_pane(lecui::containers::pane& collaboration_pane, const lecui::rect& ref_rect);
+	lecui::containers::pane& add_files_pane(lecui::containers::pane& collaboration_pane, const lecui::rect& ref_rect);
 
 	void set_avatar(const std::string& image_data);
 	void update_session_list();
 	void update_session_chat_messages();
 	void update_session_chat_files();
 	void update_file_reviews();
+	int map_extension_to_resource(const std::string& extension);
 
 	void log(const std::string& event);
 	void update_log();

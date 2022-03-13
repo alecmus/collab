@@ -22,15 +22,6 @@
     <Filter Include="collab\gui\main_form\pages">
       <UniqueIdentifier>{93704f91-1b15-425d-9cc2-587b9d9fa46f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="collab\gui\main_form\pages\new_session">
-      <UniqueIdentifier>{9cb42a16-a2a0-49d9-a2be-a669dec1fb71}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="collab\gui\main_form\pages\user">
-      <UniqueIdentifier>{0ce4fb91-d4fa-4a06-b217-22fce4157a4a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="collab\gui\main_form\pages\join_session">
-      <UniqueIdentifier>{414fc153-b6de-4f81-9a40-480826b9f746}</UniqueIdentifier>
-    </Filter>
     <Filter Include="collab\collab">
       <UniqueIdentifier>{9805a174-0d62-405d-8bde-47ed24556381}</UniqueIdentifier>
     </Filter>
@@ -48,6 +39,42 @@
     </Filter>
     <Filter Include="collab\collab\reviews">
       <UniqueIdentifier>{762c32e4-0b6b-478c-b516-1c00e486cf2b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\log">
+      <UniqueIdentifier>{3e1a8d62-5322-4b9d-8ac2-25ce2a62f4ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\help">
+      <UniqueIdentifier>{009bfd69-ad90-4774-a7fe-0987a1e02e90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\settings">
+      <UniqueIdentifier>{1311c80c-924e-4167-b70d-ebb540404d2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\home">
+      <UniqueIdentifier>{277a2c0c-eb61-4e60-a9d9-537a98cd229e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\home\new_session">
+      <UniqueIdentifier>{9cb42a16-a2a0-49d9-a2be-a669dec1fb71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\home\join_session">
+      <UniqueIdentifier>{414fc153-b6de-4f81-9a40-480826b9f746}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\top_status_pane">
+      <UniqueIdentifier>{c345dce2-09f2-4755-bb7e-cd36b736e76b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\top_status_pane\user">
+      <UniqueIdentifier>{0ce4fb91-d4fa-4a06-b217-22fce4157a4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\side_pane">
+      <UniqueIdentifier>{1fae4ded-84dc-4913-af0a-25cd3e4febb2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\home\collaboration_pane">
+      <UniqueIdentifier>{d5f48cff-2d56-47b8-90ef-73a93aa65d44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\home\collaboration_pane\chat_pane">
+      <UniqueIdentifier>{116195f2-7a4b-4d74-90db-f007d975a2e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="collab\gui\main_form\pages\home\collaboration_pane\files_pane">
+      <UniqueIdentifier>{f74c75b8-20a7-4560-8db8-f8a38d849d94}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -88,15 +115,6 @@
     <ClCompile Include="helper_functions.cpp">
       <Filter>collab</Filter>
     </ClCompile>
-    <ClCompile Include="gui\pages\help.cpp">
-      <Filter>collab\gui\main_form\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\pages\home.cpp">
-      <Filter>collab\gui\main_form\pages</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\pages\settings.cpp">
-      <Filter>collab\gui\main_form\pages</Filter>
-    </ClCompile>
     <ClCompile Include="gui\on_initialize.cpp">
       <Filter>collab\gui\main_form</Filter>
     </ClCompile>
@@ -105,21 +123,6 @@
     </ClCompile>
     <ClCompile Include="gui\on_start.cpp">
       <Filter>collab\gui\main_form</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\side_pane.cpp">
-      <Filter>collab\gui\main_form</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\top_status_pane.cpp">
-      <Filter>collab\gui\main_form</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\pages\new_session\new_session.cpp">
-      <Filter>collab\gui\main_form\pages\new_session</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\pages\user\user.cpp">
-      <Filter>collab\gui\main_form\pages\user</Filter>
-    </ClCompile>
-    <ClCompile Include="gui\pages\join_session\join_session.cpp">
-      <Filter>collab\gui\main_form\pages\join_session</Filter>
     </ClCompile>
     <ClCompile Include="collab\collab.cpp">
       <Filter>collab\collab</Filter>
@@ -136,11 +139,50 @@
     <ClCompile Include="collab\files\files.cpp">
       <Filter>collab\collab\files</Filter>
     </ClCompile>
-    <ClCompile Include="gui\pages\log.cpp">
-      <Filter>collab\gui\main_form\pages</Filter>
-    </ClCompile>
     <ClCompile Include="collab\reviews\reviews.cpp">
       <Filter>collab\collab\reviews</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\log\log.cpp">
+      <Filter>collab\gui\main_form\pages\log</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\help\help.cpp">
+      <Filter>collab\gui\main_form\pages\help</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\settings\settings.cpp">
+      <Filter>collab\gui\main_form\pages\settings</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\home.cpp">
+      <Filter>collab\gui\main_form\pages\home</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\new_session\new_session.cpp">
+      <Filter>collab\gui\main_form\pages\home\new_session</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\join_session\join_session.cpp">
+      <Filter>collab\gui\main_form\pages\home\join_session</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\top_status_pane\top_status_pane.cpp">
+      <Filter>collab\gui\main_form\top_status_pane</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\top_status_pane\user\user.cpp">
+      <Filter>collab\gui\main_form\top_status_pane\user</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\side_pane\side_pane.cpp">
+      <Filter>collab\gui\main_form\side_pane</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\collaboration_pane\chat_pane\add_chat_pane.cpp">
+      <Filter>collab\gui\main_form\pages\home\collaboration_pane\chat_pane</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\collaboration_pane\files_pane\add_files_pane.cpp">
+      <Filter>collab\gui\main_form\pages\home\collaboration_pane\files_pane</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\collaboration_pane\chat_pane\update_session_chat_messages.cpp">
+      <Filter>collab\gui\main_form\pages\home\collaboration_pane\chat_pane</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\collaboration_pane\files_pane\update_session_chat_files.cpp">
+      <Filter>collab\gui\main_form\pages\home\collaboration_pane\files_pane</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\pages\home\collaboration_pane\files_pane\update_file_reviews.cpp">
+      <Filter>collab\gui\main_form\pages\home\collaboration_pane\files_pane</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -22,7 +22,7 @@
 ** SOFTWARE.
 */
 
-#include "../gui.h"
+#include "../../gui.h"
 #include <liblec/lecui/containers/status_pane.h>
 #include <liblec/lecui/widgets/rectangle.h>
 #include <liblec/lecui/widgets/image_view.h>
