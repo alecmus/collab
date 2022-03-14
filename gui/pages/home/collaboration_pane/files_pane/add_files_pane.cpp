@@ -204,7 +204,7 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 						hash_file.start(_full_path, { leccore::hash_file::algorithm::sha256 });
 
 						while (hash_file.hashing()) {
-							if (!_main_form.keep_alive())
+							if (!keep_alive())
 								return;
 
 							std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
