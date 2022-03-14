@@ -383,6 +383,17 @@ public:
 		std::vector<file>& files,
 		std::string& error);
 
+	/// <summary>Get session file.</summary>
+	/// <param name="hash">The file's hash.</param>
+	/// <param name="session_unique_id">The session's unique id.</param>
+	/// <param name="file">The file as defined in <see cref="collab::file"></see>.</param>
+	/// <param name="error">Error information.</param>
+	/// <returns>Returns true if successful, else false.</returns>
+	/// <remarks>Files are ordered chronologically, starting with the latest.</remarks>
+	bool get_file(const std::string& hash,
+		const std::string& session_unique_id, file& file,
+		std::string& error);
+
 	/// <summary>Check if a file exists in a given session.</summary>
 	/// <param name="hash">The hash of the file.</param>
 	/// <param name="session_unique_id">The session's unique ID.</param>

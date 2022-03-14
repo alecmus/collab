@@ -589,6 +589,74 @@ bool collab::get_files(const std::string& session_unique_id, std::vector<file>& 
 	return true;
 }
 
+bool collab::get_file(const std::string& hash,
+	const std::string& session_unique_id, file& file, std::string& error) {
+	liblec::auto_mutex lock(_d._database_mutex);
+
+	file = {};
+
+	if (session_unique_id.empty() || hash.empty()) {
+		error = "Session unique id or file hash not supplied";
+		return false;
+	}
+
+	// get optional object
+	auto con_opt = _d.get_connection();
+
+	if (!con_opt.has_value()) {
+		error = "No database connection";
+		return false;
+	}
+
+	// get database connection object reference
+	auto& con = con_opt.value().get();
+
+	liblec::leccore::database::table results;
+
+	if (!con.execute_query(
+		"SELECT Hash, Time, SessionID, SenderUniqueID, Name, Extension, Description, Size "
+		"FROM SessionFiles "
+		"WHERE Hash = ? AND SessionID = ?;",
+		{ hash, session_unique_id }, results, error))
+		return false;
+
+	for (auto& row : results.data) {
+		try {
+			if (row.at("Hash").has_value())
+				file.hash = liblec::leccore::database::get::text(row.at("Hash"));
+
+			if (row.at("Time").has_value())
+				file.time = static_cast<long long>(liblec::leccore::database::get::real(row.at("Time")));
+
+			if (row.at("SessionID").has_value())
+				file.session_id = liblec::leccore::database::get::text(row.at("SessionID"));
+
+			if (row.at("SenderUniqueID").has_value())
+				file.sender_unique_id = liblec::leccore::database::get::text(row.at("SenderUniqueID"));
+
+			if (row.at("Name").has_value())
+				file.name = liblec::leccore::database::get::text(row.at("Name"));
+
+			if (row.at("Extension").has_value())
+				file.extension = liblec::leccore::database::get::text(row.at("Extension"));
+
+			if (row.at("Description").has_value())
+				file.description = liblec::leccore::database::get::text(row.at("Description"));
+
+			if (row.at("Size").has_value())
+				file.size = static_cast<long long>(liblec::leccore::database::get::real(row.at("Size")));
+
+			break;	// expecting a single file anyway
+		}
+		catch (const std::exception& e) {
+			error = e.what();
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool collab::file_exists(const std::string& hash,
 	const std::string& session_unique_id) {
 	liblec::auto_mutex lock(_d._database_mutex);
