@@ -63,7 +63,7 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 						.mini_icon(ico_resource)
 						.caption_icon(get_dpi_scale() < 2.f ? icon_png_32 : icon_png_64)
 						.theme(_main_form._setting_darktheme ? lecui::themes::dark : lecui::themes::light);
-					_dim.set_size(lecui::size().width(300.f).height(195.f));
+					_dim.set_size(lecui::size().width(300.f).height(220.f));
 
 					return true;
 				}
@@ -135,11 +135,18 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 						.rect(lecui::rect(file_name_caption.rect())
 							.snap_to(file_description.rect(), snap_type::bottom, _margin));
 
+					// add status label
+					auto& status = lecui::widgets::label::add(home, "status");
+					status
+						.rect(lecui::rect(file_size.rect())
+							.height(status.rect().height())
+							.snap_to(file_size.rect(), snap_type::bottom, _margin));
+
 					// add 'add' button
 					auto& add = lecui::widgets::button::add(home, "add");
 					add
 						.text("Add")
-						.rect(lecui::rect(add.rect()).snap_to(file_size.rect(), snap_type::bottom, _margin))
+						.rect(lecui::rect(add.rect()).snap_to(status.rect(), snap_type::bottom, _margin))
 						.events().action = [&]() { on_add(); };
 
 					_page_man.show("home");
@@ -150,6 +157,7 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 					try {
 						auto& file_name = get_text_field("home/file_name");
 						auto& file_description = get_text_field("home/file_description");
+						auto& status = get_label("home/status");
 
 						if (file_name.text().empty() || file_description.text().empty())
 							return;
@@ -203,14 +211,62 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 						leccore::hash_file hash_file;
 						hash_file.start(_full_path, { leccore::hash_file::algorithm::sha256 });
 
+						std::string file_size_string;
+
+						try {
+							file_size_string = leccore::format_size(std::filesystem::file_size(_full_path));
+						}
+						catch (const std::exception&) {}
+
+						// prevent quitting
+						prevent_quit();
+
+						// disable controls
+						std::string error;
+						if (!_widget_man.disable("home/file_name", error)) {}
+						if (!_widget_man.disable("home/file_description", error)) {}
+						if (!_widget_man.disable("home/add", error)) {}
+
+						// set status text to hashing
+						status.text("Hashing file, please wait . .");
+
+						update();
+
+						unsigned long long count = 0;
+
 						while (hash_file.hashing()) {
-							if (!keep_alive())
+							if (count % 40 == 0) {
+								// little bit of lazy animation using dots
+								if (status.text().length() >= 65)
+									status.text("Hashing file, please wait . .");
+								else
+									status.text() += " .";
+
+								update();
+							}
+
+							count++;
+
+							if (!keep_alive()) {
+								allow_quit();
 								return;
+							}
 
 							std::this_thread::sleep_for(std::chrono::milliseconds{ 1 });
 						}
 
-						std::string error;
+						// enable controls
+						if (!_widget_man.enable("home/file_name", error)) {}
+						if (!_widget_man.enable("home/file_description", error)) {}
+						if (!_widget_man.enable("home/add", error)) {}
+
+						// clear status text
+						status.text().clear();
+
+						allow_quit();
+
+						update();
+
 						leccore::hash_file::hash_results results;
 						if (!hash_file.result(results, error)) {
 							message("Error hashing file: " + error);
@@ -219,8 +275,22 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 
 						file.hash = results.at(leccore::hash_file::algorithm::sha256);
 
+						// check if file already exists in this session
+						if (_main_form._collab.file_exists(file.hash, _main_form._current_session_unique_id)) {
+							collab::file existing_file;
+
+							if (_main_form._collab.get_file(file.hash, _main_form._current_session_unique_id, existing_file, error))
+								message("This file already exists in this session under the following name:\n"
+									"<strong>" + existing_file.name + "</strong>"
+									"<span style = 'font-size: 8.0pt;'>" + existing_file.extension + "</span>");
+							else
+								message("This file already exists in this session");
+							
+							return;
+						}
+
 						// check if file already exists in another session
-						if (!_main_form._collab.file_exists(file.hash, error)) {
+						if (!_main_form._collab.file_exists(file.hash)) {
 							// copy the file to the collab folder
 							if (!leccore::file::copy(_full_path, _main_form._files_folder + "\\" + file.hash, error)) {
 								message("Error copying file: " + error);
@@ -238,6 +308,7 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 						close();
 					}
 					catch (const std::exception& e) {
+						allow_quit();
 						message(e.what());
 					}
 				}
