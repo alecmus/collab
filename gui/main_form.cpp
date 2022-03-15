@@ -26,22 +26,12 @@
 
 // lecui
 #include <liblec/lecui/widgets/label.h>
-#include <liblec/lecui/widgets/rectangle.h>
 #include <liblec/lecui/widgets/table_view.h>
-#include <liblec/lecui/widgets/icon.h>
-#include <liblec/lecui/widgets/html_editor.h>
-#include <liblec/lecui/widgets/html_view.h>
-#include <liblec/lecui/widgets/button.h>
-#include <liblec/lecui/widgets/image_view.h>
-#include <liblec/lecui/containers/pane.h>
-#include <liblec/lecui/menus/context_menu.h>
-#include <liblec/lecui/utilities/filesystem.h>
 
 // leccore
 #include <liblec/leccore/system.h>
 #include <liblec/leccore/app_version_info.h>
 #include <liblec/leccore/hash.h>
-#include <liblec/leccore/file.h>
 
 // STL
 #include <filesystem>
