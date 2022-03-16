@@ -68,6 +68,7 @@ class main_form : public lecui::form {
 	const std::string _update_xml_url = "https://raw.githubusercontent.com/alecmus/collab/master/latest_update.xml";
 
 	static const float _margin;
+	static const lecui::size _design_size, _design_size_minimum;
 	static const float _icon_size;
 	static const float _info_size;
 

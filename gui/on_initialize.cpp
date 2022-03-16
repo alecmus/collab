@@ -404,14 +404,19 @@ bool main_form::on_initialize(std::string& error) {
 		.theme(_setting_darktheme ? lecui::themes::dark : lecui::themes::light);
 
 	_dim
-		.set_size(lecui::size().width(1000.f).height(600.f))
-		.set_minimum(lecui::size().width(800.f).height(500.f));
+		.set_size(_design_size)
+		.set_minimum(_design_size_minimum);
 
 	// add form caption handler
 	form::on_caption([this]() {
 		add_back_button();
 		_page_man.show("help");
 		}, "Click to view information about this app");
+
+	// form events
+	events().size = [this](const lecui::size&) {
+		_previous_reviews.clear();	// cause reviews to be redrawn
+	};
 
 	return true;
 }

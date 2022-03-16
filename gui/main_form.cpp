@@ -37,6 +37,8 @@
 #include <filesystem>
 #include <sstream>
 
+const lecui::size main_form::_design_size = lecui::size().width(1000.f).height(600.f);
+const lecui::size main_form::_design_size_minimum = lecui::size().width(800.f).height(500.f);
 const float main_form::_margin = 10.f;
 const float main_form::_icon_size = 32.f;
 const float main_form::_info_size = 20.f;
