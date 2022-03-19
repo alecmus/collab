@@ -57,3 +57,17 @@ The application has the following runtime requirements:
 * Networking is powered by the [lecnet](https://github.com/alecmus/lecnet) library.
 * The app's user interface is powered by the [lecui](https://github.com/alecmus/lecui) library.
 * Updates and other functionality are powered by the [leccore](https://github.com/alecmus/leccore) library.
+
+<br>
+<br>
+
+### :mag: A Few More Screenshots
+
+#### Creating a New Session
+<img src="https://github.com/alecmus/files/blob/master/liblec/lecui/screenshots/collab/collab_02.png?raw=true" alt="screenshot" width="809"/>
+
+#### Changing Profile Information
+<img src="https://github.com/alecmus/files/blob/master/liblec/lecui/screenshots/collab/collab_03.png?raw=true" alt="screenshot" width="809"/>
+
+#### Team Dark Theme
+<img src="https://github.com/alecmus/files/blob/master/liblec/lecui/screenshots/collab/collab_04.png?raw=true" alt="screenshot" width="809"/>
