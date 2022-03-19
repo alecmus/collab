@@ -3,14 +3,13 @@
 
 <br>
 
-<img src="https://github.com/alecmus/files/blob/master/liblec/lecui/screenshots/collab/collab_01.png?raw=true" alt="screenshot" width="809"/>
-
-### :information_source: About
 <strong>Project Title</strong><br>
 LAN based Collaboration using Distributed Computing<br>
 
 <strong>Artefact</strong><br>
 A robust, simple, distributed desktop collaboration app that runs on a LAN.<br>
+
+<img src="https://github.com/alecmus/files/blob/master/liblec/lecui/screenshots/collab/collab_01.png?raw=true" alt="screenshot" width="809"/>
 
 ### :chart_with_upwards_trend: Repo Stats
 
@@ -45,16 +44,16 @@ The application has the following runtime requirements:
 
 ### :bulb: How to Use the App
 * Install using the setup .exe file, or extract the portable version's .zip archive.
-* Run the app.
+* Connect to a local area network (WiFi, personal hotspot, LAN cable, etc.) An internet connection doesn't have to be available.
 * Add the app to your firewall exceptions:
   - the Windows Defender Firewall will prompt you the first time you run the app.
   - third party firewalls may also prompt you the first time you run the app.
-* Click the user icon on the top right and set your profile information and profile picture (optional).
-* Connect to a local area network (WiFi, personal hotspot, LAN cable, etc.) An internet connection doesn't have to be available.
+* Run the app.
+* Set your profile picture, username and display name using the user icon on the top right of the main screen (optional).
 * Create a session or join an existing session.
 * Collaborate :sunglasses:.
 
 ### :information_source: More Info
-* The app's user interface is powered by the [lecui](https://github.com/alecmus/lecui) library.
 * Networking is powered by the [lecnet](https://github.com/alecmus/lecnet) library.
+* The app's user interface is powered by the [lecui](https://github.com/alecmus/lecui) library.
 * Updates and other functionality are powered by the [leccore](https://github.com/alecmus/leccore) library.
