@@ -177,11 +177,11 @@ void main_form::add_home_page() {
 						try {
 							auto& session_name = get_label("home/collaboration_pane/session_name");
 							auto& session_description = get_label("home/collaboration_pane/session_description");
-							auto& session_id = get_label("home/collaboration_pane/session_id");
+							auto& session_id = get_label("status::top/session_id");
 
 							session_name.text(session.name);
 							session_description.text(session.description);
-							//session_id.text("Session ID: " + _current_session_unique_id);
+							session_id.text("Current Session: " + shorten_unique_id(_current_session_unique_id));
 
 							// add panes to collaboration pane
 							auto& collaboration_pane = get_pane("home/collaboration_pane");
@@ -243,6 +243,13 @@ void main_form::add_home_page() {
 			.events().action = [this]() {
 			log("LEFT SESSION: " + shorten_unique_id(_current_session_unique_id));
 
+			// clear current session label in top status pane
+			try{
+				auto& session_id = get_label("status::top/session_id");
+				session_id.text().clear();
+			}
+			catch (const std::exception&) {}
+
 			// clear current session unique id
 			_current_session_unique_id.clear();
 			_collab.set_current_session_unique_id(_current_session_unique_id);
@@ -284,18 +291,6 @@ void main_form::add_home_page() {
 			.color_text(_caption_color)
 			.on_resize(lecui::resize_params()
 				.width_rate(100.f));
-
-		// add session unique id label
-		auto& session_id = lecui::widgets::label::add(collaboration_pane, "session_id");
-		session_id
-			.rect(lecui::rect(session_description.rect())
-				.place(ref_rect, 100.f, 100.f))
-			.alignment(lecui::text_alignment::right)
-			.font_size(_caption_font_size)
-			.color_text(_caption_color)
-			.on_resize(lecui::resize_params()
-				.width_rate(100.f)
-				.y_rate(100.f));
 	}
 
 	// add overlay images

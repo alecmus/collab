@@ -24,6 +24,7 @@
 
 #include "../../gui.h"
 #include <liblec/lecui/containers/status_pane.h>
+#include <liblec/lecui/widgets/label.h>
 #include <liblec/lecui/widgets/rectangle.h>
 #include <liblec/lecui/widgets/image_view.h>
 
@@ -63,6 +64,18 @@ void main_form::add_top_status_pane() {
 	};
 
 	avatar.badge().font_size(6.f).text(" ").color(_online);
+
+	// add session unique id label
+	auto& session_id = lecui::widgets::label::add(status_pane, "session_id");
+	session_id
+		.rect(lecui::rect(ref_rect)
+			.right(avatar.rect().left() - _margin))
+		.alignment(lecui::text_alignment::right)
+		.paragraph_alignment(lecui::paragraph_alignment::bottom)
+		.font_size(_caption_font_size)
+		.color_text(_caption_color)
+		.on_resize(lecui::resize_params()
+			.x_rate(100.f));
 }
 
 void main_form::set_avatar(const std::string& image_data) {
