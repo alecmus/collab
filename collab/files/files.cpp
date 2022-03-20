@@ -130,7 +130,7 @@ std::string read_chunk(const std::string& fullpath, int chunk_number, int total_
 
 			auto file_size = std::filesystem::file_size(fullpath);
 
-			auto remainder = file_size % file_chunk_size;
+			unsigned int remainder = file_size % file_chunk_size;
 
 			// dynamically allocate memory for a buffer that matches the chunk size
 			char* buffer = new char[remainder];
