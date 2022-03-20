@@ -231,6 +231,38 @@ void main_form::update_file_reviews() {
 		}
 	}
 
+	bool force_update = false;
+
+	try {
+		auto& list = get_pane("home/collaboration_pane/files_pane/review_info/list");
+
+		const auto ref_rect = lecui::rect(list.size());
+
+		if (reviews.empty()) {
+			auto& label = lecui::widgets::label::add(list, "label");
+
+			if (label.text().empty())
+				force_update = true;	// label has just been added for the first time
+
+			label
+				.text("No file reviews")
+				.color_text(_caption_color)
+				.alignment(lecui::text_alignment::center)
+				.font_size(_ui_font_size)
+				.rect(lecui::rect(ref_rect).height(_ui_font_height).place(ref_rect, 50.f, 50.f))
+				.on_resize(lecui::resize_params().y_rate(50.f).width_rate(100.f));
+		}
+		else {
+			auto& label = get_label("home/collaboration_pane/files_pane/review_info/list/label");
+
+			if (!label.text().empty())
+				force_update = true;	// label has text and is about to be cleared
+
+			label.text().clear();
+		}
+	}
+	catch (const std::exception&) { }
+
 	if (panes_not_rendered) {
 		// hide all panes in the pane list
 		for (const auto& path : pane_list)
@@ -243,13 +275,16 @@ void main_form::update_file_reviews() {
 		_timer_man.add("update_file_reviews", 0, [&]() {
 			update_file_reviews();
 			});
+
+		if (force_update)
+			update();
 	}
 	else {
 		// show all panes in the pane list
 		for (const auto& path : pane_list)
 			if (!_widget_man.show(path, error)) {}
 
-		if (pane_list.size())
+		if (pane_list.size() || force_update)
 			update();
 
 		// resume the timer (1200ms looping ...)
