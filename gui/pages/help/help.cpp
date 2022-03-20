@@ -192,15 +192,67 @@ void main_form::add_help_page() {
 			message(error);
 	};
 
+	auto& dimitry_miroliubov = lecui::widgets::label::add(help);
+	dimitry_miroliubov
+		.text("Icons made by Dimitry Miroliubov from https://www.flaticon.com")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect().width(width).snap_to(goodware.rect(), snap_type::bottom, 0.f);
+	dimitry_miroliubov
+		.events().action = [this]() {
+		std::string error;
+		if (!leccore::shell::open("https://www.flaticon.com/authors/dimitry-miroliubov", error))
+			message(error);
+	};
+
+	auto& roman_kacerek = lecui::widgets::label::add(help);
+	roman_kacerek
+		.text("Icons made by Roman Kacerek from https://www.flaticon.com")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect().width(width).snap_to(dimitry_miroliubov.rect(), snap_type::bottom, 0.f);
+	roman_kacerek
+		.events().action = [this]() {
+		std::string error;
+		if (!leccore::shell::open("https://www.flaticon.com/authors/roman-kacerek", error))
+			message(error);
+	};
+
+	auto& vectorslab = lecui::widgets::label::add(help);
+	vectorslab
+		.text("Icons made by Vectorslab from https://www.flaticon.com")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect().width(width).snap_to(roman_kacerek.rect(), snap_type::bottom, 0.f);
+	vectorslab
+		.events().action = [this]() {
+		std::string error;
+		if (!leccore::shell::open("https://www.flaticon.com/authors/vectorslab", error))
+			message(error);
+	};
+
+	auto& berkahicon = lecui::widgets::label::add(help);
+	berkahicon
+		.text("Icons made by berkahicon from https://www.flaticon.com")
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect().width(width).snap_to(vectorslab.rect(), snap_type::bottom, 0.f);
+	berkahicon
+		.events().action = [this]() {
+		std::string error;
+		if (!leccore::shell::open("https://www.flaticon.com/authors/berkahicon", error))
+			message(error);
+	};
+
 	// add line
 	auto& license_line = lecui::widgets::rectangle::add(help);
 	license_line
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect(lecui::rect(goodware.rect()));
+		.rect(lecui::rect(berkahicon.rect()));
 	license_line.rect().top(license_line.rect().bottom());
-	license_line.rect().top() += 5.f * _margin;
-	license_line.rect().bottom() += 5.f * _margin;
+	license_line.rect().top() += 1.f * _margin;
+	license_line.rect().bottom() += 1.f * _margin;
 
 	license_line.rect().height(.25f);
 	license_line
