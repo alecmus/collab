@@ -255,9 +255,6 @@
     <Image Include="resources\png\archive.png">
       <Filter>collab\resources\png</Filter>
     </Image>
-    <Image Include="resources\png\bmp.png">
-      <Filter>collab\resources\png</Filter>
-    </Image>
     <Image Include="resources\png\doc.png">
       <Filter>collab\resources\png</Filter>
     </Image>
@@ -270,19 +267,10 @@
     <Image Include="resources\png\files.png">
       <Filter>collab\resources\png</Filter>
     </Image>
-    <Image Include="resources\png\gif.png">
-      <Filter>collab\resources\png</Filter>
-    </Image>
-    <Image Include="resources\png\jpg.png">
-      <Filter>collab\resources\png</Filter>
-    </Image>
     <Image Include="resources\png\open_file.png">
       <Filter>collab\resources\png</Filter>
     </Image>
     <Image Include="resources\png\pdf.png">
-      <Filter>collab\resources\png</Filter>
-    </Image>
-    <Image Include="resources\png\png.png">
       <Filter>collab\resources\png</Filter>
     </Image>
     <Image Include="resources\png\ppt.png">
@@ -310,6 +298,9 @@
       <Filter>collab\resources\png</Filter>
     </Image>
     <Image Include="resources\png\review.png">
+      <Filter>collab\resources\png</Filter>
+    </Image>
+    <Image Include="resources\png\image.png">
       <Filter>collab\resources\png</Filter>
     </Image>
   </ItemGroup>

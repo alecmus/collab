@@ -49,10 +49,6 @@ png_chat			PNG		"resources/png/chat.png"		// Freepik
 png_files			PNG		"resources/png/files.png"		// Freepik
 png_tasks			PNG		"resources/png/tasks.png"		// Freepik
 png_pdf				PNG		"resources/png/pdf.png"			// Dimitry Miroliubov
-png_png				PNG		"resources/png/png.png"			// Dimitry Miroliubov
-png_jpg				PNG		"resources/png/jpg.png"			// Dimitry Miroliubov
-png_bmp				PNG		"resources/png/bmp.png"			// Dimitry Miroliubov
-png_gif				PNG		"resources/png/gif.png"			// Dimitry Miroliubov
 png_psd				PNG		"resources/png/psd.png"			// Dimitry Miroliubov
 png_doc				PNG		"resources/png/doc.png"			// Dimitry Miroliubov
 png_xls				PNG		"resources/png/xls.png"			// Dimitry Miroliubov
@@ -61,6 +57,7 @@ png_txt				PNG		"resources/png/txt.png"			// Dimitry Miroliubov
 png_iso				PNG		"resources/png/iso.png"			// Dimitry Miroliubov
 png_audio			PNG		"resources/png/audio.png"		// Good Ware
 png_video			PNG		"resources/png/video.png"		// Good Ware
+png_image			PNG		"resources/png/image.png"		// Pixel perfect
 png_archive			PNG		"resources/png/archive.png"		// Roman Kacerek
 png_executable		PNG		"resources/png/executable.png"	// Vectorslab
 png_file			PNG		"resources/png/file.png"		// berkahicon

@@ -539,17 +539,8 @@ int main_form::map_extension_to_resource(const std::string& extension) {
 	if (extension == ".pdf")
 		return png_pdf;
 
-	if (extension == ".png")
-		return png_png;
-
-	if (extension == ".jpg" || extension == ".jpeg")
-		return png_jpg;
-
-	if (extension == ".bmp")
-		return png_bmp;
-
-	if (extension == ".gif")
-		return png_gif;
+	if (extension == ".bmp" || extension == ".gif" || extension == ".png" || extension == ".jpg" || extension == ".jpeg")
+		return png_image;
 
 	if (extension == ".psd")
 		return png_psd;

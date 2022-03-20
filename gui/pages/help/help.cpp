@@ -156,9 +156,13 @@ void main_form::add_help_page() {
 	auto& freepik = lecui::widgets::label::add(help);
 	freepik
 		.text("Icons made by Freepik from https://www.flaticon.com")
+		.font_size(_caption_font_size)
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(addition_credits_caption.rect(), snap_type::bottom, 0.f);
+		.rect()
+		.width(width)
+		.height(_caption_height)
+		.snap_to(addition_credits_caption.rect(), snap_type::bottom, 0.f);
 	freepik
 		.events().action = [this]() {
 		std::string error;
@@ -169,9 +173,13 @@ void main_form::add_help_page() {
 	auto& dmitri13 = lecui::widgets::label::add(help);
 	dmitri13
 		.text("Icons made by dmitri13 from https://www.flaticon.com")
+		.font_size(_caption_font_size)
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(freepik.rect(), snap_type::bottom, 0.f);
+		.rect()
+		.width(width)
+		.height(_caption_height)
+		.snap_to(freepik.rect(), snap_type::bottom, 0.f);
 	dmitri13
 		.events().action = [this]() {
 		std::string error;
@@ -182,9 +190,13 @@ void main_form::add_help_page() {
 	auto& goodware = lecui::widgets::label::add(help);
 	goodware
 		.text("Icons made by Good Ware from https://www.flaticon.com")
+		.font_size(_caption_font_size)
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(dmitri13.rect(), snap_type::bottom, 0.f);
+		.rect()
+		.width(width)
+		.height(_caption_height)
+		.snap_to(dmitri13.rect(), snap_type::bottom, 0.f);
 	goodware
 		.events().action = [this]() {
 		std::string error;
@@ -195,9 +207,13 @@ void main_form::add_help_page() {
 	auto& dimitry_miroliubov = lecui::widgets::label::add(help);
 	dimitry_miroliubov
 		.text("Icons made by Dimitry Miroliubov from https://www.flaticon.com")
+		.font_size(_caption_font_size)
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(goodware.rect(), snap_type::bottom, 0.f);
+		.rect()
+		.width(width)
+		.height(_caption_height)
+		.snap_to(goodware.rect(), snap_type::bottom, 0.f);
 	dimitry_miroliubov
 		.events().action = [this]() {
 		std::string error;
@@ -208,9 +224,13 @@ void main_form::add_help_page() {
 	auto& roman_kacerek = lecui::widgets::label::add(help);
 	roman_kacerek
 		.text("Icons made by Roman Kacerek from https://www.flaticon.com")
+		.font_size(_caption_font_size)
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(dimitry_miroliubov.rect(), snap_type::bottom, 0.f);
+		.rect()
+		.width(width)
+		.height(_caption_height)
+		.snap_to(dimitry_miroliubov.rect(), snap_type::bottom, 0.f);
 	roman_kacerek
 		.events().action = [this]() {
 		std::string error;
@@ -221,9 +241,13 @@ void main_form::add_help_page() {
 	auto& vectorslab = lecui::widgets::label::add(help);
 	vectorslab
 		.text("Icons made by Vectorslab from https://www.flaticon.com")
+		.font_size(_caption_font_size)
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(roman_kacerek.rect(), snap_type::bottom, 0.f);
+		.rect()
+		.width(width)
+		.height(_caption_height)
+		.snap_to(roman_kacerek.rect(), snap_type::bottom, 0.f);
 	vectorslab
 		.events().action = [this]() {
 		std::string error;
@@ -234,13 +258,34 @@ void main_form::add_help_page() {
 	auto& berkahicon = lecui::widgets::label::add(help);
 	berkahicon
 		.text("Icons made by berkahicon from https://www.flaticon.com")
+		.font_size(_caption_font_size)
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(vectorslab.rect(), snap_type::bottom, 0.f);
+		.rect()
+		.height(_caption_height)
+		.width(width)
+		.snap_to(vectorslab.rect(), snap_type::bottom, 0.f);
 	berkahicon
 		.events().action = [this]() {
 		std::string error;
 		if (!leccore::shell::open("https://www.flaticon.com/authors/berkahicon", error))
+			message(error);
+	};
+
+	auto& pixel_perfect = lecui::widgets::label::add(help);
+	pixel_perfect
+		.text("Icons made by Pixel perfect from https://www.flaticon.com")
+		.font_size(_caption_font_size)
+		.on_resize(lecui::resize_params()
+			.width_rate(100.f))
+		.rect()
+		.width(width)
+		.height(_caption_height)
+		.snap_to(berkahicon.rect(), snap_type::bottom, 0.f);
+	pixel_perfect
+		.events().action = [this]() {
+		std::string error;
+		if (!leccore::shell::open("https://www.flaticon.com/authors/pixel-perfect", error))
 			message(error);
 	};
 
@@ -249,7 +294,7 @@ void main_form::add_help_page() {
 	license_line
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect(lecui::rect(berkahicon.rect()));
+		.rect(lecui::rect(pixel_perfect.rect()));
 	license_line.rect().top(license_line.rect().bottom());
 	license_line.rect().top() += 1.f * _margin;
 	license_line.rect().bottom() += 1.f * _margin;
@@ -265,5 +310,16 @@ void main_form::add_help_page() {
 		.text("This app is free software released under the MIT License.")
 		.on_resize(lecui::resize_params()
 			.width_rate(100.f))
-		.rect().width(width).snap_to(license_line.rect(), snap_type::bottom, _margin);
+		.rect()
+		.width(width)
+		.height(_ui_font_height + _margin)
+		.snap_to(license_line.rect(), snap_type::bottom, _margin);
+
+	// add dummy rectangle behind the license notice for UI scrolling to honor the margin below the label
+	auto& rectangle = lecui::widgets::rectangle::add(help);
+	rectangle
+		.rect(license_notice.rect())
+		.color_fill(lecui::color().alpha(0))
+		.border(0.f)
+		.on_resize(license_notice.on_resize());
 }
