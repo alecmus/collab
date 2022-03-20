@@ -1,19 +1,35 @@
 # collab
-:link: Collaborate, :grin: chat, :outbox_tray: share, :eyes: review, and accomplish :calendar: tasks over a local area network ... without an internet connection!
+Collaborate, chat, share, review, and accomplish tasks over a local area network ... <em>without</em> an internet connection!
 
-<br>
+### :black_nib:Project Title
+LAN based Collaboration using Distributed Computing
 
-<strong>Project Title</strong><br>
-LAN based Collaboration using Distributed Computing<br>
+### :microscope:Artefact
+A robust, simple, distributed desktop collaboration app that runs on a LAN (codename: <em>Collab</em>)
 
-<strong>Artefact</strong><br>
-A robust, simple, distributed desktop collaboration app that runs on a LAN.<br>
+### :pushpin:Progress on Primary Objectives
+<ol>
+  <li>:white_check_mark: To create virtual nodes on a LAN that can identify and be identified by other nodes</li>
+  <li>:white_check_mark: To join an existing collaboration session or initiate a new one for others to join</li>
+  <li>:white_check_mark: To create a server-less distributed computing network over a LAN by linking together all available nodes into a synchronized session</li>
+  <li>:black_square_button: To collaborate over the LAN by utilizing the synchronized session
+    <ul>
+      <li>:white_check_mark: Real-time collaboration with zero or close to no-lag</li>
+      <li>:white_check_mark: Sharing digital content</li>
+      <li>:white_check_mark: Reviewing digital content</li>
+      <li>:black_square_button: Sharing computing resources</li>
+    </ul>
+  </li>
+</ol>
 
+### :mag: Screenshot
 <img src="https://github.com/alecmus/files/blob/master/liblec/lecui/screenshots/collab/collab_01.png?raw=true" alt="screenshot" width="809"/>
 
 ### :chart_with_upwards_trend: Repo Stats
 
 <p>
+  <em>Code Info</em>
+  <br>
   <img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/alecmus/collab">
   <img alt="GitHub issues" src="https://img.shields.io/github/issues-raw/alecmus/collab">
   <img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed-raw/alecmus/collab">
@@ -57,9 +73,6 @@ The application has the following runtime requirements:
 * Networking is powered by the [lecnet](https://github.com/alecmus/lecnet) library.
 * The app's user interface is powered by the [lecui](https://github.com/alecmus/lecui) library.
 * Updates and other functionality are powered by the [leccore](https://github.com/alecmus/leccore) library.
-
-<br>
-<br>
 
 ### :mag: A Few More Screenshots
 
