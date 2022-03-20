@@ -376,7 +376,7 @@ bool main_form::on_initialize(std::string& error) {
 	}
 
 	// set colors that are theme dependent
-	_caption_color = lecui::defaults::color(_setting_darktheme ? lecui::themes::dark : lecui::themes::light, lecui::item::icon_description_text);
+	_caption_color = lecui::defaults::color(_setting_darktheme ? lecui::themes::dark : lecui::themes::light, lecui::element::icon_description_text);
 
 	// schedule timer for session list (1000ms kick start ... the method will do the timer looping)
 	_timer_man.add("update_session_list", 1000, [&]() { update_session_list(); });

@@ -157,7 +157,7 @@ void main_form::update_session_chat_files() {
 						.color_fill(lecui::color().alpha(0))
 						.color_border(lecui::color().alpha(0))
 						.color_hot(lecui::defaults::color(_setting_darktheme ?
-							lecui::themes::dark : lecui::themes::light, lecui::item::icon_hot).alpha(20));
+							lecui::themes::dark : lecui::themes::light, lecui::element::icon_hot).alpha(20));
 					hit_testing
 						.events().action = [&]() {
 						std::string error;

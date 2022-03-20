@@ -181,7 +181,7 @@ void main_form::add_home_page() {
 
 							session_name.text(session.name);
 							session_description.text(session.description);
-							session_id.text("Session ID: " + _current_session_unique_id);
+							//session_id.text("Session ID: " + _current_session_unique_id);
 
 							// add panes to collaboration pane
 							auto& collaboration_pane = get_pane("home/collaboration_pane");

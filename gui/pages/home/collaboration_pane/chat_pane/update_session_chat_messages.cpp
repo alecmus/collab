@@ -164,7 +164,7 @@ void main_form::update_session_chat_messages() {
 								.width(text_width + 2.f * _margin))
 							.corner_radius_x(day_label_background.rect().height() / 2.f)
 							.corner_radius_y(day_label_background.corner_radius_x())
-							.color_fill(lecui::defaults::color(_setting_darktheme ? lecui::themes::dark : lecui::themes::light, lecui::item::text_field));
+							.color_fill(lecui::defaults::color(_setting_darktheme ? lecui::themes::dark : lecui::themes::light, lecui::element::text_field));
 
 						auto& day_label = lecui::widgets::label::add(messages_pane, day_string);
 						day_label
