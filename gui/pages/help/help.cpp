@@ -162,7 +162,7 @@ void main_form::add_help_page() {
 		.rect()
 		.width(width)
 		.height(_caption_height)
-		.snap_to(addition_credits_caption.rect(), snap_type::bottom, 0.f);
+		.snap_to(addition_credits_caption.rect(), snap_type::bottom, _margin / 5.f);
 	freepik
 		.events().action = [this]() {
 		std::string error;
@@ -179,7 +179,7 @@ void main_form::add_help_page() {
 		.rect()
 		.width(width)
 		.height(_caption_height)
-		.snap_to(freepik.rect(), snap_type::bottom, 0.f);
+		.snap_to(freepik.rect(), snap_type::bottom, _margin / 5.f);
 	dmitri13
 		.events().action = [this]() {
 		std::string error;
@@ -196,7 +196,7 @@ void main_form::add_help_page() {
 		.rect()
 		.width(width)
 		.height(_caption_height)
-		.snap_to(dmitri13.rect(), snap_type::bottom, 0.f);
+		.snap_to(dmitri13.rect(), snap_type::bottom, _margin / 5.f);
 	goodware
 		.events().action = [this]() {
 		std::string error;
@@ -213,7 +213,7 @@ void main_form::add_help_page() {
 		.rect()
 		.width(width)
 		.height(_caption_height)
-		.snap_to(goodware.rect(), snap_type::bottom, 0.f);
+		.snap_to(goodware.rect(), snap_type::bottom, _margin / 5.f);
 	dimitry_miroliubov
 		.events().action = [this]() {
 		std::string error;
@@ -230,7 +230,7 @@ void main_form::add_help_page() {
 		.rect()
 		.width(width)
 		.height(_caption_height)
-		.snap_to(dimitry_miroliubov.rect(), snap_type::bottom, 0.f);
+		.snap_to(dimitry_miroliubov.rect(), snap_type::bottom, _margin / 5.f);
 	roman_kacerek
 		.events().action = [this]() {
 		std::string error;
@@ -247,7 +247,7 @@ void main_form::add_help_page() {
 		.rect()
 		.width(width)
 		.height(_caption_height)
-		.snap_to(roman_kacerek.rect(), snap_type::bottom, 0.f);
+		.snap_to(roman_kacerek.rect(), snap_type::bottom, _margin / 5.f);
 	vectorslab
 		.events().action = [this]() {
 		std::string error;
@@ -264,7 +264,7 @@ void main_form::add_help_page() {
 		.rect()
 		.height(_caption_height)
 		.width(width)
-		.snap_to(vectorslab.rect(), snap_type::bottom, 0.f);
+		.snap_to(vectorslab.rect(), snap_type::bottom, _margin / 5.f);
 	berkahicon
 		.events().action = [this]() {
 		std::string error;
@@ -281,7 +281,7 @@ void main_form::add_help_page() {
 		.rect()
 		.width(width)
 		.height(_caption_height)
-		.snap_to(berkahicon.rect(), snap_type::bottom, 0.f);
+		.snap_to(berkahicon.rect(), snap_type::bottom, _margin / 5.f);
 	pixel_perfect
 		.events().action = [this]() {
 		std::string error;
