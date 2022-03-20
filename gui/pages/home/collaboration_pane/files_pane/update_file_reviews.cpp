@@ -249,8 +249,8 @@ void main_form::update_file_reviews() {
 				.color_text(_caption_color)
 				.alignment(lecui::text_alignment::center)
 				.font_size(_ui_font_size)
-				.rect(lecui::rect(ref_rect).height(_ui_font_height).place(ref_rect, 50.f, 50.f))
-				.on_resize(lecui::resize_params().y_rate(50.f).width_rate(100.f));
+				.rect(lecui::rect(ref_rect).height(_ui_font_height).place(ref_rect, 50.f, 20.f))
+				.on_resize(lecui::resize_params().y_rate(20.f).width_rate(100.f));
 		}
 		else {
 			auto& label = get_label("home/collaboration_pane/files_pane/review_info/list/label");
