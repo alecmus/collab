@@ -333,7 +333,8 @@ bool main_form::on_initialize(std::string& error) {
 		}
 		catch (const std::exception&) {}
 		
-		_files_folder = _folder + "\\files";
+		_node_folder = _folder + "\\" + shorten_unique_id(_collab.unique_id());
+		_files_folder = _node_folder + "\\files";
 		_files_staging_folder = _files_folder + "\\staging";
 
 		// create the folder
@@ -354,10 +355,10 @@ bool main_form::on_initialize(std::string& error) {
 		}
 
 		// set the database file path
-		_database_file = _folder + "\\collab.db";
+		_database_file = _node_folder + "\\collab.db";
 
 		// set the avatar file path
-		_avatar_file = _folder + "\\avatar.jpg";
+		_avatar_file = _node_folder + "\\avatar.jpg";
 	}
 
 	// initialize collab

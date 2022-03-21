@@ -266,18 +266,16 @@ void main_form::on_select_location() {
 		if (!_settings.write_value("", "folder", folder, error))
 			message("Error saving folder location: " + error);
 		else {
-			const auto old_folder = _folder;
-			_folder = folder;
-			const auto new_folder = _folder;
-
 			try {
 				// change location label
-				get_label("settings/location").text(_folder);
+				get_label("settings/location").text(folder);
 				update();
 			}
 			catch (const std::exception&) {}
 
 			// to-do: add option to move files from older folder
+			// to-do: add option to restart since the following cannot be updated in the current app session:
+			// _folder and its derivatives - _node_folder, _files_folder and _files_staging_folder
 		}
 	}
 }

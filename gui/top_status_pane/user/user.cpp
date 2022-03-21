@@ -56,7 +56,7 @@ void main_form::user() {
 			leccore::image image(full_path);
 
 			// a simple name for the file
-			_resized_profile_image = _main_form._folder + "\\rpi";	// rpi for resized profile image
+			_resized_profile_image = _main_form._node_folder + "\\rpi";	// rpi for resized profile image
 
 			leccore::image::image_options options;
 			options
@@ -178,7 +178,7 @@ void main_form::user() {
 						return false;
 
 					if (!_existing_user.user_image.empty()) {
-						std::string fullpath = _main_form._folder + "\\rpi.jpg";
+						std::string fullpath = _main_form._node_folder + "\\rpi.jpg";
 						if (!leccore::file::write(fullpath, _existing_user.user_image, error))
 							return false;
 
