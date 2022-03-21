@@ -9,14 +9,14 @@
       <download_url>https://github.com/alecmus/collab/releases/download/v1.0.0-alpha.1/update.32.zip</download_url>
       <size>3344140</size>
       <hash>
-        <sha256>363B5EC7F8B8B909A61CD32A967428912C9174D5E74D87681B537F07E01FD218</sha256>
+        <sha256>363b5ec7f8b8b909a61cd32a967428912c9174d5e74d87681b537f07e01fd218</sha256>
       </hash>
     </x86>
     <x64>
       <download_url>https://github.com/alecmus/collab/releases/download/v1.0.0-alpha.1/update.64.zip</download_url>
       <size>4058655</size>
       <hash>
-        <sha256>2758A60368173618EE5861B26E04D6D10962CD343197ADCA583114BC02C4E45A</sha256>
+        <sha256>2758a60368173618ee5861b26e04d6d10962cd343197adca583114bc02c4e45a</sha256>
       </hash>
     </x64>
   </update>

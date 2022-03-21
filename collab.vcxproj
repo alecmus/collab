@@ -271,6 +271,9 @@ xcopy "$(ProjectDir)collab.sink" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
     <None Include="collab.sink" />
     <None Include="collab.source" />
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="latest_update.xml" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

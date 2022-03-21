@@ -312,4 +312,9 @@
       <Filter>collab</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="latest_update.xml">
+      <Filter>collab</Filter>
+    </Xml>
+  </ItemGroup>
 </Project>
