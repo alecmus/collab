@@ -255,6 +255,10 @@
     <Image Include="resources\png\video.png" />
     <Image Include="resources\png\xls.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="sink.crt" />
+    <None Include="source.crt" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

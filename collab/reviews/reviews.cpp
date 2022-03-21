@@ -94,11 +94,11 @@ bool deserialize_review_broadcast_structure(const std::string& serialized,
 	}
 }
 
-class review_server : public liblec::lecnet::tcp::server_async {
+class review_source : public liblec::lecnet::tcp::server_async_ssl {
 	collab& _collab;
 
 public:
-	review_server(collab& collab) :
+	review_source(collab& collab) :
 		_collab(collab) {}
 
 private:
@@ -116,23 +116,26 @@ private:
 
 		std::string error;
 		if (!_collab.get_review(review_unique_id, review, error))
-			return std::string();	// return empty string. to-do: use a structure to return error back to client
+			return std::string();	// return empty string. to-do: use a structure to return error back to sink
 		else
 			return review.text;
 	}
 };
 
 void collab::impl::review_broadcast_sender_func(impl* p_impl) {
-	// create a review server object
+	// create a review source object
 	liblec::lecnet::tcp::server::server_params params;
 	params.port = REVIEW_TRANSFER_PORT;
 	params.magic_number = review_transfer_magic_number;
 	params.max_clients = 1;
+	params.server_cert = p_impl->cert_folder() + "\\source.crt";
+	params.server_cert_key = p_impl->cert_folder() + "\\source.crt";
+	params.server_cert_key_password = "com.github.alecmus.collab.source";
 
-	review_server server(p_impl->_collab);
+	review_source source(p_impl->_collab);
 
-	// start the server
-	if (!server.start(params)) {
+	// start the source
+	if (!source.start(params)) {
 		// I mean, why would it fail?
 	}
 
@@ -203,16 +206,16 @@ void collab::impl::review_broadcast_sender_func(impl* p_impl) {
 		std::this_thread::sleep_for(std::chrono::milliseconds{ review_broadcast_cycle });
 	}
 
-	while (server.starting())
+	while (source.starting())
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-	// check if the server is running
-	if (server.running()) {
+	// check if the source is running
+	if (source.running()) {
 		// close all connections
-		server.close();
+		source.close();
 
-		// stop the server
-		server.stop();
+		// stop the source
+		source.stop();
 	}
 }
 
@@ -271,33 +274,34 @@ void collab::impl::review_broadcast_receiver_func(impl* p_impl) {
 								bool downloaded = false;	// flag to determine if review text has been downloaded
 								std::string text;
 
-								// get client IP list
+								// get sink IP list
 								std::vector<std::string> ips_client;
 								liblec::lecnet::tcp::get_host_ips(ips_client);
 
 								// select the ip to connect to
 								const std::string selected_ip = select_ip(cls.ips, ips_client);
 
-								// configure tcp/ip client parameters
+								// configure tcp/ip sink parameters
 								liblec::lecnet::tcp::client::client_params params;
 								params.address = selected_ip;
 								params.port = REVIEW_TRANSFER_PORT;
 								params.magic_number = review_transfer_magic_number;
-								params.use_ssl = false;
+								params.use_ssl = true;
+								params.ca_cert_path = p_impl->cert_folder() + "\\sink.crt";
 
-								// create tcp/ip client object
-								liblec::lecnet::tcp::client client;
+								// create tcp/ip sink object
+								liblec::lecnet::tcp::client sink;
 
-								if (client.connect(params, error)) {
-									while (client.connecting())
+								if (sink.connect(params, error)) {
+									while (sink.connecting())
 										std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-									if (client.connected(error)) {
+									if (sink.connected(error)) {
 										// review unique_id
 
 										p_impl->_log("Connected via TCP to " + selected_ip + " to download review '" + shorten_unique_id(it.unique_id));
 
-										if (client.send_data(it.unique_id, text, 10, nullptr, error)) {
+										if (sink.send_data(it.unique_id, text, 10, nullptr, error)) {
 											downloaded = true;
 										}
 										else {
@@ -305,8 +309,8 @@ void collab::impl::review_broadcast_receiver_func(impl* p_impl) {
 											break;
 										}
 
-										// disconnect tcp client
-										client.disconnect();
+										// disconnect tcp sink
+										sink.disconnect();
 									}
 									else
 										p_impl->_log("TCP connection for downloading review '" + shorten_unique_id(it.unique_id) + "' from " + selected_ip + " failed: " + error);

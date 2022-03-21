@@ -157,7 +157,7 @@ class collab::impl {
 	std::future<void> _review_broadcast_sender;
 	std::future<void> _review_broadcast_receiver;
 	bool _stop_session_broadcast = false;
-	std::string _files_folder;
+	std::string _cert_folder, _files_folder;
 	std::function<void(const std::string& event)> _log;
 
 public:
@@ -177,8 +177,9 @@ public:
 	impl(collab& collab);
 	~impl();
 
-	bool initialize(const std::string& database_file, const std::string& files_folder,
-		std::function<void(const std::string&)> log, std::string& error);
+	bool initialize(const std::string& database_file, const std::string& cert_folder,
+		const std::string& files_folder, std::function<void(const std::string&)> log, std::string& error);
+	const std::string& cert_folder();
 	const std::string& files_folder();
 
 	std::optional<std::reference_wrapper<liblec::leccore::database::connection>> get_connection();

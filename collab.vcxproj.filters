@@ -304,4 +304,12 @@
       <Filter>collab\resources\png</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="source.crt">
+      <Filter>collab</Filter>
+    </None>
+    <None Include="sink.crt">
+      <Filter>collab</Filter>
+    </None>
+  </ItemGroup>
 </Project>

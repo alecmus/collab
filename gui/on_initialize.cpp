@@ -326,6 +326,13 @@ bool main_form::on_initialize(std::string& error) {
 			// default to the current directory in portable mode
 			_folder = get_current_folder() + "\\Collab";
 
+		try {
+			// not necessarily the same as the result returned by get_current_folder()
+			// this call assumes there hasn't been a file dialog used so far from within the app
+			_cert_folder = std::filesystem::current_path().string();
+		}
+		catch (const std::exception&) {}
+		
 		_files_folder = _folder + "\\files";
 		_files_staging_folder = _files_folder + "\\staging";
 
@@ -354,7 +361,7 @@ bool main_form::on_initialize(std::string& error) {
 	}
 
 	// initialize collab
-	if (!_collab.initialize(_database_file, _files_folder,
+	if (!_collab.initialize(_database_file, _cert_folder, _files_folder,
 		[&](const std::string& event) {
 			log(event);
 		}, error))

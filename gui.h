@@ -125,7 +125,7 @@ class main_form : public lecui::form {
 	leccore::download_update _download_update;
 	std::string _update_directory;
 	bool _setting_autostart = false;
-	std::string _folder, _files_folder, _files_staging_folder;
+	std::string _folder, _cert_folder, _files_folder, _files_staging_folder;
 	std::vector<collab::session> _previous_sessions;
 	std::vector<collab::message> _previous_messages;
 	std::vector<collab::file> _previous_files;

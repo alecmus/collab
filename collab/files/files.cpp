@@ -158,11 +158,11 @@ std::string read_chunk(const std::string& fullpath, int chunk_number, int total_
 	return chunk_data;
 }
 
-class file_server : public liblec::lecnet::tcp::server_async {
+class file_source : public liblec::lecnet::tcp::server_async_ssl {
 	collab& _collab;
 
 public:
-	file_server(collab& collab) :
+	file_source(collab& collab) :
 		_collab(collab) {}
 
 private:
@@ -200,16 +200,19 @@ private:
 };
 
 void collab::impl::file_broadcast_sender_func(impl* p_impl) {
-	// create a file server object
+	// create a file source object
 	liblec::lecnet::tcp::server::server_params params;
 	params.port = FILE_TRANSFER_PORT;
 	params.magic_number = file_transfer_magic_number;
 	params.max_clients = 1;
+	params.server_cert = p_impl->cert_folder() + "\\source.crt";
+	params.server_cert_key = p_impl->cert_folder() + "\\source.crt";
+	params.server_cert_key_password = "com.github.alecmus.collab.source";
 	
-	file_server server(p_impl->_collab);
+	file_source source(p_impl->_collab);
 
-	// start the server
-	if (!server.start(params)) {
+	// start the source
+	if (!source.start(params)) {
 		// I mean, why would it fail?
 	}
 
@@ -269,16 +272,16 @@ void collab::impl::file_broadcast_sender_func(impl* p_impl) {
 		std::this_thread::sleep_for(std::chrono::milliseconds{ file_broadcast_cycle });
 	}
 
-	while (server.starting())
+	while (source.starting())
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-	// check if the server is running
-	if (server.running()) {
+	// check if the source is running
+	if (source.running()) {
 		// close all connections
-		server.close();
+		source.close();
 
-		// stop the server
-		server.stop();
+		// stop the source
+		source.stop();
 	}
 }
 
@@ -343,28 +346,29 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 									downloaded = true;
 								}
 								else {
-									// get client IP list
+									// get sink IP list
 									std::vector<std::string> ips_client;
 									liblec::lecnet::tcp::get_host_ips(ips_client);
 
 									// select the ip to connect to
 									const std::string selected_ip = select_ip(cls.ips, ips_client);
 
-									// configure tcp/ip client parameters
+									// configure tcp/ip sink parameters
 									liblec::lecnet::tcp::client::client_params params;
 									params.address = selected_ip;
 									params.port = FILE_TRANSFER_PORT;
 									params.magic_number = file_transfer_magic_number;
-									params.use_ssl = false;
+									params.use_ssl = true;
+									params.ca_cert_path = p_impl->cert_folder() + "\\sink.crt";
 
-									// create tcp/ip client object
-									liblec::lecnet::tcp::client client;
+									// create tcp/ip sink object
+									liblec::lecnet::tcp::client sink;
 
-									if (client.connect(params, error)) {
-										while (client.connecting())
+									if (sink.connect(params, error)) {
+										while (sink.connecting())
 											std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-										if (client.connected(error)) {
+										if (sink.connected(error)) {
 											// "filename#chunk_number/total_chunks"
 
 											const std::string filename = it.hash;
@@ -398,7 +402,7 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 													// send the file request string, and receive the file chunk data
 													std::string chunk_data;
 
-													if (client.send_data(file_request_string, chunk_data, 20, nullptr, error)) {
+													if (sink.send_data(file_request_string, chunk_data, 20, nullptr, error)) {
 														// write chunk data
 														file.write(chunk_data.c_str(), chunk_data.length());
 
@@ -450,8 +454,8 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 												p_impl->_log("Error downloading '" + it.name + it.extension + "': " + error);
 											}
 
-											// disconnect tcp client
-											client.disconnect();
+											// disconnect tcp sink
+											sink.disconnect();
 										}
 										else
 											p_impl->_log("TCP connection for downloading '" + it.name + it.extension + "' from " + selected_ip + " failed: " + error);

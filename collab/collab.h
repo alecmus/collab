@@ -190,6 +190,7 @@ public:
 
 	/// <summary>Initialize the collaboration class.</summary>
 	/// <param name="database_file">The full path to the database file.</param>
+	/// <param name="cert_folder">The full path to the certificate folder.</param>
 	/// <param name="files_folder">The full path to the files folder.</param>
 	/// <param name="log">The function to call for logging.</param>
 	/// <param name="error">Error information.</param>
@@ -197,8 +198,12 @@ public:
 	/// <remarks>This method creates the database connection. Calling any methods that need a
 	/// database connection before calling it will only result in those methods returning
 	/// a 'No database connection' error.</remarks>
-	bool initialize(const std::string& database_file, const std::string& files_folder,
-		std::function<void(const std::string&)> log, std::string& error);
+	bool initialize(const std::string& database_file, const std::string& cert_folder,
+		const std::string& files_folder, std::function<void(const std::string&)> log, std::string& error);
+
+	/// <summary>Get the full path to the app folder.</summary>
+	/// <returns>Returns the full path to the app folder.</returns>
+	const std::string& cert_folder();
 
 	/// <summary>Get the full path to the files folder.</summary>
 	/// <returns>Returns the full path to the files folder.</returns>
