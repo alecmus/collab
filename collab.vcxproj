@@ -109,7 +109,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\lib\;C:\local\libs\boost_1_78_0\lib32-msvc-14.3;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I
+
+xcopy "$(ProjectDir)collab.source" "$(ProjectDir)..\bin\" /F /R /Y /I
+xcopy "$(ProjectDir)collab.sink" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -131,7 +134,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\lib\;C:\local\libs\boost_1_78_0\lib32-msvc-14.3;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I
+
+xcopy "$(ProjectDir)collab.source" "$(ProjectDir)..\bin\" /F /R /Y /I
+xcopy "$(ProjectDir)collab.sink" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -149,7 +155,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\lib\;C:\local\libs\boost_1_78_0\lib64-msvc-14.3;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I
+
+xcopy "$(ProjectDir)collab.source" "$(ProjectDir)..\bin\" /F /R /Y /I
+xcopy "$(ProjectDir)collab.sink" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -171,7 +180,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\lib\;C:\local\libs\boost_1_78_0\lib64-msvc-14.3;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
+      <Command>xcopy "$(OutDir)$(TargetName)$(TargetExt)" "$(ProjectDir)..\bin\" /F /R /Y /I
+
+xcopy "$(ProjectDir)collab.source" "$(ProjectDir)..\bin\" /F /R /Y /I
+xcopy "$(ProjectDir)collab.sink" "$(ProjectDir)..\bin\" /F /R /Y /I</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -256,8 +268,8 @@
     <Image Include="resources\png\xls.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="sink.crt" />
-    <None Include="source.crt" />
+    <None Include="collab.sink" />
+    <None Include="collab.source" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -305,10 +305,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="source.crt">
+    <None Include="collab.source">
       <Filter>collab</Filter>
     </None>
-    <None Include="sink.crt">
+    <None Include="collab.sink">
       <Filter>collab</Filter>
     </None>
   </ItemGroup>

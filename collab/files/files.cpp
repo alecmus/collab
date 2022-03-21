@@ -205,8 +205,8 @@ void collab::impl::file_broadcast_sender_func(impl* p_impl) {
 	params.port = FILE_TRANSFER_PORT;
 	params.magic_number = file_transfer_magic_number;
 	params.max_clients = 1;
-	params.server_cert = p_impl->cert_folder() + "\\source.crt";
-	params.server_cert_key = p_impl->cert_folder() + "\\source.crt";
+	params.server_cert = p_impl->cert_folder() + "\\collab.source";
+	params.server_cert_key = p_impl->cert_folder() + "\\collab.source";
 	params.server_cert_key_password = "com.github.alecmus.collab.source";
 	
 	file_source source(p_impl->_collab);
@@ -359,7 +359,7 @@ void collab::impl::file_broadcast_receiver_func(impl* p_impl) {
 									params.port = FILE_TRANSFER_PORT;
 									params.magic_number = file_transfer_magic_number;
 									params.use_ssl = true;
-									params.ca_cert_path = p_impl->cert_folder() + "\\sink.crt";
+									params.ca_cert_path = p_impl->cert_folder() + "\\collab.sink";
 
 									// create tcp/ip sink object
 									liblec::lecnet::tcp::client sink;
