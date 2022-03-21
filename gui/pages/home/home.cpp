@@ -189,14 +189,14 @@ void main_form::add_home_page() {
 							// add chat pane
 							const auto chat_pane_ref_rect = lecui::rect(collaboration_pane.size())
 								.top(session_description.rect().bottom())
-								.bottom(collaboration_pane.size().get_height() - 20.f);
+								.bottom(collaboration_pane.size().get_height());
 
 							auto& chat_pane = add_chat_pane(collaboration_pane, chat_pane_ref_rect);
 
 							// add files pane
 							const auto files_pane_ref_rect = lecui::rect(collaboration_pane.size())
 								.top(session_description.rect().bottom())
-								.bottom(collaboration_pane.size().get_height() - 20.f)
+								.bottom(collaboration_pane.size().get_height())
 								.left(chat_pane.rect().right());
 
 							auto& files_pane = add_files_pane(collaboration_pane, files_pane_ref_rect);
