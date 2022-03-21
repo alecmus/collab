@@ -143,3 +143,5 @@ namespace liblec {
 }
 
 std::string select_ip(std::vector<std::string> server_ips, std::vector<std::string> client_ips);
+
+bool file_available(const std::string& full_path);

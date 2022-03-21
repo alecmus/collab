@@ -28,6 +28,7 @@
 
 #include <mutex>
 #include <sstream>
+#include <filesystem>
 #include <algorithm>
 #include <stdio.h>
 
@@ -271,4 +272,16 @@ std::string select_ip(std::vector<std::string> server_ips, std::vector<std::stri
 	}
 
 	return s_ip;
+}
+
+bool file_available(const std::string& full_path) {
+	try {
+		std::filesystem::path path(full_path);
+		if (std::filesystem::exists(path) && std::filesystem::is_regular_file(path))
+			return true;
+	}
+	catch (const std::exception&) {
+	}
+
+	return false;
 }

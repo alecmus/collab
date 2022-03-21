@@ -273,6 +273,12 @@ void collab::impl::review_broadcast_receiver_func(impl* p_impl) {
 		if (!current_session_unique_id.empty()) {
 			std::string error;
 
+			// check if collab.sink file exists
+			if (!file_available(p_impl->cert_folder() + "\\collab.sink")) {
+				p_impl->_log("Error: sink file not available. No reviews will be received.");
+				break;
+			}
+
 			// run the receiver
 			if (receiver.run(review_receiver_cycle, error)) {
 				// loop while running
