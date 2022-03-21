@@ -52,107 +52,6 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 				main_form& _main_form;
 				const std::string& _full_path;
 
-				bool on_initialize(std::string& error) override {
-					// size and stuff
-					_ctrls
-						.allow_resize(false)
-						.allow_minimize(false);
-
-					_apprnc
-						.main_icon(ico_resource)
-						.mini_icon(ico_resource)
-						.caption_icon(get_dpi_scale() < 2.f ? icon_png_32 : icon_png_64)
-						.theme(_main_form._setting_darktheme ? lecui::themes::dark : lecui::themes::light);
-					_dim.set_size(lecui::size().width(300.f).height(220.f));
-
-					return true;
-				}
-
-				bool on_layout(std::string& error) override {
-					// add home page
-					auto& home = _page_man.add("home");
-
-					auto& ref_rect = lecui::rect()
-						.left(_margin)
-						.top(_margin)
-						.width(home.size().get_width() - 2.f * _margin)
-						.height(home.size().get_height() - 2.f * _margin);
-
-					// add file name caption
-					auto& file_name_caption = lecui::widgets::label::add(home);
-					file_name_caption
-						.text("File Name")
-						.font_size(_caption_font_size)
-						.color_text(_main_form._caption_color)
-						.rect(lecui::rect()
-							.left(_margin)
-							.width(ref_rect.width())
-							.height(_main_form._caption_height));
-
-					// add file name text field
-					auto& file_name = lecui::widgets::text_field::add(home, "file_name");
-					file_name
-						.prompt("e.g. 'ImportantFile.pdf'")
-						.maximum_length(40)	// to-do: remove magic number
-						.rect(lecui::rect(file_name.rect())
-							.width(file_name_caption.rect().width())
-							.snap_to(file_name_caption.rect(), snap_type::bottom, _margin / 4.f))
-						.events().action = [&]() { on_add(); };
-
-					if (!get_filename_from_full_path(_full_path, file_name.text())) {}
-
-					// add file description caption
-					auto& file_description_caption = lecui::widgets::label::add(home);
-					file_description_caption
-						.text("File Description")
-						.font_size(_caption_font_size)
-						.color_text(_main_form._caption_color)
-						.rect(lecui::rect(file_name_caption.rect())
-							.snap_to(file_name.rect(), snap_type::bottom, _margin));
-
-					// add file description text field
-					auto& file_description = lecui::widgets::text_field::add(home, "file_description");
-					file_description
-						.prompt("e.g. 'Some important document'")
-						.maximum_length(100)	// to-do: remove magic number
-						.rect(lecui::rect(file_name.rect())
-							.snap_to(file_description_caption.rect(), snap_type::bottom, _margin / 4.f))
-						.events().action = [&]() { on_add(); };
-
-					std::string file_size_string;
-
-					try {
-						file_size_string = leccore::format_size(std::filesystem::file_size(_full_path));
-					}
-					catch (const std::exception&) {}
-
-					// add file size
-					auto& file_size = lecui::widgets::label::add(home);
-					file_size
-						.text("Size: " + file_size_string)
-						.font_size(_caption_font_size)
-						.color_text(_main_form._caption_color)
-						.rect(lecui::rect(file_name_caption.rect())
-							.snap_to(file_description.rect(), snap_type::bottom, _margin));
-
-					// add status label
-					auto& status = lecui::widgets::label::add(home, "status");
-					status
-						.rect(lecui::rect(file_size.rect())
-							.height(status.rect().height())
-							.snap_to(file_size.rect(), snap_type::bottom, _margin));
-
-					// add 'add' button
-					auto& add = lecui::widgets::button::add(home, "add");
-					add
-						.text("Add")
-						.rect(lecui::rect(add.rect()).snap_to(status.rect(), snap_type::bottom, _margin))
-						.events().action = [&]() { on_add(); };
-
-					_page_man.show("home");
-					return true;
-				}
-
 				void on_add() {
 					try {
 						auto& file_name = get_text_field("home/file_name");
@@ -318,7 +217,111 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 					main_form& main_form, const std::string& full_path) :
 					form(caption, main_form),
 					_main_form(main_form),
-					_full_path(full_path) {}
+					_full_path(full_path) {
+					// initialize event
+					events().initialize = [this](std::string& error) {
+						// size and stuff
+						_ctrls
+							.allow_resize(false)
+							.allow_minimize(false);
+
+						_apprnc
+							.main_icon(ico_resource)
+							.mini_icon(ico_resource)
+							.caption_icon(get_dpi_scale() < 2.f ? icon_png_32 : icon_png_64)
+							.theme(_main_form._setting_darktheme ? lecui::themes::dark : lecui::themes::light);
+						_dim.set_size(lecui::size().width(300.f).height(220.f));
+
+						return true;
+					};
+
+					// layout event
+					events().layout = [this](std::string& error) {
+						// add home page
+						auto& home = _page_man.add("home");
+
+						auto& ref_rect = lecui::rect()
+							.left(_margin)
+							.top(_margin)
+							.width(home.size().get_width() - 2.f * _margin)
+							.height(home.size().get_height() - 2.f * _margin);
+
+						// add file name caption
+						auto& file_name_caption = lecui::widgets::label::add(home);
+						file_name_caption
+							.text("File Name")
+							.font_size(_caption_font_size)
+							.color_text(_main_form._caption_color)
+							.rect(lecui::rect()
+								.left(_margin)
+								.width(ref_rect.width())
+								.height(_main_form._caption_height));
+
+						// add file name text field
+						auto& file_name = lecui::widgets::text_field::add(home, "file_name");
+						file_name
+							.prompt("e.g. 'ImportantFile.pdf'")
+							.maximum_length(40)	// to-do: remove magic number
+							.rect(lecui::rect(file_name.rect())
+								.width(file_name_caption.rect().width())
+								.snap_to(file_name_caption.rect(), snap_type::bottom, _margin / 4.f))
+							.events().action = [&]() { on_add(); };
+
+						if (!get_filename_from_full_path(_full_path, file_name.text())) {}
+
+						// add file description caption
+						auto& file_description_caption = lecui::widgets::label::add(home);
+						file_description_caption
+							.text("File Description")
+							.font_size(_caption_font_size)
+							.color_text(_main_form._caption_color)
+							.rect(lecui::rect(file_name_caption.rect())
+								.snap_to(file_name.rect(), snap_type::bottom, _margin));
+
+						// add file description text field
+						auto& file_description = lecui::widgets::text_field::add(home, "file_description");
+						file_description
+							.prompt("e.g. 'Some important document'")
+							.maximum_length(100)	// to-do: remove magic number
+							.rect(lecui::rect(file_name.rect())
+								.snap_to(file_description_caption.rect(), snap_type::bottom, _margin / 4.f))
+							.events().action = [&]() { on_add(); };
+
+						std::string file_size_string;
+
+						try {
+							file_size_string = leccore::format_size(std::filesystem::file_size(_full_path));
+						}
+						catch (const std::exception&) {}
+
+						// add file size
+						auto& file_size = lecui::widgets::label::add(home);
+						file_size
+							.text("Size: " + file_size_string)
+							.font_size(_caption_font_size)
+							.color_text(_main_form._caption_color)
+							.rect(lecui::rect(file_name_caption.rect())
+								.snap_to(file_description.rect(), snap_type::bottom, _margin));
+
+						// add status label
+						auto& status = lecui::widgets::label::add(home, "status");
+						status
+							.rect(lecui::rect(file_size.rect())
+								.height(status.rect().height())
+								.snap_to(file_size.rect(), snap_type::bottom, _margin));
+
+						// add 'add' button
+						auto& add = lecui::widgets::button::add(home, "add");
+						add
+							.text("Add")
+							.rect(lecui::rect(add.rect()).snap_to(status.rect(), snap_type::bottom, _margin))
+							.events().action = [&]() { on_add(); };
+
+						_page_man.show("home");
+						return true;
+					};
+				}
+
 				~add_file_form() {}
 			};
 

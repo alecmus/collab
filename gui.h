@@ -159,11 +159,12 @@ class main_form : public lecui::form {
 	std::vector<event_info> _log_queue;
 	std::map<std::string, collab::file> _session_files;
 
-	bool on_initialize(std::string& error) override;
-	bool on_layout(std::string& error) override;
-	void on_start() override;
-	void on_close() override;
-	void on_shutdown() override;
+	bool on_initialize(std::string& error);
+	bool on_layout(std::string& error);
+	void on_start();
+	void on_close();
+	void on_shutdown();
+
 	void add_side_pane();
 	void add_top_status_pane();
 	void add_back_button();

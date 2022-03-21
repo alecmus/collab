@@ -578,6 +578,37 @@ main_form::main_form(const std::string& caption, bool restarted) :
 
 	if (_cleanup_mode || _update_mode || _recent_update_mode)
 		force_instance();
+
+	// caption event
+	events().caption = [this]() {
+		add_back_button();
+		_page_man.show("help");
+	};
+
+	// initialize event
+	events().initialize = [this](std::string& error) {
+		return on_initialize(error);
+	};
+
+	// layout event
+	events().layout = [this](std::string& error) {
+		return on_layout(error);
+	};
+
+	// start event
+	events().start = [this]() {
+		return on_start();
+	};
+
+	// close event
+	events().close = [this]() {
+		return on_close();
+	};
+
+	// shutdown event
+	events().shutdown = [this]() {
+		return on_shutdown();
+	};
 }
 
 main_form::~main_form() {

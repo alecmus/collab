@@ -46,119 +46,6 @@ bool main_form::join_session(const collab::session& session) {
 		bool _join_successful = false;
 		std::map<std::string, int>& _attempts_remaining;
 
-		bool on_initialize(std::string& error) override {
-			// size and stuff
-			_ctrls
-				.allow_resize(false)
-				.allow_minimize(false);
-
-			_apprnc
-				.main_icon(ico_resource)
-				.mini_icon(ico_resource)
-				.caption_icon(get_dpi_scale() < 2.f ? icon_png_32 : icon_png_64)
-				.theme(_main_form._setting_darktheme ? lecui::themes::dark : lecui::themes::light);
-			_dim.set_size(lecui::size().width(300.f).height(230.f));
-
-			return true;
-		}
-
-		bool on_layout(std::string& error) override {
-			// add home page
-			auto& home = _page_man.add("home");
-
-			auto& ref_rect = lecui::rect()
-				.left(_margin)
-				.top(_margin)
-				.width(home.size().get_width() - 2.f * _margin)
-				.height(home.size().get_height() - 2.f * _margin);
-
-			// add session name caption
-			auto& session_name = lecui::widgets::label::add(home);
-			session_name
-				.text(_session.name)
-				.font_size(_detail_font_size)
-				.rect(lecui::rect()
-					.left(_margin)
-					.top(_margin)
-					.width(ref_rect.width())
-					.height(_main_form._detail_height));
-
-			// add session description
-			auto& session_description = lecui::widgets::label::add(home);
-			session_description
-				.text(_session.description)
-				.font_size(_caption_font_size)
-				.color_text(_main_form._caption_color)
-				.rect(lecui::rect(session_name.rect())
-					.height(_main_form._caption_height * 2.5f)
-					.snap_to(session_name.rect(), snap_type::bottom, 0.f));
-
-			// add session password pane
-			auto& session_password_pane = lecui::containers::pane::add(home, "session_password_pane");
-			session_password_pane
-				.rect()
-				.width(session_name.rect().width())
-				.height(80.f)
-				.snap_to(session_description.rect(), snap_type::bottom, _margin);
-
-			{
-				auto& ref_rect = lecui::rect()
-					.width(session_password_pane.size().get_width())
-					.height(session_password_pane.size().get_height());
-
-				// add password caption
-				auto& session_password_caption = lecui::widgets::label::add(session_password_pane);
-				session_password_caption
-					.text("Password")
-					.font_size(_caption_font_size)
-					.color_text(_main_form._caption_color)
-					.rect(lecui::rect()
-						.width(ref_rect.width())
-						.height(_main_form._caption_height)
-						.place(ref_rect, 50.f, 0.f));
-
-				// add password field
-				auto& session_password = lecui::widgets::password_field::add(session_password_pane, "session_password");
-				session_password
-					.prompt("Enter session password")
-					.maximum_length(40)
-					.rect(lecui::rect(session_password.rect())
-						.width(session_password_caption.rect().width())
-						.snap_to(session_password_caption.rect(), snap_type::bottom, _margin / 4.f));
-				session_password
-					.events().action = [&]() { on_join(); };
-
-				// add attempts remaining dialog
-				auto& attempts_remaining = lecui::widgets::label::add(session_password_pane, "attempts_remaining");
-				attempts_remaining
-					.font_size(_main_form._caption_font_size)
-					.color_text(lecui::color().red(255).green(0).blue(0))
-					.alignment(lecui::text_alignment::right)
-					.rect(lecui::rect(session_password.rect())
-						.height(_main_form._caption_height)
-						.snap_to(session_password.rect(), snap_type::bottom, 0.f));
-
-				if (_attempts_remaining[_session.unique_id] < 3) {
-					const std::string attempts_string = std::to_string(_attempts_remaining[_session.unique_id]) +
-						" attempt" + (_attempts_remaining[_session.unique_id] == 1 ?
-							std::string("") : std::string("s")) + " remaining";
-
-					attempts_remaining
-						.text(attempts_string);
-				}
-			}
-
-			// add join button
-			auto& join_session = lecui::widgets::button::add(home, "join_session");
-			join_session
-				.text("Join")
-				.rect(lecui::rect(join_session.rect()).snap_to(session_password_pane.rect(), snap_type::bottom, _margin))
-				.events().action = [&]() { on_join(); };
-
-			_page_man.show("home");
-			return true;
-		}
-
 		void on_join() {
 			try {
 				auto& session_password = get_password_field("home/session_password_pane/session_password");
@@ -218,7 +105,123 @@ bool main_form::join_session(const collab::session& session) {
 			form(caption, main_form),
 			_main_form(main_form),
 			_session(session),
-			_attempts_remaining(attempts_remaining) {}
+			_attempts_remaining(attempts_remaining) {
+			// initialize event
+			events().initialize = [this](std::string& error) {
+				// size and stuff
+				_ctrls
+					.allow_resize(false)
+					.allow_minimize(false);
+
+				_apprnc
+					.main_icon(ico_resource)
+					.mini_icon(ico_resource)
+					.caption_icon(get_dpi_scale() < 2.f ? icon_png_32 : icon_png_64)
+					.theme(_main_form._setting_darktheme ? lecui::themes::dark : lecui::themes::light);
+				_dim.set_size(lecui::size().width(300.f).height(230.f));
+
+				return true;
+			};
+
+			// layout event
+			events().layout = [this](std::string& error) {
+				// add home page
+				auto& home = _page_man.add("home");
+
+				auto& ref_rect = lecui::rect()
+					.left(_margin)
+					.top(_margin)
+					.width(home.size().get_width() - 2.f * _margin)
+					.height(home.size().get_height() - 2.f * _margin);
+
+				// add session name caption
+				auto& session_name = lecui::widgets::label::add(home);
+				session_name
+					.text(_session.name)
+					.font_size(_detail_font_size)
+					.rect(lecui::rect()
+						.left(_margin)
+						.top(_margin)
+						.width(ref_rect.width())
+						.height(_main_form._detail_height));
+
+				// add session description
+				auto& session_description = lecui::widgets::label::add(home);
+				session_description
+					.text(_session.description)
+					.font_size(_caption_font_size)
+					.color_text(_main_form._caption_color)
+					.rect(lecui::rect(session_name.rect())
+						.height(_main_form._caption_height * 2.5f)
+						.snap_to(session_name.rect(), snap_type::bottom, 0.f));
+
+				// add session password pane
+				auto& session_password_pane = lecui::containers::pane::add(home, "session_password_pane");
+				session_password_pane
+					.rect()
+					.width(session_name.rect().width())
+					.height(80.f)
+					.snap_to(session_description.rect(), snap_type::bottom, _margin);
+
+				{
+					auto& ref_rect = lecui::rect()
+						.width(session_password_pane.size().get_width())
+						.height(session_password_pane.size().get_height());
+
+					// add password caption
+					auto& session_password_caption = lecui::widgets::label::add(session_password_pane);
+					session_password_caption
+						.text("Password")
+						.font_size(_caption_font_size)
+						.color_text(_main_form._caption_color)
+						.rect(lecui::rect()
+							.width(ref_rect.width())
+							.height(_main_form._caption_height)
+							.place(ref_rect, 50.f, 0.f));
+
+					// add password field
+					auto& session_password = lecui::widgets::password_field::add(session_password_pane, "session_password");
+					session_password
+						.prompt("Enter session password")
+						.maximum_length(40)
+						.rect(lecui::rect(session_password.rect())
+							.width(session_password_caption.rect().width())
+							.snap_to(session_password_caption.rect(), snap_type::bottom, _margin / 4.f));
+					session_password
+						.events().action = [&]() { on_join(); };
+
+					// add attempts remaining dialog
+					auto& attempts_remaining = lecui::widgets::label::add(session_password_pane, "attempts_remaining");
+					attempts_remaining
+						.font_size(_main_form._caption_font_size)
+						.color_text(lecui::color().red(255).green(0).blue(0))
+						.alignment(lecui::text_alignment::right)
+						.rect(lecui::rect(session_password.rect())
+							.height(_main_form._caption_height)
+							.snap_to(session_password.rect(), snap_type::bottom, 0.f));
+
+					if (_attempts_remaining[_session.unique_id] < 3) {
+						const std::string attempts_string = std::to_string(_attempts_remaining[_session.unique_id]) +
+							" attempt" + (_attempts_remaining[_session.unique_id] == 1 ?
+								std::string("") : std::string("s")) + " remaining";
+
+						attempts_remaining
+							.text(attempts_string);
+					}
+				}
+
+				// add join button
+				auto& join_session = lecui::widgets::button::add(home, "join_session");
+				join_session
+					.text("Join")
+					.rect(lecui::rect(join_session.rect()).snap_to(session_password_pane.rect(), snap_type::bottom, _margin))
+					.events().action = [&]() { on_join(); };
+
+				_page_man.show("home");
+				return true;
+			};
+		}
+
 		~join_session_form() {}
 
 		bool successful() {

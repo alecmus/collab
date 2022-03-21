@@ -51,168 +51,6 @@ void main_form::user() {
 
 		collab::user _existing_user;
 
-		bool on_initialize(std::string& error) override {
-			// size and stuff
-			_ctrls
-				.allow_resize(false)
-				.allow_minimize(false);
-
-			_apprnc
-				.main_icon(ico_resource)
-				.mini_icon(ico_resource)
-				.caption_icon(get_dpi_scale() < 2.f ? icon_png_32 : icon_png_64)
-				.theme(_main_form._setting_darktheme ? lecui::themes::dark : lecui::themes::light);
-			_dim.set_size(lecui::size().width(300.f).height(340.f));
-
-			if (_editing_mode) {
-				if (!_main_form._collab.get_user(_main_form._collab.unique_id(), _existing_user, error))
-					return false;
-
-				if (!_existing_user.user_image.empty()) {
-					std::string fullpath = _main_form._folder + "\\rpi.jpg";
-					if (!leccore::file::write(fullpath, _existing_user.user_image, error))
-						return false;
-
-					_resized_profile_image = fullpath;
-				}
-			}
-
-			return true;
-		}
-
-		void on_start() override {
-			on_drop_files([&](const std::string& file) {
-				set_user_image(file);
-				});
-		}
-
-		bool on_layout(std::string& error) override {
-			// add home page
-			auto& home = _page_man.add("home");
-
-			auto& ref_rect = lecui::rect()
-				.left(_margin)
-				.top(_margin)
-				.width(home.size().get_width() - 2.f * _margin)
-				.height(home.size().get_height() - 2.f * _margin);
-
-			// add user image
-			auto& user_image = lecui::widgets::image_view::add(home, "user_image");
-			user_image
-				.png_resource(_resized_profile_image.empty() ? png_user : 0)
-				.file(_resized_profile_image)
-				.rect(lecui::rect()
-					.width(128.f)
-					.height(128.f)
-					.place(ref_rect, 50.f, 0.f)
-				)
-				.corner_radius_x(128.f / 2.f)
-				.corner_radius_y(128.f / 2.f);
-
-			user_image.events().action = [&]() {
-				lecui::open_file_params params;
-				params
-					.title("Select Image")
-					.include_all_supported_types(true)
-					.allow_multi_select(false)
-					.file_types({
-					{ "jpg", "JPG Image" },
-					{ "jpeg", "JPEG Image" },
-					{ "png", "PNG Image" },
-					{ "bmp", "Bitmap Image" },
-					});
-
-				lecui::filesystem _file_system{ *this };
-				std::vector<std::string> file = _file_system.open_file(params);
-
-				if (!file.empty()) {
-					// get the full path to the file
-					std::string full_path = file[0];
-					set_user_image(full_path);
-				}
-			};
-			user_image.events().right_click = [&]() {
-				lecui::context_menu::specs menu_specs;
-				menu_specs.items.push_back({ "Remove", png_delete });
-
-				auto selected = lecui::context_menu::context_menu()(*this, menu_specs);
-
-				if (selected == "Remove") {
-					try {
-						auto& user_image = get_image_view("home/user_image");
-						user_image
-							.png_resource(png_user)
-							.file("");
-
-						update();
-					}
-					catch (const std::exception&) {}
-				}
-			};
-
-			// add user name caption
-			auto& username_caption = lecui::widgets::label::add(home);
-			username_caption
-				.text("Username")
-				.font_size(_caption_font_size)
-				.color_text(_main_form._caption_color)
-				.rect(lecui::rect()
-					.left(_margin)
-					.width(ref_rect.width())
-					.height(_main_form._caption_height)
-					.snap_to(user_image.rect(), snap_type::bottom, 3.f * _margin));
-
-			const std::set<char> allowed_set = {
-				'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-				'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-				'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-				'.', '-', '_'
-			};
-
-			// add user name text field
-			auto& username = lecui::widgets::text_field::add(home, "username");
-			username
-				.text(_existing_user.username)
-				.prompt("e.g. 'johndoe'")
-				.allowed_characters(allowed_set)
-				.maximum_length(20)	// to-do: remove magic number
-				.rect(lecui::rect(username.rect())
-					.width(username_caption.rect().width())
-					.snap_to(username_caption.rect(), snap_type::bottom, _margin / 4.f))
-				.events().action = [&]() {
-				on_save();
-			};
-
-			// add display name caption
-			auto& display_name_caption = lecui::widgets::label::add(home);
-			display_name_caption
-				.text("Display Name")
-				.font_size(_caption_font_size)
-				.color_text(_main_form._caption_color)
-				.rect(lecui::rect(username_caption.rect())
-					.snap_to(username.rect(), snap_type::bottom, _margin));
-
-			// add session description text field
-			auto& display_name = lecui::widgets::text_field::add(home, "display_name");
-			display_name
-				.text(_existing_user.display_name)
-				.prompt("e.g. 'John Doe'")
-				.maximum_length(100)	// to-do: remove magic number
-				.rect(lecui::rect(username.rect())
-					.snap_to(display_name_caption.rect(), snap_type::bottom, _margin / 4.f))
-				.events().action = [&]() { on_save(); };
-
-			// add save button
-			auto& save_user = lecui::widgets::button::add(home, "save_user");
-			save_user
-				.text(_editing_mode ? "Save Changes" : "Save")
-				.rect(lecui::rect(save_user.rect()).width(90.f).snap_to(display_name.rect(), snap_type::bottom, _margin))
-				.events().action = [&]() { on_save(); };
-
-			_page_man.show("home");
-			return true;
-		}
-
 		void set_user_image(const std::string& full_path) {
 			// save the image to a temporary file of size 256x256 pixels
 			leccore::image image(full_path);
@@ -310,26 +148,191 @@ void main_form::user() {
 			catch (const std::exception&) {}
 		}
 
-		void on_shutdown() override {
-			try {
-				// remove the resized profile image so we can be able to delete it in the destructor
-				auto& user_image = get_image_view("home/user_image");
-				user_image
-					.png_resource(png_user)
-					.file("");
-
-				std::string error;
-				if (!_widget_man.refresh("home/user_image", error)) {}
-			}
-			catch (const std::exception&) {}
-		}
-
 	public:
 		user_form(const std::string& caption,
 			main_form& main_form, const bool& editing_mode) :
 			form(caption, main_form),
 			_main_form(main_form),
-			_editing_mode(editing_mode) {}
+			_editing_mode(editing_mode) {
+			// drop files event
+			events().drop_files = [this](const std::string& file) {
+				set_user_image(file);
+			};
+
+			// initialize event
+			events().initialize = [this](std::string& error) {
+				// size and stuff
+				_ctrls
+					.allow_resize(false)
+					.allow_minimize(false);
+
+				_apprnc
+					.main_icon(ico_resource)
+					.mini_icon(ico_resource)
+					.caption_icon(get_dpi_scale() < 2.f ? icon_png_32 : icon_png_64)
+					.theme(_main_form._setting_darktheme ? lecui::themes::dark : lecui::themes::light);
+				_dim.set_size(lecui::size().width(300.f).height(340.f));
+
+				if (_editing_mode) {
+					if (!_main_form._collab.get_user(_main_form._collab.unique_id(), _existing_user, error))
+						return false;
+
+					if (!_existing_user.user_image.empty()) {
+						std::string fullpath = _main_form._folder + "\\rpi.jpg";
+						if (!leccore::file::write(fullpath, _existing_user.user_image, error))
+							return false;
+
+						_resized_profile_image = fullpath;
+					}
+				}
+
+				return true;
+			};
+
+			// layout event
+			events().layout = [this](std::string& error) {
+				// add home page
+				auto& home = _page_man.add("home");
+
+				auto& ref_rect = lecui::rect()
+					.left(_margin)
+					.top(_margin)
+					.width(home.size().get_width() - 2.f * _margin)
+					.height(home.size().get_height() - 2.f * _margin);
+
+				// add user image
+				auto& user_image = lecui::widgets::image_view::add(home, "user_image");
+				user_image
+					.png_resource(_resized_profile_image.empty() ? png_user : 0)
+					.file(_resized_profile_image)
+					.rect(lecui::rect()
+						.width(128.f)
+						.height(128.f)
+						.place(ref_rect, 50.f, 0.f)
+					)
+					.corner_radius_x(128.f / 2.f)
+					.corner_radius_y(128.f / 2.f);
+
+				user_image.events().action = [&]() {
+					lecui::open_file_params params;
+					params
+						.title("Select Image")
+						.include_all_supported_types(true)
+						.allow_multi_select(false)
+						.file_types({
+						{ "jpg", "JPG Image" },
+						{ "jpeg", "JPEG Image" },
+						{ "png", "PNG Image" },
+						{ "bmp", "Bitmap Image" },
+							});
+
+					lecui::filesystem _file_system{ *this };
+					std::vector<std::string> file = _file_system.open_file(params);
+
+					if (!file.empty()) {
+						// get the full path to the file
+						std::string full_path = file[0];
+						set_user_image(full_path);
+					}
+				};
+				user_image.events().right_click = [&]() {
+					lecui::context_menu::specs menu_specs;
+					menu_specs.items.push_back({ "Remove", png_delete });
+
+					auto selected = lecui::context_menu::context_menu()(*this, menu_specs);
+
+					if (selected == "Remove") {
+						try {
+							auto& user_image = get_image_view("home/user_image");
+							user_image
+								.png_resource(png_user)
+								.file("");
+
+							update();
+						}
+						catch (const std::exception&) {}
+					}
+				};
+
+				// add user name caption
+				auto& username_caption = lecui::widgets::label::add(home);
+				username_caption
+					.text("Username")
+					.font_size(_caption_font_size)
+					.color_text(_main_form._caption_color)
+					.rect(lecui::rect()
+						.left(_margin)
+						.width(ref_rect.width())
+						.height(_main_form._caption_height)
+						.snap_to(user_image.rect(), snap_type::bottom, 3.f * _margin));
+
+				const std::set<char> allowed_set = {
+					'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+					'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+					'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+					'.', '-', '_'
+				};
+
+				// add user name text field
+				auto& username = lecui::widgets::text_field::add(home, "username");
+				username
+					.text(_existing_user.username)
+					.prompt("e.g. 'johndoe'")
+					.allowed_characters(allowed_set)
+					.maximum_length(20)	// to-do: remove magic number
+					.rect(lecui::rect(username.rect())
+						.width(username_caption.rect().width())
+						.snap_to(username_caption.rect(), snap_type::bottom, _margin / 4.f))
+					.events().action = [&]() {
+					on_save();
+				};
+
+				// add display name caption
+				auto& display_name_caption = lecui::widgets::label::add(home);
+				display_name_caption
+					.text("Display Name")
+					.font_size(_caption_font_size)
+					.color_text(_main_form._caption_color)
+					.rect(lecui::rect(username_caption.rect())
+						.snap_to(username.rect(), snap_type::bottom, _margin));
+
+				// add session description text field
+				auto& display_name = lecui::widgets::text_field::add(home, "display_name");
+				display_name
+					.text(_existing_user.display_name)
+					.prompt("e.g. 'John Doe'")
+					.maximum_length(100)	// to-do: remove magic number
+					.rect(lecui::rect(username.rect())
+						.snap_to(display_name_caption.rect(), snap_type::bottom, _margin / 4.f))
+					.events().action = [&]() { on_save(); };
+
+				// add save button
+				auto& save_user = lecui::widgets::button::add(home, "save_user");
+				save_user
+					.text(_editing_mode ? "Save Changes" : "Save")
+					.rect(lecui::rect(save_user.rect()).width(90.f).snap_to(display_name.rect(), snap_type::bottom, _margin))
+					.events().action = [&]() { on_save(); };
+
+				_page_man.show("home");
+				return true;
+			};
+
+			// shutdown event
+			events().shutdown = [this]() {
+				try {
+					// remove the resized profile image so we can be able to delete it in the destructor
+					auto& user_image = get_image_view("home/user_image");
+					user_image
+						.png_resource(png_user)
+						.file("");
+
+					std::string error;
+					if (!_widget_man.refresh("home/user_image", error)) {}
+				}
+				catch (const std::exception&) {}
+			};
+		}
+
 		~user_form() {
 			// delete resized profile image
 			std::string error;

@@ -407,12 +407,6 @@ bool main_form::on_initialize(std::string& error) {
 		.set_size(_design_size)
 		.set_minimum(_design_size_minimum);
 
-	// add form caption handler
-	form::on_caption([this]() {
-		add_back_button();
-		_page_man.show("help");
-		}, "Click to view information about this app");
-
 	// form events
 	events().size = [this](const lecui::size&) {
 		_previous_reviews.clear();	// cause reviews to be redrawn
