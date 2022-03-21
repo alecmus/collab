@@ -269,3 +269,11 @@ const std::string& collab::cert_folder() {
 const std::string& collab::files_folder() {
 	return _d.files_folder();
 }
+
+bool collab::file_source_running() {
+	return _d.file_source_running();
+}
+
+bool collab::review_source_running() {
+	return _d.review_source_running();
+}

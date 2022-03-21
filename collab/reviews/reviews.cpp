@@ -139,75 +139,100 @@ void collab::impl::review_broadcast_sender_func(impl* p_impl) {
 		// I mean, why would it fail?
 	}
 
-	// create a broadcast sender object
-	liblec::lecnet::udp::broadcast::sender sender(REVIEW_BROADCAST_PORT);
+	while (source.starting())
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-	// loop until _stop_session_broadcast is false
-	while (true) {
-		{
-			liblec::auto_mutex lock(p_impl->_session_broadcast_mutex);
-
-			// check flag
-			if (p_impl->_stop_session_broadcast)
-				break;
-		}
-
-		std::string current_session_unique_id;
+	if (source.running()) {
+		p_impl->_log("Review source started");
 
 		{
-			liblec::auto_mutex lock(p_impl->_message_broadcast_mutex);
-			current_session_unique_id = p_impl->_current_session_unique_id;
+			liblec::auto_mutex lock(p_impl->_review_source_mutex);
+			p_impl->_review_source_running = true;
 		}
 
-		if (!current_session_unique_id.empty()) {
-			std::string error;
-			std::vector<review> local_review_list;
+		// create a broadcast sender object
+		liblec::lecnet::udp::broadcast::sender sender(REVIEW_BROADCAST_PORT);
 
-			// get review list from local database
-			if (p_impl->_collab.get_reviews(current_session_unique_id, local_review_list, error)) {
+		// loop until _stop_session_broadcast is false
+		while (source.running()) {
+			{
+				liblec::auto_mutex lock(p_impl->_session_broadcast_mutex);
 
-				// make a revies broadcast object
-				std::string serialized_review_list;
-				review_broadcast_structure cls;
+				// check flag
+				if (p_impl->_stop_session_broadcast)
+					break;
+			}
 
-				// capture source node unique id
-				cls.source_node_unique_id = p_impl->_collab.unique_id();
+			std::string current_session_unique_id;
 
-				// capture host ip addresses
-				liblec::lecnet::tcp::get_host_ips(cls.ips);
+			{
+				liblec::auto_mutex lock(p_impl->_message_broadcast_mutex);
+				current_session_unique_id = p_impl->_current_session_unique_id;
+			}
 
-				// capture local review header (excludes review text)
-				cls.review_list.reserve(local_review_list.size());
+			if (!current_session_unique_id.empty()) {
+				std::string error;
+				std::vector<review> local_review_list;
 
-				for (const auto& review : local_review_list) {
-					review_header_structure header;
-					header.unique_id = review.unique_id;
-					header.session_id = review.session_id;
-					header.time = review.time;
-					header.file_hash = review.file_hash;
-					header.sender_unique_id = review.sender_unique_id;
+				// get review list from local database
+				if (p_impl->_collab.get_reviews(current_session_unique_id, local_review_list, error)) {
 
-					cls.review_list.push_back(header);
-				}
+					// make a revies broadcast object
+					std::string serialized_review_list;
+					review_broadcast_structure cls;
 
-				// serialize the review broadcast object
-				if (serialize_review_broadcast_structure(cls, serialized_review_list, error)) {
+					// capture source node unique id
+					cls.source_node_unique_id = p_impl->_collab.unique_id();
 
-					// broadcast the serialized object
-					unsigned long actual_count = 0;
-					if (sender.send(serialized_review_list, 1, 0, actual_count, error)) {
-						// broadcast successful
+					// capture host ip addresses
+					liblec::lecnet::tcp::get_host_ips(cls.ips);
+
+					// capture local review header (excludes review text)
+					cls.review_list.reserve(local_review_list.size());
+
+					for (const auto& review : local_review_list) {
+						review_header_structure header;
+						header.unique_id = review.unique_id;
+						header.session_id = review.session_id;
+						header.time = review.time;
+						header.file_hash = review.file_hash;
+						header.sender_unique_id = review.sender_unique_id;
+
+						cls.review_list.push_back(header);
+					}
+
+					// serialize the review broadcast object
+					if (serialize_review_broadcast_structure(cls, serialized_review_list, error)) {
+
+						// broadcast the serialized object
+						unsigned long actual_count = 0;
+						if (sender.send(serialized_review_list, 1, 0, actual_count, error)) {
+							// broadcast successful
+						}
 					}
 				}
 			}
+
+			// take a breath
+			std::this_thread::sleep_for(std::chrono::milliseconds{ review_broadcast_cycle });
 		}
 
-		// take a breath
-		std::this_thread::sleep_for(std::chrono::milliseconds{ review_broadcast_cycle });
-	}
+		bool stopped_by_request = false;
 
-	while (source.starting())
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		{
+			liblec::auto_mutex lock(p_impl->_session_broadcast_mutex);
+			stopped_by_request = p_impl->_stop_session_broadcast == true;
+		}
+
+		if (!stopped_by_request)
+			p_impl->_log("Error: review source stopped");
+	}
+	else {
+		p_impl->_log("Error: review source failed to start");
+
+		liblec::auto_mutex lock(p_impl->_review_source_mutex);
+		p_impl->_review_source_running = false;
+	}
 
 	// check if the source is running
 	if (source.running()) {
@@ -216,6 +241,11 @@ void collab::impl::review_broadcast_sender_func(impl* p_impl) {
 
 		// stop the source
 		source.stop();
+	}
+
+	{
+		liblec::auto_mutex lock(p_impl->_review_source_mutex);
+		p_impl->_review_source_running = false;
 	}
 }
 
@@ -352,6 +382,11 @@ void collab::impl::review_broadcast_receiver_func(impl* p_impl) {
 			std::this_thread::sleep_for(std::chrono::milliseconds{ review_receiver_cycle });
 		}
 	}
+}
+
+bool collab::impl::review_source_running() {
+	liblec::auto_mutex lock(_review_source_mutex);
+	return _review_source_running;
 }
 
 bool collab::create_review(const review& review, std::string& error) {

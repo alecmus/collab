@@ -174,6 +174,14 @@ public:
 	// concurrency control related to the message broadcast thread
 	liblec::mutex _message_broadcast_mutex;
 
+	// concurrency control related to the file source
+	liblec::mutex _file_source_mutex;
+	bool _file_source_running = false;
+
+	// concurrency control related to the review source
+	liblec::mutex _review_source_mutex;
+	bool _review_source_running = false;
+
 	impl(collab& collab);
 	~impl();
 
@@ -198,4 +206,7 @@ public:
 
 	static void review_broadcast_sender_func(impl* p_impl);
 	static void review_broadcast_receiver_func(impl* p_impl);
+
+	bool file_source_running();
+	bool review_source_running();
 };

@@ -393,8 +393,11 @@ lecui::containers::pane& main_form::add_files_pane(lecui::containers::pane& coll
 			.snap_to(content_pane.rect(), snap_type::bottom, 0.f))
 		.on_resize(lecui::resize_params()
 			.y_rate(100.f))
-		.events().action = [do_add_file]() {
-		do_add_file();
+		.events().action = [this, do_add_file]() {
+		if (_collab.file_source_running())
+			do_add_file();
+		else
+			message("Error: file source is not running");
 	};
 
 	return files_pane;

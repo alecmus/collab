@@ -208,6 +208,14 @@ public:
 	/// <summary>Get the full path to the files folder.</summary>
 	/// <returns>Returns the full path to the files folder.</returns>
 	const std::string& files_folder();
+
+	/// <summary>Check if the file source is running.</summary>
+	/// <returns>Returns true if the file source is running, else false.</returns>
+	bool file_source_running();
+
+	/// <summary>Check if the review source is running.</summary>
+	/// <returns>Returns true if the review source is running, else false.</returns>
+	bool review_source_running();
 	
 	//------------------------------------------------------------------------------------------------
 	// users

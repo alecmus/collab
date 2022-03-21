@@ -355,203 +355,207 @@ void main_form::update_session_chat_files() {
 						}
 
 						if (selected == "Review") {
-							try {
-								_current_session_file_hash.clear();
-
-								auto& files_pane = get_pane("home/collaboration_pane/files_pane");
-								auto& content_pane = get_pane("home/collaboration_pane/files_pane/content");
-
-								// close review info pane
-								_page_man.close("home/collaboration_pane/files_pane/review_info");
-
-								std::tm time = { };
-								localtime_s(&time, &file.time);
-
-								std::stringstream ss;
-								ss << std::put_time(&time, "%d %B %Y, %H:%M");
-								std::string send_date = ss.str();
-
-								std::string display_name;
-
-								// try to get this user's display name
+							if (_collab.review_source_running()) {
 								try {
-									// fetch from local database
-									std::string _display_name;
-									if (_collab.get_user_display_name(file.sender_unique_id, _display_name, error) && !_display_name.empty()) {
-										// capture
-										display_name = _display_name;
+									_current_session_file_hash.clear();
+
+									auto& files_pane = get_pane("home/collaboration_pane/files_pane");
+									auto& content_pane = get_pane("home/collaboration_pane/files_pane/content");
+
+									// close review info pane
+									_page_man.close("home/collaboration_pane/files_pane/review_info");
+
+									std::tm time = { };
+									localtime_s(&time, &file.time);
+
+									std::stringstream ss;
+									ss << std::put_time(&time, "%d %B %Y, %H:%M");
+									std::string send_date = ss.str();
+
+									std::string display_name;
+
+									// try to get this user's display name
+									try {
+										// fetch from local database
+										std::string _display_name;
+										if (_collab.get_user_display_name(file.sender_unique_id, _display_name, error) && !_display_name.empty()) {
+											// capture
+											display_name = _display_name;
+										}
+										else {
+											// use shortened version of user's unique id
+											display_name = shorten_unique_id(file.sender_unique_id);
+										}
 									}
-									else {
+									catch (const std::exception&) {
 										// use shortened version of user's unique id
 										display_name = shorten_unique_id(file.sender_unique_id);
 									}
-								}
-								catch (const std::exception&) {
-									// use shortened version of user's unique id
-									display_name = shorten_unique_id(file.sender_unique_id);
-								}
 
-								// create review input pane
-								auto& review_input = lecui::containers::pane::add(files_pane, "review_input", 0.f);
-								review_input
-									.rect(lecui::rect(files_pane.size())
-										.top(content_pane.rect().top())
-										.left(content_pane.rect().right())
-										.right(files_pane.size().get_width()))
-									.on_resize(lecui::resize_params()
-										.width_rate(100.f)
-										.height_rate(100.f));
+									// create review input pane
+									auto& review_input = lecui::containers::pane::add(files_pane, "review_input", 0.f);
+									review_input
+										.rect(lecui::rect(files_pane.size())
+											.top(content_pane.rect().top())
+											.left(content_pane.rect().right())
+											.right(files_pane.size().get_width()))
+										.on_resize(lecui::resize_params()
+											.width_rate(100.f)
+											.height_rate(100.f));
 
-								// make pane invisible
-								review_input
-									.border(0.f);
-								review_input
-									.color_fill().alpha(0);
+									// make pane invisible
+									review_input
+										.border(0.f);
+									review_input
+										.color_fill().alpha(0);
 
-								auto ref_rect = lecui::rect(review_input.size());
-								ref_rect.left() += _margin;
-								ref_rect.right() -= _margin;
-								ref_rect.top() += _margin;
-								ref_rect.bottom() -= _margin;
+									auto ref_rect = lecui::rect(review_input.size());
+									ref_rect.left() += _margin;
+									ref_rect.right() -= _margin;
+									ref_rect.top() += _margin;
+									ref_rect.bottom() -= _margin;
 
-								auto& title = lecui::widgets::label::add(review_input, "title");
-								title
-									.text("<strong>NEW FILE REVIEW</strong>")
-									.rect(lecui::rect()
-										.left(_margin)
-										.width(ref_rect.width())
-										.top(_margin)
-										.height(title.rect().height()))
-									.on_resize(lecui::resize_params().width_rate(100.f));
+									auto& title = lecui::widgets::label::add(review_input, "title");
+									title
+										.text("<strong>NEW FILE REVIEW</strong>")
+										.rect(lecui::rect()
+											.left(_margin)
+											.width(ref_rect.width())
+											.top(_margin)
+											.height(title.rect().height()))
+										.on_resize(lecui::resize_params().width_rate(100.f));
 
-								// add file image
-								auto& file_image = lecui::widgets::image_view::add(review_input, "file_image");
-								file_image
-									.rect(lecui::rect()
-										.left(_margin)
-										.top(title.rect().bottom() + 2.f * _margin)
-										.width(40.f)
-										.height(40.f))
-									.png_resource(map_extension_to_resource(file.extension));
+									// add file image
+									auto& file_image = lecui::widgets::image_view::add(review_input, "file_image");
+									file_image
+										.rect(lecui::rect()
+											.left(_margin)
+											.top(title.rect().bottom() + 2.f * _margin)
+											.width(40.f)
+											.height(40.f))
+										.png_resource(map_extension_to_resource(file.extension));
 
-								auto& file_name = lecui::widgets::label::add(review_input, "file_name");
-								file_name
-									.text("<strong>" + file.name + "</strong><span style = 'font-size: 8.0pt;'>" + file.extension + "</span>")
-									.rect(lecui::rect(file_image.rect())
-										.top(file_image.rect().top())
-										.height(file_name.rect().height())
-										.left(file_image.rect().right() + _margin)
-										.right(ref_rect.right()))
-									.on_resize(lecui::resize_params().width_rate(100.f));
+									auto& file_name = lecui::widgets::label::add(review_input, "file_name");
+									file_name
+										.text("<strong>" + file.name + "</strong><span style = 'font-size: 8.0pt;'>" + file.extension + "</span>")
+										.rect(lecui::rect(file_image.rect())
+											.top(file_image.rect().top())
+											.height(file_name.rect().height())
+											.left(file_image.rect().right() + _margin)
+											.right(ref_rect.right()))
+										.on_resize(lecui::resize_params().width_rate(100.f));
 
-								auto& additional = lecui::widgets::label::add(review_input, "additional");
-								additional
-									.text("<strong>" + leccore::format_size(file.size, 2) + "</strong>, shared by <em>" + display_name + "</em>")
-									.font_size(_caption_font_size)
-									.color_text(_caption_color)
-									.rect(lecui::rect(file_name.rect())
-										.height(_caption_height)
-										.snap_to(file_name.rect(), snap_type::bottom, 0.f))
-									.on_resize(lecui::resize_params().width_rate(100.f));
+									auto& additional = lecui::widgets::label::add(review_input, "additional");
+									additional
+										.text("<strong>" + leccore::format_size(file.size, 2) + "</strong>, shared by <em>" + display_name + "</em>")
+										.font_size(_caption_font_size)
+										.color_text(_caption_color)
+										.rect(lecui::rect(file_name.rect())
+											.height(_caption_height)
+											.snap_to(file_name.rect(), snap_type::bottom, 0.f))
+										.on_resize(lecui::resize_params().width_rate(100.f));
 
-								auto& shared_on = lecui::widgets::label::add(review_input, "shared_on");
-								shared_on
-									.text("Shared on " + send_date)
-									.font_size(_caption_font_size)
-									.color_text(_caption_color)
-									.rect(lecui::rect(file_name.rect())
-										.height(_caption_height)
-										.snap_to(additional.rect(), snap_type::bottom, 0.f))
-									.on_resize(lecui::resize_params().width_rate(100.f));
+									auto& shared_on = lecui::widgets::label::add(review_input, "shared_on");
+									shared_on
+										.text("Shared on " + send_date)
+										.font_size(_caption_font_size)
+										.color_text(_caption_color)
+										.rect(lecui::rect(file_name.rect())
+											.height(_caption_height)
+											.snap_to(additional.rect(), snap_type::bottom, 0.f))
+										.on_resize(lecui::resize_params().width_rate(100.f));
 
-								auto& file_description = lecui::widgets::label::add(review_input, "file_description");
-								file_description
-									.text(file.description)
-									.font_size(_caption_font_size)
-									.rect(lecui::rect()
-										.height(_caption_height)
-										.snap_to(shared_on.rect(), snap_type::bottom, _margin / 2.f)
-										.left(file_image.rect().left())
-										.right(shared_on.rect().right()))
-									.on_resize(lecui::resize_params().width_rate(100.f));
+									auto& file_description = lecui::widgets::label::add(review_input, "file_description");
+									file_description
+										.text(file.description)
+										.font_size(_caption_font_size)
+										.rect(lecui::rect()
+											.height(_caption_height)
+											.snap_to(shared_on.rect(), snap_type::bottom, _margin / 2.f)
+											.left(file_image.rect().left())
+											.right(shared_on.rect().right()))
+										.on_resize(lecui::resize_params().width_rate(100.f));
 
-								// add input html editor
-								auto& input = lecui::widgets::html_editor::add(review_input, "input");
-								input
-									.font(_font)
-									.font_size(_review_font_size)
-									.alignment(lecui::text_alignment::justified)
-									.rect(lecui::rect()
-										.left(_margin)
-										.width(ref_rect.width())
-										.top(file_description.rect().bottom() + _margin)
-										.bottom(ref_rect.bottom() - 25.f - _margin))
-									.on_resize(lecui::resize_params()
-										.width_rate(100.f)
-										.height_rate(100.f));
+									// add input html editor
+									auto& input = lecui::widgets::html_editor::add(review_input, "input");
+									input
+										.font(_font)
+										.font_size(_review_font_size)
+										.alignment(lecui::text_alignment::justified)
+										.rect(lecui::rect()
+											.left(_margin)
+											.width(ref_rect.width())
+											.top(file_description.rect().bottom() + _margin)
+											.bottom(ref_rect.bottom() - 25.f - _margin))
+										.on_resize(lecui::resize_params()
+											.width_rate(100.f)
+											.height_rate(100.f));
 
-								auto do_add_review = [&]() {
-									std::string error;
+									auto do_add_review = [&]() {
+										std::string error;
 
-									try {
-										auto& input = get_html_editor("home/collaboration_pane/files_pane/review_input/input");
+										try {
+											auto& input = get_html_editor("home/collaboration_pane/files_pane/review_input/input");
 
-										const auto& text = input.text();
+											const auto& text = input.text();
 
-										if (text.empty())
-											return;
+											if (text.empty())
+												return;
 
-										// make review object
-										collab::review review;
+											// make review object
+											collab::review review;
 
-										// make review unique id
-										review.unique_id = leccore::hash_string::uuid();
+											// make review unique id
+											review.unique_id = leccore::hash_string::uuid();
 
-										// capture review time
-										review.time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+											// capture review time
+											review.time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
-										// capture session unique id
-										review.session_id = _current_session_unique_id;
+											// capture session unique id
+											review.session_id = _current_session_unique_id;
 
-										// capture the file hash
-										review.file_hash = file.hash;
+											// capture the file hash
+											review.file_hash = file.hash;
 
-										// capture the sender's unique id
-										review.sender_unique_id = _collab.unique_id();
+											// capture the sender's unique id
+											review.sender_unique_id = _collab.unique_id();
 
-										// capture the review text
-										review.text = text;
+											// capture the review text
+											review.text = text;
 
-										if (_collab.create_review(review, error)) {
-											// review created successfully
+											if (_collab.create_review(review, error)) {
+												// review created successfully
 
-											// close review input pane
-											_page_man.close("home/collaboration_pane/files_pane/review_input");
+												// close review input pane
+												_page_man.close("home/collaboration_pane/files_pane/review_input");
+											}
 										}
-									}
-									catch (const std::exception& e) {
-										message(e.what());
-									}
-								};
+										catch (const std::exception& e) {
+											message(e.what());
+										}
+									};
 
-								// add button
-								auto& add_review = lecui::widgets::button::add(review_input, "add_review");
-								add_review
-									.text("Add review")
-									.rect(lecui::rect(add_review.rect())
-										.width(input.rect().width())
-										.height(25.f)
-										.snap_to(input.rect(), snap_type::bottom, _margin))
-									.on_resize(lecui::resize_params()
-										.x_rate(50.f)
-										.y_rate(100.f))
-									.events().action = [do_add_review]() {
-									do_add_review();
-								};
+									// add button
+									auto& add_review = lecui::widgets::button::add(review_input, "add_review");
+									add_review
+										.text("Add review")
+										.rect(lecui::rect(add_review.rect())
+											.width(input.rect().width())
+											.height(25.f)
+											.snap_to(input.rect(), snap_type::bottom, _margin))
+										.on_resize(lecui::resize_params()
+											.x_rate(50.f)
+											.y_rate(100.f))
+										.events().action = [do_add_review]() {
+										do_add_review();
+									};
+								}
+								catch (const std::exception& e) {
+									message(e.what());
+								}
 							}
-							catch (const std::exception& e) {
-								message(e.what());
-							}
+							else
+								message("Error: review source not running");
 						}
 					};
 
