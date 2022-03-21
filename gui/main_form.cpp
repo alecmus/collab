@@ -105,7 +105,7 @@ void main_form::on_update_check() {
 
 	// update status label
 	try {
-		auto& text = get_label("home/update_status").text();
+		auto& text = get_label("status::top/update_status").text();
 		const size_t dot_count = std::count(text.begin(), text.end(), '.');
 
 		if (dot_count == 0)
@@ -127,7 +127,7 @@ void main_form::on_update_check() {
 	if (!_check_update.result(_update_info, error)) {
 		// update status label
 		try {
-			get_label("home/update_status").text("Error while checking for updates");
+			get_label("status::top/update_status").text("Error while checking for updates");
 			update();
 			close_update_status();
 		}
@@ -147,7 +147,7 @@ void main_form::on_update_check() {
 
 		// update status label
 		try {
-			get_label("home/update_status").text("Update available: " + _update_info.version);
+			get_label("status::top/update_status").text("Update available: " + _update_info.version);
 			update();
 		}
 		catch (const std::exception&) {}
@@ -171,7 +171,7 @@ void main_form::on_update_check() {
 
 		// update status label
 		try {
-			get_label("home/update_status").text("Downloading update ...");
+			get_label("status::top/update_status").text("Downloading update ...");
 			update();
 		}
 		catch (const std::exception&) {}
@@ -183,7 +183,7 @@ void main_form::on_update_check() {
 	else {
 		// update status label
 		try {
-			get_label("home/update_status").text("Latest version is already installed");
+			get_label("status::top/update_status").text("Latest version is already installed");
 			update();
 			close_update_status();
 		}
@@ -199,7 +199,7 @@ void main_form::on_update_download() {
 	if (_download_update.downloading(progress)) {
 		// update status label
 		try {
-			auto& text = get_label("home/update_status").text();
+			auto& text = get_label("status::top/update_status").text();
 			text = "Downloading update ...";
 
 			if (progress.file_size > 0)
@@ -223,7 +223,7 @@ void main_form::on_update_download() {
 	if (!_download_update.result(fullpath, error)) {
 		// update status label
 		try {
-			get_label("home/update_status").text("Downloading update failed");
+			get_label("status::top/update_status").text("Downloading update failed");
 			update();
 			close_update_status();
 		}
@@ -252,7 +252,7 @@ void main_form::on_update_download() {
 	if (!hash.result(results, error)) {
 		// update status label
 		try {
-			get_label("home/update_status").text("Update file integrity check failed");
+			get_label("status::top/update_status").text("Update file integrity check failed");
 			update();
 			close_update_status();
 		}
@@ -268,7 +268,7 @@ void main_form::on_update_download() {
 		if (result_hash != _update_info.hash) {
 			// update status label
 			try {
-				get_label("home/update_status").text("Update files seem to be corrupt");
+				get_label("status::top/update_status").text("Update files seem to be corrupt");
 				update();
 				close_update_status();
 			}
@@ -286,7 +286,7 @@ void main_form::on_update_download() {
 
 		// update status label
 		try {
-			get_label("home/update_status").text("Update file integrity check failed");
+			get_label("status::top/update_status").text("Update file integrity check failed");
 			update();
 			close_update_status();
 		}
@@ -305,7 +305,7 @@ void main_form::on_update_download() {
 
 		// update status label
 		try {
-			get_label("home/update_status").text("Downloading update failed");	// to-do: improve
+			get_label("status::top/update_status").text("Downloading update failed");	// to-do: improve
 			update();
 			close_update_status();
 		}
@@ -318,7 +318,7 @@ void main_form::on_update_download() {
 
 	// update status label
 	try {
-		get_label("home/update_status")
+		get_label("status::top/update_status")
 			.text("v" + _update_info.version + " ready to be installed")
 			.events().action = [this]() {
 			if (prompt("Would you like to apply the update now?")) {
@@ -390,23 +390,9 @@ void main_form::create_update_status() {
 	_update_details_displayed = true;
 
 	try {
-		auto& home = get_page("home");
-		lecui::rect ref = lecui::rect()
-			.left(_margin)
-			.top(_margin)
-			.width(home.size().get_width() - 2.f * _margin)
-			.height(home.size().get_height() - 2.f * _margin);
-
-		// add update status label
-		auto& update_status = lecui::widgets::label::add(home, "update_status");
+		auto& update_status = get_label("status::top/update_status");
 		update_status
-			.text("Checking for updates")
-			.color_text(lecui::color().red(100).green(100).blue(100))
-			.font_size(8.f)
-			.on_resize(lecui::resize_params()
-				.y_rate(100.f))
-			.rect().height(15.f).width(ref.width())
-			.place(ref, 0.f, 100.f);
+			.text("Checking for updates");
 
 		// update the ui
 		update();
@@ -426,11 +412,10 @@ void main_form::on_close_update_status() {
 	_timer_man.stop("update_status_timer");
 
 	try {
-		auto& home = get_page("home");
-		auto& update_status_specs = get_label("home/update_status");
+		auto& update_status = get_label("status::top/update_status");
+		update_status
+			.text().clear();
 
-		// close update status label
-		_widget_man.close("home/update_status");
 		update();
 	}
 	catch (const std::exception&) {}

@@ -65,7 +65,7 @@ void main_form::add_top_status_pane() {
 
 	avatar.badge().font_size(6.f).text(" ").color(_online);
 
-	// add session unique id label
+	// add current session id label
 	auto& session_id = lecui::widgets::label::add(status_pane, "session_id");
 	session_id
 		.rect(lecui::rect(ref_rect)
@@ -76,6 +76,16 @@ void main_form::add_top_status_pane() {
 		.color_text(_caption_color)
 		.on_resize(lecui::resize_params()
 			.x_rate(100.f));
+
+	// add update status label
+	auto& update_status = lecui::widgets::label::add(status_pane, "update_status");
+	update_status
+		.rect(lecui::rect(session_id.rect()))
+		.alignment(lecui::text_alignment::right)
+		.paragraph_alignment(lecui::paragraph_alignment::top)
+		.font_size(_caption_font_size)
+		.color_text(_caption_color)
+		.on_resize(session_id.on_resize());
 }
 
 void main_form::set_avatar(const std::string& image_data) {
